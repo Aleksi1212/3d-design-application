@@ -1,5 +1,6 @@
 import { useRef } from "react"
 import useScrollEffect from "./hooks/scrollEffectHook"
+import Image from "next/image"
 
 import logo from '../images/logo.png'
 import arrow from '../images/arrowDown.png'
@@ -39,7 +40,8 @@ function Start() {
 
                 <div className="text-white text-[20rem] inline-block ml-10">
                     <h1>Arcus</h1>
-                    <img src={logo} alt="logo" className="ml-[50rem] mt-[-19rem]" />
+                    {/* <img src={logo} alt="logo" className="ml-[50rem] mt-[-19rem]" /> */}
+                    <Image className="ml-[50rem] mt-[-19rem]" src={logo} alt="logo" />
                     <div className="text-[4rem] w-[40%] mt-10">
                         <h1>Design Your Own Look!</h1>
                     </div>
@@ -47,7 +49,8 @@ function Start() {
 
                 <div className="text-white text-[1.5rem] ml-10 absolute bottom-10 flex justify-between w-[20rem]">
                     <h1>Scroll Down Learn More</h1>
-                    <img src={arrow} alt="arrow" ref={arrowRef} width={35}/>
+                    {/* <img src={arrow} alt="arrow" ref={arrowRef} width={35}/> */}
+                    <Image src={arrow} alt="arrow" ref={arrowRef} width={35} />
                 </div>
             </section>
 
