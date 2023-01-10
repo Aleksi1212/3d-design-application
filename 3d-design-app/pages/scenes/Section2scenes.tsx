@@ -1,38 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import useWindowDimensions from '../hooks/windowDimensionsHook'
+import { useMemo, useRef } from 'react'
 
 import * as THREE from 'three'
 import { OrbitControls } from '@react-three/drei'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import vertexShader from './shaders/vertexShader'
 import fragmentShader from './shaders/fragmentShader'
 
-function Section1Scene() {
-    const mesh = useRef<THREE.Mesh>(null!)
-    const { camera } = useThree()
-    const [mobile, setMobile] = useState(true)
-
-    const dimensions = useWindowDimensions()
-
-    useEffect(() => {
-        camera.position.set(10, 2, 5)  
-        
-        if (dimensions.width < 900) {
-            setMobile(false)
-        } else {
-            setMobile(true)
-        }
-    }, [camera, dimensions])
-
-    return (
-        <mesh ref={mesh}>
-            <gridHelper args={[200, 10]} />
-            <OrbitControls enableZoom={false} minDistance={100} args={[camera]} enableRotate={mobile} />
-        </mesh>
-    )
-}
-
-function Section2Scene() {
+function Blob() {
     const mesh = useRef<THREE.Mesh<THREE.IcosahedronGeometry, THREE.ShaderMaterial>>(null!)
     const hover = useRef<boolean>(false)
     const uniforms = useMemo(() => {
@@ -58,8 +32,6 @@ function Section2Scene() {
             )
         }
     })
-    console.log('test');
-    
 
     return (
         <mesh 
@@ -71,11 +43,16 @@ function Section2Scene() {
         >
             <icosahedronBufferGeometry args={[2, 20]} />
             <shaderMaterial vertexShader={vertexShader} fragmentShader={fragmentShader} uniforms={uniforms} />
+            <OrbitControls enableZoom={false} />
         </mesh>
     )
 }
 
-export {
-    Section1Scene,
-    Section2Scene
+function Pyramid() {
+    return (
+        <mesh>
+        </mesh>
+    )
 }
+
+export default Blob
