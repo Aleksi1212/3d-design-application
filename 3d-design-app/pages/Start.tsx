@@ -7,7 +7,7 @@ import arrow from '../public/images/arrowDown.png'
 import { gsap } from "gsap"
 
 import { Canvas } from '@react-three/fiber'
-import StartPageScene from "./scenes/Startpagescene"
+import { Section1Scene, Section2Scene } from "./scenes/Startpagescenes"
 
 function Start() {
     const scrollEffect = useScrollEffect()
@@ -22,7 +22,7 @@ function Start() {
             <section style={scrollEffect.sectionStyle1} className="sections fixed bg-transparent top-0">
                 <div className="fixed top-0 left-0 w-full h-[100vh]">
                     <Canvas>
-                        <StartPageScene />
+                        <Section1Scene />
                     </Canvas>
                 </div>
 
@@ -52,9 +52,18 @@ function Start() {
                 </div>
             </section>
 
-            <section style={scrollEffect.sectionStyle2} className="sections bg-[#F55D50]">
-                <div className="bg-blue-500 inline-block">
-                    <h1></h1>
+            <section style={scrollEffect.sectionStyle2} className="sections bg-cyan-500">
+                <div className="absolute w-full h-[100vh]">
+                    <Canvas camera={{  position: [0.0, 0.0, 8.0] }}>
+                        <Section2Scene />
+                    </Canvas>
+                </div>
+
+                <div className=" top-0 left-0 flex justify-center items-center w-full h-[100vh]">
+                    <div className="inline-block absolute">
+                        <h1 className="text-[1.2rem] text-white">START DESIGNING YOUR LOOKS WITH</h1>
+                        <h1 className="flex justify-center text-[7rem] text-white opacity-50 mt-[-1.5rem]">Arcus</h1>
+                    </div>
                 </div>
             </section>
 
