@@ -2,8 +2,8 @@ import { useRef } from "react"
 import useScrollEffect from "./hooks/scrollEffectHook"
 import Image from "next/image"
 
-import logo from '../images/logo.png'
-import arrow from '../images/arrowDown.png'
+import logo from '../public/images/logo.png'
+import arrow from '../public/images/arrowDown.png'
 import { gsap } from "gsap"
 
 import { Canvas } from '@react-three/fiber'
@@ -40,22 +40,22 @@ function Start() {
 
                 <div className="text-white text-[20rem] inline-block ml-10">
                     <h1>Arcus</h1>
-                    {/* <img src={logo} alt="logo" className="ml-[50rem] mt-[-19rem]" /> */}
                     <Image className="ml-[50rem] mt-[-19rem]" src={logo} alt="logo" />
                     <div className="text-[4rem] w-[40%] mt-10">
                         <h1>Design Your Own Look!</h1>
                     </div>
                 </div>
 
-                <div className="text-white text-[1.5rem] ml-10 absolute bottom-10 flex justify-between w-[20rem]">
-                    <h1>Scroll Down Learn More</h1>
-                    {/* <img src={arrow} alt="arrow" ref={arrowRef} width={35}/> */}
+                <div className="text-white text-[1.5rem] ml-10 absolute bottom-10 flex justify-between w-[21rem]">
+                    <h1>Scroll Down To Learn More</h1>
                     <Image src={arrow} alt="arrow" ref={arrowRef} width={35} />
                 </div>
             </section>
 
-            <section style={scrollEffect.sectionStyle2} className="flex justify-center items-center sections bg-red-500">
-                <h1>hello</h1>
+            <section style={scrollEffect.sectionStyle2} className="sections bg-[#F55D50]">
+                <div className="bg-blue-500 inline-block">
+                    <h1></h1>
+                </div>
             </section>
 
             <section style={scrollEffect.sectionStyle3} className="sections bg-blue-500 absolute top-[200%]">
