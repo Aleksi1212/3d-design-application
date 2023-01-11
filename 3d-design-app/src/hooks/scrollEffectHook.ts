@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
 function useScrollEffect() {
     const [scrollY, setScrollY] = useState(0)
@@ -10,7 +10,7 @@ function useScrollEffect() {
             setScrollY(window.scrollY)
         }
 
-        if (scrollY >= window.innerHeight) {
+        if (scrollY > window.innerHeight) {
             setPosition('fixed')
             setTop(0)
         } else {
@@ -20,7 +20,7 @@ function useScrollEffect() {
 
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
-    }, [scrollY])    
+    }, [])
 
     const sectionStyle1: any = {
         xIndex: scrollY > 0 ? 1 : -1

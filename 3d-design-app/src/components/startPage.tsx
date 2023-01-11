@@ -1,31 +1,32 @@
-import { useRef } from "react"
-import useScrollEffect from "./hooks/scrollEffectHook"
-import Image from "next/image"
+'use client';
 
-import logo from '../public/images/logo.png'
-import arrow from '../public/images/arrowDown.png'
-import { gsap } from "gsap"
+import { useRef } from "react";
+import useScrollEffect from "../hooks/scrollEffectHook";
+import Image from "next/image";
 
-import { Canvas } from '@react-three/fiber'
-import Section1Scene from "./scenes/Section1scene"
-import Blob from "./scenes/Section2scenes"
+import logo from '../images/logo.png'
+import arrow from '../images/arrowDown.png'
+import { gsap } from "gsap";
 
-import Typewriter from "typewriter-effect";
+import { Canvas } from "@react-three/fiber";
+import Grid from "../scenes/section1Scene";
+import Blob from "../scenes/section2Scene";
 
-function Start() {
+import Typewriter from 'typewriter-effect'
+
+function StartPage() {
     const scrollEffect = useScrollEffect()
     const arrowRef = useRef<HTMLImageElement>(null)
-    
-    const tl = gsap.timeline({defaults: {duration: .75}})
-    
+
+    const tl = gsap.timeline({ defaults: {duration: .75} })
     tl.fromTo(arrowRef.current, {y: 0}, {y: -20, yoyo: true, repeat: Infinity})
-    
+
     return (
         <>
             <section style={scrollEffect.sectionStyle1} className="sections bg-transparent fixed top-0">
                 <div className="fixed top-0 w-full h-[100vh]">
                     <Canvas>
-                        <Section1Scene />
+                        <Grid />
                     </Canvas>
                 </div>
 
@@ -140,4 +141,4 @@ function Start() {
     )
 }
 
-export default Start
+export default StartPage

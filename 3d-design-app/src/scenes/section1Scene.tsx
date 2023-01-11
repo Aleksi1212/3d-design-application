@@ -5,7 +5,7 @@ import * as THREE from 'three'
 import { OrbitControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 
-function Section1Scene() {
+function Grid() {
     const mesh = useRef<THREE.Mesh>(null!)
     const { camera } = useThree()
     const [mobile, setMobile] = useState(true)
@@ -30,4 +30,4 @@ function Section1Scene() {
     )
 }
 
-export default Section1Scene
+export default Grid
