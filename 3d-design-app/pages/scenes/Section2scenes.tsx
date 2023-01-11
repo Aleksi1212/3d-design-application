@@ -6,7 +6,7 @@ import { useFrame } from '@react-three/fiber'
 import vertexShader from './shaders/vertexShader'
 import fragmentShader from './shaders/fragmentShader'
 
-function Blob() {
+function Blob(props: any) {
     const mesh = useRef<THREE.Mesh<THREE.IcosahedronGeometry, THREE.ShaderMaterial>>(null!)
     const hover = useRef<boolean>(false)
     const uniforms = useMemo(() => {
@@ -24,11 +24,11 @@ function Blob() {
         const { clock } = state
 
         if (mesh.current) {
-            mesh.current.material.uniforms.u_time.value = .4*clock.getElapsedTime()
+            mesh.current.material.uniforms.u_time.value = props.speed*clock.getElapsedTime()
 
             mesh.current.material.uniforms.u_intensity.value = THREE.MathUtils.lerp(
                 mesh.current.material.uniforms.u_intensity.value,
-                hover.current ? 1 : .15, .02
+                hover.current ? props.hover : .15, .02
             )
         }
     })
@@ -44,13 +44,6 @@ function Blob() {
             <icosahedronBufferGeometry args={[2, 20]} />
             <shaderMaterial vertexShader={vertexShader} fragmentShader={fragmentShader} uniforms={uniforms} />
             <OrbitControls enableZoom={false} />
-        </mesh>
-    )
-}
-
-function Pyramid() {
-    return (
-        <mesh>
         </mesh>
     )
 }

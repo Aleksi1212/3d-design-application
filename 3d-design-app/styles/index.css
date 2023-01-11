@@ -4,16 +4,22 @@
 
 @layer components {
   .sections {
-     @apply w-full h-[100vh] left-0 
+     @apply w-full h-[100vh] left-0
   }
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Jost&display=swap');
 
 html, body {
   padding: 0;
   margin: 0;
-  font-family: 'Jost', sans-serif;
   overflow-x: hidden;
   background-color: black;
+}
+
+.lastSection {
+  width: 100%;
+  height: 150vh;
+  left: 0;
+  background: rgb(45,45,45);
+  background: linear-gradient(360deg, rgba(45,45,45,1) 43%, rgba(52,52,52,1) 49%, rgba(61,61,61,1) 54%);
 }
