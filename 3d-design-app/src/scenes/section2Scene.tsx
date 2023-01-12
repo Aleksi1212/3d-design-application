@@ -43,7 +43,6 @@ function Blob(props: any) {
         >
             <icosahedronBufferGeometry args={[2, 20]} />
             <shaderMaterial vertexShader={vertexShader} fragmentShader={fragmentShader} uniforms={uniforms} />
-            <OrbitControls enableZoom={false} />
         </mesh>
     )
 }

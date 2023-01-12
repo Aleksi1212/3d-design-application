@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import useScrollEffect from "../hooks/scrollEffectHook";
 import Image from "next/image";
+import Link from "next/link";
 
 import logo from '../images/logo.png'
 import arrow from '../images/arrowDown.png'
@@ -33,11 +34,11 @@ function StartPage() {
                 <nav className="flex justify-end h-16 w-full absolute">
                     <div className="flex justify-evenly w-72 pt-5 mr-5">
                         <button className="bg-black w-[7rem] h-[3rem] flex justify-center items-center text-white border-2 rounded-[10px]">
-                            <a href="">Log In</a>
+                            <Link href="/logIn" className="w-full h-full flex justify-center items-center">Log In</Link>
                         </button>
 
                         <button className="bg-white w-[7rem] h-[3rem] flex justify-center items-center rounded-[10px]">
-                            <a href="">Sign Up</a>
+                            <Link href="/signUp" className="w-full h-full flex justify-center items-center">Sign Up</Link>
                         </button>
                     </div>
                 </nav>
@@ -67,7 +68,7 @@ function StartPage() {
                     </div>
                 </div>
 
-                <div className="text-white text-[1.5rem] ml-10 absolute bottom-10 flex justify-between w-[21rem]">
+                <div className="text-white text-[1.5rem] ml-10 absolute bottom-10 flex justify-between w-[22rem]">
                     <h1>Scroll Down To Learn More</h1>
                     <Image src={arrow} alt="arrow" ref={arrowRef} width={35} />
                 </div>
@@ -84,24 +85,28 @@ function StartPage() {
                     <Canvas camera={{ position: [0, 0, 10] }}>
                         <Blob hover={.5} speed={.7} />
                     </Canvas>
+                    <h1 className="blobContent">Free</h1>
                 </div>
 
                 <div className="absolute w-[20rem] h-[20rem] bottom-36">
                     <Canvas camera={{ position: [0, 0, 12] }}>
                         <Blob hover={.6} speed={.2} />
                     </Canvas>
+                    <h1 className="blobContent text-lg w-14 top-[42%]">Open Source</h1>
                 </div>
 
                 <div className="absolute w-[20rem] h-[20rem] left-[37rem] top-10">
                     <Canvas camera={{ position: [0, 0, 6] }}>
                         <Blob hover={.8} speed={.3} />
                     </Canvas>
+                    <h1 className="blobContent text-4xl left-[40%] top-[44%]">Fast</h1>
                 </div>
 
                 <div className="absolute w-[20rem] h-[20rem] right-40 bottom-0">
                     <Canvas camera={{ position: [0, 0, 6] }}>
                         <Blob hover={.9} speed={.5} />
                     </Canvas>
+                    <h1 className="blobContent left-[32%]">High Quality</h1>
                 </div>
 
                 <div className="flex justify-center items-center w-full h-[100vh]">
@@ -120,19 +125,19 @@ function StartPage() {
                             <h1>Free And Open Source</h1>
                         </div>
                         
-                        <button className="bg-cyan-300 rounded-[50px] w-[15rem] h-[5rem] text-2xl font-medium shadow-xl">
-                            <a href="">Get Started</a>
-                        </button>
+                        <Link href="/signUp" className="button">
+                            Get Started
+                        </Link>
                     </div>
 
                     <div className="h-[45rem] flex flex-col justify-between items-center">
                         <div className="box w-[25rem] h-[20rem] shadow-xl text-cyan-300 text-2xl flex justify-center items-center">
                             <h1>High Quality</h1>
                         </div>
-                        
-                        <button className="bg-cyan-300 rounded-[50px] w-[15rem] h-[5rem] text-2xl font-medium shadow-xl">
-                            <a href="">Back To Top</a>
-                        </button>
+
+                        <Link href="/" className="button">
+                            Back To Top
+                        </Link>
                     </div>
                 </div>
 
