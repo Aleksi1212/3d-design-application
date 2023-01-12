@@ -118,10 +118,15 @@ function StartPage() {
             </section>
 
             <section style={scrollEffect.sectionStyle3} className="lastSection absolute top-[200%]">
+                <div className="w-full h-[40%]">
+                    <Canvas camera={{ position: [0, 10, 20] }}>
+                        <Grid />
+                    </Canvas>
+                </div>
                 <div className="absolute w-full flex justify-evenly top-[40%]">
 
                     <div className="h-[45rem] flex flex-col justify-between items-center">
-                        <div className="box w-[25rem] h-[20rem] rounded-lg text-cyan-300 text-2xl flex justify-center items-center">
+                        <div className="w-[25rem] h-[20rem] rounded-lg text-cyan-300 text-2xl flex justify-center items-center">
                             <h1>Free And Open Source</h1>
                         </div>
                         
@@ -131,7 +136,7 @@ function StartPage() {
                     </div>
 
                     <div className="h-[45rem] flex flex-col justify-between items-center">
-                        <div className="box w-[25rem] h-[20rem] rounded-lg text-cyan-300 text-2xl flex justify-center items-center">
+                        <div className="w-[25rem] h-[20rem] rounded-lg text-cyan-300 text-2xl flex justify-center items-center">
                             <h1>High Quality</h1>
                         </div>
 
@@ -140,7 +145,6 @@ function StartPage() {
                         </Link>
                     </div>
                 </div>
-
             </section>
         </>
     )
