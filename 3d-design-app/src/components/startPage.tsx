@@ -121,7 +121,7 @@ function StartPage() {
                 <div className="absolute w-full flex justify-evenly top-[40%]">
 
                     <div className="h-[45rem] flex flex-col justify-between items-center">
-                        <div className="box w-[25rem] h-[20rem] shadow-xl text-cyan-300 text-2xl flex justify-center items-center">
+                        <div className="box w-[25rem] h-[20rem] rounded-lg text-cyan-300 text-2xl flex justify-center items-center">
                             <h1>Free And Open Source</h1>
                         </div>
                         
@@ -131,7 +131,7 @@ function StartPage() {
                     </div>
 
                     <div className="h-[45rem] flex flex-col justify-between items-center">
-                        <div className="box w-[25rem] h-[20rem] shadow-xl text-cyan-300 text-2xl flex justify-center items-center">
+                        <div className="box w-[25rem] h-[20rem] rounded-lg text-cyan-300 text-2xl flex justify-center items-center">
                             <h1>High Quality</h1>
                         </div>
 

@@ -6,7 +6,7 @@ import { Raleway } from '@next/font/google'
 
 const raleway = Raleway({
     subsets: ['latin'],
-    preload: false
+    weight: ['400']
 })
 
 export default function RootLayout({ children }: {
