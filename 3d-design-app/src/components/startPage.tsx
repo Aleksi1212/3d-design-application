@@ -11,7 +11,7 @@ import { gsap } from "gsap";
 
 import { Canvas } from "@react-three/fiber";
 import Grid from "../scenes/section1Scene";
-import Blob from "../scenes/section2Scene";
+import Scene from "../scenes/section2Scene";
 
 import Typewriter from 'typewriter-effect'
 
@@ -74,46 +74,9 @@ function StartPage() {
                 </div>
             </section>
 
-            <section style={scrollEffect.sectionStyle2} className="sections bg-[#5CDB95]">
-                <div className="absolute w-full h-[100vh]">
-                    <Canvas camera={{ position: [0, 0, 7] }}>
-                        <Blob hover={1} speed={.4} />
-                    </Canvas>
-                </div>
-
-                <div className="absolute w-[20rem] h-[20rem] right-20">
-                    <Canvas camera={{ position: [0, 0, 10] }}>
-                        <Blob hover={.5} speed={.7} />
-                    </Canvas>
-                    <h1 className="blobContent">Free</h1>
-                </div>
-
-                <div className="absolute w-[20rem] h-[20rem] bottom-36">
-                    <Canvas camera={{ position: [0, 0, 12] }}>
-                        <Blob hover={.6} speed={.2} />
-                    </Canvas>
-                    <h1 className="blobContent text-lg w-14 top-[42%]">Open Source</h1>
-                </div>
-
-                <div className="absolute w-[20rem] h-[20rem] left-[37rem] top-10">
-                    <Canvas camera={{ position: [0, 0, 6] }}>
-                        <Blob hover={.8} speed={.3} />
-                    </Canvas>
-                    <h1 className="blobContent text-4xl left-[40%] top-[44%]">Fast</h1>
-                </div>
-
-                <div className="absolute w-[20rem] h-[20rem] right-40 bottom-0">
-                    <Canvas camera={{ position: [0, 0, 6] }}>
-                        <Blob hover={.9} speed={.5} />
-                    </Canvas>
-                    <h1 className="blobContent left-[32%]">High Quality</h1>
-                </div>
-
-                <div className="flex justify-center items-center w-full h-[100vh]">
-                    <div className="inline-block absolute">
-                        <h1 className="text-[1.2rem] text-white">START DESIGNING YOUR LOOKS WITH</h1>
-                        <h1 className="flex justify-center text-[7rem] text-white opacity-50 mt-[-1.5rem]">Arcus</h1>
-                    </div>
+            <section style={scrollEffect.sectionStyle2} className="sections bg-[#2B32B2]">
+                <div className="w-full h-full absolute">
+                    <Scene />
                 </div>
             </section>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -9,7 +10,22 @@ import show from '../images/show.png'
 import hide from '../images/hide.png'
 import back from '../images/back.png'
 
+import test from "../datalayer/test";
+
 function SignUp() {
+    const router = useRouter()
+
+    async function newPage() {
+        const testt = test()
+
+        if (testt != null) {
+            console.log(testt);
+            router.push('/gottenData', testt)
+        } else {
+            console.log('no data');
+        }
+    }
+
     const [helper, setHelper] = useState(true)
     const [type, setType] = useState(String)
     const [image, setImage] = useState(show)
@@ -36,18 +52,19 @@ function SignUp() {
                     <h1 className="formHeader">Sign Up</h1>
 
                     <div className="formContainer h-96">
-                        <form action="" className="form">
-                            <input type="text" className="input" placeholder="Email Address" required />
-                            <input type="text" className="input" placeholder="Username" required />
+                        <form action="/gottenData" className="form">
+                            <input type="text" className="input" placeholder="Email Address" />
+                            <input type="text" className="input" placeholder="Username" />
 
                             <div className="flex relative">
-                                <input type={type} className="input" placeholder="Password" required />
+                                <input type={type} className="input" placeholder="Password" />
                                 <Image src={image} alt="image" onClick={() => setHelper(!helper)} className="absolute right-4 top-[.75rem] cursor-pointer" />
                             </div>
 
                             <button className="inputButton" type="submit">Sign Up</button>
                         </form>
                     </div>
+                    <button onClick={newPage}>add</button>
 
                     <div className="w-full flex justify-start pl-10 bottom-2 absolute">
                         <Link href="/logIn" className="text-[#3D8ED9]" id="link">Already Have An Account</Link>
