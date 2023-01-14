@@ -1,13 +1,9 @@
 'use client';
 
-function Test() {
-    // const router = useRouter()
-    // const data = JSON.parse(router.query.data as any)
+import { useState, useContext } from "react";
 
+function Test(props: any) {
     return (
-        // <div>
-        //     {data.map((item: any) => <p>{item.username}</p>)}
-        // </div>
         <h1 className="text-white">hello</h1>
     )
 }

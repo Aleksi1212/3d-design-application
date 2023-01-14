@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { useRouter } from "next/navigation";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -8,6 +9,8 @@ import Image from "next/image";
 import show from '../images/show.png'
 import hide from '../images/hide.png'
 import back from '../images/back.png'
+
+import Get from "../datalayer/read";
 
 function LogIn() {
     const [helper, setHelper] = useState(true)
@@ -24,6 +27,14 @@ function LogIn() {
         }
     }, [helper])
 
+    // const [nameOrEmail, setNameOrEmail] = useState(String)
+    // const [password, setPassword] = useState(String)
+
+
+    Get().then(data => console.log(...[data]))
+    
+
+    
     return (
         <>
             <nav className="absolute w-full flex justify-end pr-20 pt-12">
@@ -36,18 +47,20 @@ function LogIn() {
                     <h1 className="formHeader">Log In</h1>
 
                     <div className="formContainer">
-                        <form action="" className="form">
+                        <form /*action="/gottenData"*/ className="form">
                             <input type="text" className="input" placeholder="Username Or Email Address" required />
 
                             <div className="flex relative">
                                 <input type={type} className="input" placeholder="Password" required />
-                                <Image src={image} alt="image" onClick={() => setHelper(!helper)} className="absolute right-4 top-[.75rem] cursor-pointer" />
+                                <div className="absolute h-full right-2 flex flex-col justify-center">
+                                    <Image src={image} alt="image" onClick={() => setHelper(!helper)} className="cursor-pointer" />
+                                </div>
                             </div>
 
                             <button className="inputButton" type="submit">Log In</button>
                         </form>
                     </div>
-
+                    {/* <button onClick={printData}>test</button> */}
 
                     <div className="w-full absolute bottom-2 flex justify-evenly">
                         <Link href="/logIn/reset-password" className="text-[#3D8ED9]" id="link">Forgot Password</Link>

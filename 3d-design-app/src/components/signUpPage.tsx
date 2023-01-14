@@ -10,21 +10,19 @@ import show from '../images/show.png'
 import hide from '../images/hide.png'
 import back from '../images/back.png'
 
-import test from "../datalayer/test";
-
 function SignUp() {
     const router = useRouter()
 
-    async function newPage() {
-        const testt = test()
+    // async function newPage() {
+    //     const testt = test()
 
-        if (testt != null) {
-            console.log(testt);
-            router.push('/gottenData', testt)
-        } else {
-            console.log('no data');
-        }
-    }
+    //     if (testt != null) {
+    //         console.log(testt);
+    //         router.push('/gottenData', testt)
+    //     } else {
+    //         console.log('no data');
+    //     }
+    // }
 
     const [helper, setHelper] = useState(true)
     const [type, setType] = useState(String)
@@ -52,19 +50,21 @@ function SignUp() {
                     <h1 className="formHeader">Sign Up</h1>
 
                     <div className="formContainer h-96">
-                        <form action="/gottenData" className="form">
-                            <input type="text" className="input" placeholder="Email Address" />
+                        <form action="" className="form" >
+                            <input type="text" className="input" placeholder="Email Address"  />
                             <input type="text" className="input" placeholder="Username" />
 
                             <div className="flex relative">
                                 <input type={type} className="input" placeholder="Password" />
-                                <Image src={image} alt="image" onClick={() => setHelper(!helper)} className="absolute right-4 top-[.75rem] cursor-pointer" />
+                                <div className="absolute h-full right-2 flex flex-col justify-center">
+                                    <Image src={image} alt="image" onClick={() => setHelper(!helper)} className="cursor-pointer" />
+                                </div>
                             </div>
 
                             <button className="inputButton" type="submit">Sign Up</button>
                         </form>
                     </div>
-                    <button onClick={newPage}>add</button>
+                    {/* <button onClick={() => Create(data)}>add</button> */}
 
                     <div className="w-full flex justify-start pl-10 bottom-2 absolute">
                         <Link href="/logIn" className="text-[#3D8ED9]" id="link">Already Have An Account</Link>
