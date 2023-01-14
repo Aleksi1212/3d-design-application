@@ -2,18 +2,21 @@ import { strict } from "assert";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "./config";
 
-// interface Item {
+// export interface Item {
 //     id: string
 //     data: object
 // }
 
-// interface Props {
+// export interface Props {
 //     data: Item[]
 // }
 
 
-async function Get(): Promise<any> {
+async function Get() {
     const querySnapshots = await getDocs(collection(db, 'data'))
+    // const data: Item[] = querySnapshots.docs.map((doc) => ({id: doc.id, data: doc.data()}))
+
+    // return { props: { data } }
     const data = querySnapshots.docs.map((doc) => doc.data())
 
     return data

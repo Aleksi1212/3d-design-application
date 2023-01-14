@@ -10,7 +10,6 @@ import show from '../images/show.png'
 import hide from '../images/hide.png'
 import back from '../images/back.png'
 
-import Get from "../datalayer/read";
 
 function LogIn() {
     const [helper, setHelper] = useState(true)
@@ -30,11 +29,27 @@ function LogIn() {
     // const [nameOrEmail, setNameOrEmail] = useState(String)
     // const [password, setPassword] = useState(String)
 
+    const data = {
+        name: 'john'
+    }
+    
+    const request = async () => {
+        const res = await fetch('http://localhost:3000/api/hello', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
 
-    Get().then(data => console.log(...[data]))
+        return res.json()
+    }
+
+    request().then(data => console.log(data.data)
+    )
+    
     
 
-    
     return (
         <>
             <nav className="absolute w-full flex justify-end pr-20 pt-12">
@@ -60,7 +75,7 @@ function LogIn() {
                             <button className="inputButton" type="submit">Log In</button>
                         </form>
                     </div>
-                    {/* <button onClick={printData}>test</button> */}
+                    {/* <button onClick={}>test</button> */}
 
                     <div className="w-full absolute bottom-2 flex justify-evenly">
                         <Link href="/logIn/reset-password" className="text-[#3D8ED9]" id="link">Forgot Password</Link>
