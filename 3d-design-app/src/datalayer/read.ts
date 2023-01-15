@@ -1,6 +1,6 @@
 import { strict } from "assert";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "./config";
+// import { db } from "./config";
 
 // export interface Item {
 //     id: string
@@ -13,13 +13,11 @@ import { db } from "./config";
 
 
 async function Get() {
-    const querySnapshots = await getDocs(collection(db, 'data'))
-    // const data: Item[] = querySnapshots.docs.map((doc) => ({id: doc.id, data: doc.data()}))
-
-    // return { props: { data } }
-    const data = querySnapshots.docs.map((doc) => doc.data())
-
-    return data
+    // const querySnapshots = await getDocs(collection(db, 'data'))
+    // querySnapshots.forEach((doc) => {
+    //     console.log(doc.data());
+    // })
+    return null
 }
 
 export default Get

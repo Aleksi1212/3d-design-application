@@ -1,17 +1,35 @@
-async function logIn(data: object) {
-    const res = await fetch('http:/localhost:3000/api/logIn', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword  } from 'firebase/auth'
+import { auth } from './config'
 
-    return res.json()
+
+async function logIn(data: any) {
+
+    createUserWithEmailAndPassword(auth, data.email, data.password)
+        .then(async (userCredential) => {
+            const user = userCredential.user
+
+            const relevantData = {
+                username: data.name,
+                userId: user.uid,
+                email: user.email,
+                documents: []
+            }
+
+            await fetch('http://localhost:3000/api/logIn', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(relevantData)
+            })
+        })
+        .catch((err) => {
+            console.log(err);
+        })
 }
 
 async function signUp(data: object) {
-    const res = await fetch('http://localhost:300/api/signUp', {
+    const res = await fetch('http://localhost:3000/api/signUp', {
         method: 'POST',
         headers: {
             'Content-type': 'application/json'
