@@ -42,15 +42,13 @@ function SignUp() {
         password: password
     }
 
-    const [userId, setUserId] = useState(String)
-
-    async function logIn(data: any) {
-        createUserWithEmailAndPassword(auth, data.email, data.password)
+    async function logIn(formData: any) {
+        createUserWithEmailAndPassword(auth, formData.email, formData.password)
             .then(async (userCredential) => {
                 const user = userCredential.user
     
                 const relevantData = {
-                    username: data.name,
+                    username: formData.name,
                     userId: user.uid,
                     email: user.email,
                     documents: []
@@ -64,17 +62,11 @@ function SignUp() {
                     body: JSON.stringify(relevantData)
                 })
 
-                setUserId(user.uid)
+                router.push(`/gottendata/${user.uid}`)
             })
             .catch((err) => {
                 console.log(err);
-                setUserId('none')
             })
-    }
-
-    async function handleSubmit(formData: object) {
-        await logIn(formData)
-        console.log(userId);
     }
 
     return (
@@ -89,7 +81,7 @@ function SignUp() {
                     <h1 className="formHeader">Sign Up</h1>
 
                     <div className="formContainer h-96">
-                        <form action="" className="form" >
+                        <form className="form" onSubmit={() => logIn(data)}>
                             <input type="text" className="input" placeholder="Email Address" onChange={(e) => setEmail(e.target.value)} required />
                             <input type="text" className="input" placeholder="Username" onChange={(e) => setName(e.target.value)} required />
 
@@ -103,7 +95,8 @@ function SignUp() {
                             <button className="inputButton" type="submit">Sign Up</button>
                         </form>
                     </div>
-                    <button onClick={() => handleSubmit(data)}>add</button>
+
+                    <button onClick={() => logIn(data)}>add</button>
 
                     <div className="w-full flex justify-start pl-10 bottom-2 absolute">
                         <Link href="/logIn" className="text-[#3D8ED9]" id="link">Already Have An Account</Link>

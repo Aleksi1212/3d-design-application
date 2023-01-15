@@ -5,7 +5,7 @@ interface pageProps {}
 
 async function GetUserData(data: object) {
     const res = await fetch('http://localhost:3000/api/getUserInfo', {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
