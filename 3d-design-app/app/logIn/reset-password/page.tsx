@@ -1,9 +1,6 @@
-import { FC } from "react";
 import ResetPage from "../../../src/components/resetPasswordPage";
 
-interface pageProps {}
-
-const ResetPasswordPage: FC<pageProps> = ({}) => {
+function ResetPasswordPage() {
     return (
         <ResetPage />
     )

@@ -1,9 +1,6 @@
-import { FC } from "react";
 import StartPage from "../src/components/startPage";
 
-interface pageProps {}
-
-const Page: FC<pageProps> = ({}) => {
+function Page() {
     return (
         <StartPage />
     )
