@@ -10,8 +10,6 @@ async function getUserData(data: object) {
     })
 
     const userData = await res.json()
-    const user = auth.currentUser
-    console.log(user);
 
     return userData?.userData as any[]
 }
