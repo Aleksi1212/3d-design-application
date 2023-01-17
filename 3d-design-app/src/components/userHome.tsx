@@ -1,6 +1,3 @@
-'use client';
-
-import { useState, useEffect } from "react";
 import Image from "next/image";
 
 import arrow1 from '../images/arrow1.svg'

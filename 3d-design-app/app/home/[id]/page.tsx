@@ -1,5 +1,6 @@
 import UserHome from "../../../src/components/userHome";
-import getUserData from "../../../src/datalayer/getUserData";
+import getUserData from "../../../src/datalayer/querys";
+import Profle from "../../../src/components/profileCard";
 
 import Image from "next/image";
 
@@ -8,15 +9,26 @@ import docMenu from '../../../src/images/docMenu.png'
 import docShare from '../../../src/images/docShare.png'
 import docRemove from '../../../src/images/docRemove.png'
 
+import { auth } from "../../../src/datalayer/config";
+
 async function UserHomePage({ params }: any) {
     const userData = await getUserData({ userId: params.id })
-    let documents: any = []
 
-    userData.map((card) => {
+    let documents: any = []
+    let userName: string = ''
+    let userEmail: string = ''
+
+    userData.userData.map((card) => {
         card.documents.forEach((doc: any) => {
             documents.push(doc)
         })
-    })    
+
+        userName = card.username
+        userEmail = card.email
+    })
+
+    // console.log(userData.userState);
+    
 
     // function generateRandom() {
     //     let text = ''
@@ -35,15 +47,16 @@ async function UserHomePage({ params }: any) {
 
     return (
         <>
-            <div className="absolute top-0 w-full h-[100vh] flex justify-center">
-                <div className="max-w-[66rem] top-[15rem] absolute flex gap-y-12 gap-x-12 flex-wrap ">
+            <div className="absolute top-0 w-full h-[150vh] flex items-center flex-col">
+                <h1 className="text-white text-5xl mt-24">Welcome Back {userName}</h1>
 
-                    <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc">
-                        <div className="flex flex-col items-center text-[#1A73E8] gap-y-8 mt-8">
-                            <Image src={addDoc} alt="addDoc" />
-                            <h1>Add New Document</h1>
+                <div className="max-w-[66rem] my-[6rem] flex gap-y-12 gap-x-12 flex-wrap ">
+                        <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc">
+                            <div className="flex flex-col items-center text-[#1A73E8] gap-y-8 mt-8">
+                                <Image src={addDoc} alt="addDoc" />
+                                <h1>Add New Design</h1>
+                            </div>
                         </div>
-                    </div>
 
                     {        
                         documents.map((docCard: any) => {
@@ -51,6 +64,10 @@ async function UserHomePage({ params }: any) {
                         })
                     }
                 </div>
+
+                <hr className="bg-[#5D5D5D] opacity-40 w-[50rem] pb-[1.5px]" />
+
+                <Profle userName={userName} userEmail={userEmail} userState={userData.userState} />
             </div>
             <UserHome />
         </>

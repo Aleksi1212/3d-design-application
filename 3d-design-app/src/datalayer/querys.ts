@@ -1,3 +1,5 @@
+
+
 async function getUserData(data: object) {
     const res = await fetch('http://localhost:3000/api/getUserInfo', {
         method: 'POST',
@@ -9,7 +11,11 @@ async function getUserData(data: object) {
 
     const userData = await res.json()
 
-    return userData?.userData as any[]
+    return {
+        userData: userData?.userData as any[],
+        userState: userData?.userState as any[]
+    }
+
 }
 
 export default getUserData

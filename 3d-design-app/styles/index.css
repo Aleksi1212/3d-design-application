@@ -30,6 +30,26 @@
   .blobContent {
     @apply absolute top-[45%] left-[42%] text-white opacity-50 text-2xl
   }
+
+  .userButton {
+    @apply w-[7rem] h-[2.5rem] rounded-lg shadow-xl
+  }
+
+  .userButton:hover {
+    @apply brightness-95
+  }
+
+  .userButton:active {
+    @apply scale-95
+  }
+
+  .editUser {
+    @apply bg-[#F6F7F9]
+  }
+
+  .editUser:focus {
+    outline: none;
+  }
 }
 
 

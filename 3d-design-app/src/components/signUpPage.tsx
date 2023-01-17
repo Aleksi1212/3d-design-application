@@ -40,7 +40,7 @@ function SignUp() {
 
                     <div className="formContainer h-96">
                         <form className="form" action="http://localhost:3000/api/signUp" method="POST">
-                            <input type="text" className="input" placeholder="Email Address"  name="email" required />
+                            <input type="text" className="input" placeholder="Email Address" name="email" required />
                             <input type="text" className="input" placeholder="Username" name="username" required />
 
                             <div className="flex relative">
@@ -53,8 +53,6 @@ function SignUp() {
                             <button className="inputButton" type="submit">Sign Up</button>
                         </form>
                     </div>
-
-                    {/* <button onClick={() => logIn(data)}>add</button> */}
 
                     <div className="w-full flex justify-start pl-10 bottom-2 absolute">
                         <Link href="/logIn" className="text-[#3D8ED9]" id="link">Already Have An Account</Link>
