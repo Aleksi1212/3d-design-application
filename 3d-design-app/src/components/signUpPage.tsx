@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -11,7 +10,6 @@ import hide from '../images/hide.png'
 import back from '../images/back.png'
 
 function SignUp() {
-    const router = useRouter()
 
     const [helper, setHelper] = useState(true)
     const [type, setType] = useState(String)

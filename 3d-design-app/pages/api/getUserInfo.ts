@@ -10,22 +10,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const { userId } = req.body
-
     const que = query(collection(db, 'data'), where('userId', '==', userId))
 
     const querySnapshots = await getDocs(que)
     const data = querySnapshots.docs.map((doc) => doc.data())
 
     console.log(`data found with id: ${userId}`);
-    
-    // const user = auth.currentUser
-    // res.status(200).json({ userData: data, userState: user })
 
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            res.status(200).json({ userData: data, userState: user })
-        } else {
-            console.log('no user');
-        }
-    })
+
+    res.status(200).json({ userData: data})
+
 }

@@ -18,7 +18,6 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
         })
         .catch((err) => {
             console.log(err);
-            
             res.redirect('/logIn')
         })
 }

@@ -8,7 +8,6 @@ import addDoc from '../../../src/images/addDoc.png'
 import docMenu from '../../../src/images/docMenu.png'
 import docShare from '../../../src/images/docShare.png'
 import docRemove from '../../../src/images/docRemove.png'
-
 import { auth } from "../../../src/datalayer/config";
 
 async function UserHomePage({ params }: any) {
@@ -18,7 +17,7 @@ async function UserHomePage({ params }: any) {
     let userName: string = ''
     let userEmail: string = ''
 
-    userData.userData.map((card) => {
+    userData.map((card) => {
         card.documents.forEach((doc: any) => {
             documents.push(doc)
         })
@@ -26,9 +25,6 @@ async function UserHomePage({ params }: any) {
         userName = card.username
         userEmail = card.email
     })
-
-    // console.log(userData.userState);
-    
 
     // function generateRandom() {
     //     let text = ''
@@ -67,7 +63,7 @@ async function UserHomePage({ params }: any) {
 
                 <hr className="bg-[#5D5D5D] opacity-40 w-[50rem] pb-[1.5px]" />
 
-                <Profle userName={userName} userEmail={userEmail} userState={userData.userState} />
+                <Profle userName={userName} userEmail={userEmail} />
             </div>
             <UserHome />
         </>

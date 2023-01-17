@@ -1,4 +1,4 @@
-
+import { auth } from "./config"
 
 async function getUserData(data: object) {
     const res = await fetch('http://localhost:3000/api/getUserInfo', {
@@ -10,12 +10,10 @@ async function getUserData(data: object) {
     })
 
     const userData = await res.json()
+    const user = auth.currentUser
+    console.log(user);
 
-    return {
-        userData: userData?.userData as any[],
-        userState: userData?.userState as any[]
-    }
-
+    return userData?.userData as any[]
 }
 
 export default getUserData

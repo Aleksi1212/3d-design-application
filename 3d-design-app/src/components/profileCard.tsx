@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 import { signOut, deleteUser, updateEmail, getAuth } from "firebase/auth";
 import { auth } from "../datalayer/config";
+import Link from "next/link";
 
 function Profle(props: any) {
     const [userName, setUserName] = useState(props.userName)
@@ -28,20 +29,6 @@ function Profle(props: any) {
             setShowicon('flex')
         }
     }, [readonly])
-
-    const router = useRouter()
-
-    function userSignOut() {
-        signOut(auth)
-        .then(() => {
-            router.push('/')
-        })
-        .catch((err) => {
-            console.log(err);
-        })
-    }
-
-    console.log(props.userState);
     
     // function deleteAccount() {
     //     updateEmail(props.userState, 'new@gmail.com')
@@ -52,8 +39,14 @@ function Profle(props: any) {
     //         console.log(err);
     //     })
     // }
-    
 
+    async function test() {
+        await fetch('http://localhost:3000/api/signOut',{
+            method: 'GET'
+        }
+        )
+    }
+    
     return (
         <div className="h-[20rem] w-[40rem] flex mt-[6rem]">
             <div className="pl-10 pr-14 flex flex-col justify-evenly items-center relative">
@@ -84,7 +77,7 @@ function Profle(props: any) {
             <div className="pt-10">
                 <div className="flex flex-col h-[11rem] justify-evenly">
                     <button className="userButton bg-white" onClick={() => setReadonly(false)}>Edit</button>
-                    <button className="userButton bg-white" onClick={userSignOut}>Sign Out</button>
+                    <Link href={'/'} className="userButton bg-white flex justify-center items-center" onClick={test}>Sign Out</Link>
                     <button className="userButton bg-[#FA5252]">Delete</button>
                 </div>
             </div>
