@@ -9,6 +9,8 @@ import show from '../images/show.png'
 import hide from '../images/hide.png'
 import back from '../images/back.png'
 
+import { useRouter } from "next/navigation";
+
 function LogIn() {
     const [helper, setHelper] = useState(true)
     const [type, setType] = useState(String)
@@ -37,7 +39,7 @@ function LogIn() {
 
                     <div className="formContainer">
                         <form action="http://localhost:3000/api/logIn" className="form" method="POST">
-                            <input type="text" className="input" placeholder="Email Address" name="email"  required />
+                            <input type="text" className="input" placeholder="Email Address" name="email" required />
 
                             <div className="flex relative">
                                 <input type={type} className="input" placeholder="Password" name="password" required />

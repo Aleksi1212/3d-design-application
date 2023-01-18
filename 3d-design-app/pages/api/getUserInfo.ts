@@ -17,7 +17,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log(`data found with id: ${userId}`);
 
-
-    res.status(200).json({ userData: data})
+    const user = auth.currentUser
+    
+    res.status(200).json({ userData: data, userState: user})
 
 }

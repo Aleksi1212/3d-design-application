@@ -13,6 +13,16 @@ import { auth } from "../datalayer/config";
 import Link from "next/link";
 
 function Profle(props: any) {
+    const router = useRouter()
+
+    // if (props.userName.length <= 0 && props.userEmail.length <= 0) {
+    //     router.push('/error/page-not-found')
+    // }
+
+    if (!props.userState) {
+        router.push('/logIn')
+    }    
+
     const [userName, setUserName] = useState(props.userName)
     const [userEmail, setUserEmail] = useState(props.userEmail)
 
@@ -41,11 +51,22 @@ function Profle(props: any) {
     // }
 
     async function test() {
-        await fetch('http://localhost:3000/api/signOut',{
+        const res = await fetch('http://localhost:3000/api/signOut',{
             method: 'GET'
+        })
+
+        const data = await res.json()
+
+        const message = data?.message as any
+
+        if (message === 'ok') {
+            router.push('/')
+        } else {
+            console.log('error');
         }
-        )
     }
+
+    
     
     return (
         <div className="h-[20rem] w-[40rem] flex mt-[6rem]">
@@ -77,7 +98,8 @@ function Profle(props: any) {
             <div className="pt-10">
                 <div className="flex flex-col h-[11rem] justify-evenly">
                     <button className="userButton bg-white" onClick={() => setReadonly(false)}>Edit</button>
-                    <Link href={'/'} className="userButton bg-white flex justify-center items-center" onClick={test}>Sign Out</Link>
+                    {/* <Link href={'/'} className="userButton bg-white flex justify-center items-center" onClick={test}>Sign Out</Link> */}
+                    <button className="userButton bg-white" onClick={test}>Sign Out</button>
                     <button className="userButton bg-[#FA5252]">Delete</button>
                 </div>
             </div>

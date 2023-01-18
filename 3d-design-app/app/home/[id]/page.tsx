@@ -8,7 +8,6 @@ import addDoc from '../../../src/images/addDoc.png'
 import docMenu from '../../../src/images/docMenu.png'
 import docShare from '../../../src/images/docShare.png'
 import docRemove from '../../../src/images/docRemove.png'
-import { auth } from "../../../src/datalayer/config";
 
 async function UserHomePage({ params }: any) {
     const userData = await getUserData({ userId: params.id })
@@ -17,7 +16,7 @@ async function UserHomePage({ params }: any) {
     let userName: string = ''
     let userEmail: string = ''
 
-    userData.map((card) => {
+    userData.userData.map((card) => {
         card.documents.forEach((doc: any) => {
             documents.push(doc)
         })
@@ -25,6 +24,16 @@ async function UserHomePage({ params }: any) {
         userName = card.username
         userEmail = card.email
     })
+
+
+    // user.onAuthStateChanged(user => {
+    //     if (user) {
+    //         console.log('user');
+    //     } else {
+    //         console.log('no user');
+            
+    //     }
+    // })
 
     // function generateRandom() {
     //     let text = ''
@@ -40,34 +49,39 @@ async function UserHomePage({ params }: any) {
     // const testt = generateRandom()
     // console.log(testt);
     
-
-    return (
-        <>
-            <div className="absolute top-0 w-full h-[150vh] flex items-center flex-col">
-                <h1 className="text-white text-5xl mt-24">Welcome Back {userName}</h1>
-
-                <div className="max-w-[66rem] my-[6rem] flex gap-y-12 gap-x-12 flex-wrap ">
-                        <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc">
-                            <div className="flex flex-col items-center text-[#1A73E8] gap-y-8 mt-8">
-                                <Image src={addDoc} alt="addDoc" />
-                                <h1>Add New Design</h1>
+    if (userName.length > 0 && userEmail.length > 0) {
+        return (
+            <>
+                <div className="absolute top-0 w-full h-[150vh] flex items-center flex-col">
+                    <h1 className="text-white text-5xl mt-24">Welcome Back {userName}</h1>
+    
+                    <div className="max-w-[66rem] my-[6rem] flex gap-y-12 gap-x-12 flex-wrap ">
+                            <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc">
+                                <div className="flex flex-col items-center text-[#1A73E8] gap-y-8 mt-8">
+                                    <Image src={addDoc} alt="addDoc" />
+                                    <h1>Add New Design</h1>
+                                </div>
                             </div>
-                        </div>
-
-                    {        
-                        documents.map((docCard: any) => {
-                            return <DocumentCard key={docCard.docId} document={docCard} />
-                        })
-                    }
+    
+                        {        
+                            documents.map((docCard: any) => {
+                                return <DocumentCard key={docCard.docId} document={docCard} />
+                            })
+                        }
+                    </div>
+    
+                    <hr className="bg-[#5D5D5D] opacity-40 w-[50rem] pb-[1.5px]" />
+    
+                    <Profle userName={userName} userEmail={userEmail} userState={userData.userState} />
                 </div>
-
-                <hr className="bg-[#5D5D5D] opacity-40 w-[50rem] pb-[1.5px]" />
-
-                <Profle userName={userName} userEmail={userEmail} />
-            </div>
-            <UserHome />
-        </>
-    )
+                <UserHome />
+            </>
+        )
+    } else {
+        return (
+            <h1 className="text-white">page not found</h1>
+        )
+    }
 }
 
 function DocumentCard({ document }: any) {

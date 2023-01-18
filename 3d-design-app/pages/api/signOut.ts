@@ -8,11 +8,15 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const user = auth.currentUser
+
+    console.log(user);
     signOut(auth)
     .then(() => {
         console.log(`signed out user with id: ${user?.uid}`)
+        res.status(200).json({ message: 'ok' })
     })
     .catch((err) => {
         console.error(err);
+        res.status(400).json({ message: 'bad request' })
     })
 }
