@@ -1,9 +1,13 @@
-import LogIn from "../../src/components/logInPage";
+import ChooseAuth from "../../src/components/chooseAuth"
 
-function LoginPage() {
+
+export default function LogInButtons() {
     return (
-        <LogIn />
+        <ChooseAuth method={'logIn'} header={'Choose Log In Method'} buttons={{
+            email: 'Log In With Email',
+            google: 'Log In With Google',
+            github: 'Log In With GitHub',
+            facebook: 'Log In With FaceBook'
+        }} />
     )
 }
-
-export default LoginPage

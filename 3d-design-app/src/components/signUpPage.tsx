@@ -27,12 +27,14 @@ function SignUp() {
 
     return (
         <>
-            <nav className="absolute w-full flex justify-end pr-20 pt-12">
-                <Link href="/">
-                    <Image src={back} alt="back" />
-                </Link>
-            </nav>
             <section className="w-full h-[100vh] bg-[#2D2D2D] flex justify-center">
+                <div className="goBack">
+                    <Link href="/" className="w-full flex">
+                        <Image src={back} alt="back" id="link" />
+                        <span className="pl-2 pt-[1px]">Start</span>
+                    </Link>
+                </div>
+
                 <div className="bg-[#3D3D3D] w-[25rem] h-[35rem] mt-52 rounded-xl shadow-lg relative">
                     <h1 className="formHeader">Sign Up</h1>
 

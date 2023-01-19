@@ -23,6 +23,18 @@
     @apply underline
   }
 
+  .goBack {
+    @apply absolute top-40 w-[25rem] text-xl text-white
+  }
+
+  .logInButton {
+    @apply w-[20rem] h-[3rem] rounded-lg border-[1px] border-[cyan] bg-[#2d2d2d] overflow-hidden relative flex justify-center items-center
+  }
+
+  .buttonText {
+    @apply absolute top-14 left-0 w-full h-full 
+  }
+
   .button {
     @apply rounded-3xl w-[15rem] h-[5rem] text-2xl font-medium shadow-lg flex justify-center items-center
   }
@@ -35,7 +47,7 @@
     @apply w-[7rem] h-[2.5rem] rounded-lg shadow-xl
   }
 
-  .userButton:hover {
+  .userButton:hover, #doc:hover {
     @apply brightness-95
   }
 
@@ -93,6 +105,20 @@ html, body {
   background: linear-gradient(90deg, rgba(0,255,255,1) 30%, rgba(45,167,167,1) 75%);
 }
 
-#doc:hover {
-  filter: brightness(95%);
+.buttonImage {
+  transition: all .5s;
+}
+
+.buttonText {
+  transition: all .5s;
+  /* opacity: 1;
+  visibility: hidden; */
+}
+
+.logInButton:hover .buttonImage {
+  transform: translateY(-3rem);
+}
+
+.logInButton:hover .buttonText {
+  top: .75rem;
 }

@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 console.log(`New document created with id: ${docRef.id}`);
                 
-                res.redirect(`/home/${user.uid}`)
+                res.redirect(`/dashboard/${user.uid}`)
             }
             catch(err) {
                 console.log(err);

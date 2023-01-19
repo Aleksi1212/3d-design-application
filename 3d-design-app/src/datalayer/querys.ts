@@ -1,3 +1,6 @@
+import { db } from "./config"
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
+
 async function getUserData(data: object) {
     const res = await fetch('http://localhost:3000/api/getUserInfo', {
         method: 'POST',
@@ -17,4 +20,30 @@ async function getUserData(data: object) {
     }
 }
 
-export default getUserData
+async function checkUser (userInfo: any) {
+    const que = query(collection(db, 'data'), where('userId', '==', userInfo.userId))
+    const querySnapshot = await getDocs(que)
+
+    if (querySnapshot.empty) {
+        try {
+            const docRef = await addDoc(collection(db, 'data'), {
+                userId: userInfo.userId,
+                username: userInfo.userName,
+                email: userInfo.userEmail,
+                documents: []
+            })
+
+            console.log(`Data added with id: ${docRef.id}`);
+            
+        } catch (err) {
+            console.log(err);
+        }
+    } else {
+        console.log('data exists');
+    }
+}
+
+export {
+    getUserData,
+    checkUser
+}

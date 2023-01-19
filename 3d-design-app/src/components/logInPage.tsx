@@ -9,8 +9,6 @@ import show from '../images/show.png'
 import hide from '../images/hide.png'
 import back from '../images/back.png'
 
-import { useRouter } from "next/navigation";
-
 function LogIn() {
     const [helper, setHelper] = useState(true)
     const [type, setType] = useState(String)
@@ -25,20 +23,23 @@ function LogIn() {
             setImage(hide)
         }
     }, [helper])
+    
 
     return (
         <>
-            <nav className="absolute w-full flex justify-end pr-20 pt-12">
-                <Link href="/">
-                    <Image src={back} alt="back" />
-                </Link>
-            </nav>
             <section className="w-full h-[100vh] bg-[#2D2D2D] flex justify-center">
+                <div className="goBack">
+                    <Link href="/" className="w-full flex" id="link">
+                        <Image src={back} alt="back" />
+                        <span className="pl-2 pt-[1px]">Start</span>
+                    </Link>
+                </div>
+
                 <div className="bg-[#3D3D3D] w-[25rem] h-[30rem] mt-52 rounded-xl shadow-lg relative">
                     <h1 className="formHeader">Log In</h1>
 
                     <div className="formContainer">
-                        <form action="http://localhost:3000/api/logIn" className="form" method="POST">
+                        <form className="form" method="POST" action="http://localhost:3000/api/logIn">
                             <input type="text" className="input" placeholder="Email Address" name="email" required />
 
                             <div className="flex relative">

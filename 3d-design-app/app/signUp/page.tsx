@@ -1,9 +1,12 @@
-import SignUp from "../../src/components/signUpPage";
+import ChooseAuth from "../../src/components/chooseAuth";
 
-function SignUpPage() {
+export default function SignUpButtons() {
     return (
-        <SignUp />
+        <ChooseAuth method={'signUp'} header={'Choose Sign Up Method'} buttons={{
+            email: 'Sign Up With Email',
+            google: 'Sign Up With Google',
+            github: 'Sign Up With GitHub',
+            facebook: 'Sign Up With FaceBook'
+        }} />
     )
 }
-
-export default SignUpPage

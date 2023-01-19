@@ -14,7 +14,7 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
             const user = userCredential.user
             console.log(`user found with id: ${user.uid}`);
             
-            res.redirect(`/home/${user.uid}`)
+            res.redirect(`/dashboard/${user.uid}`)
         })
         .catch((err) => {
             console.log(err);

@@ -12,16 +12,19 @@ import { signOut, deleteUser, updateEmail, getAuth } from "firebase/auth";
 import { auth } from "../datalayer/config";
 import Link from "next/link";
 
-function Profle(props: any) {
+function Profile(props: any) {
     const router = useRouter()
+    const user = auth.currentUser
+    console.log(user);
+    
 
     // if (props.userName.length <= 0 && props.userEmail.length <= 0) {
     //     router.push('/error/page-not-found')
     // }
 
-    if (!props.userState) {
-        router.push('/logIn')
-    }    
+    // if (!props.userState || props.userState.uid !== props.id) {
+    //     router.push('/logIn')
+    // }    
 
     const [userName, setUserName] = useState(props.userName)
     const [userEmail, setUserEmail] = useState(props.userEmail)
@@ -55,15 +58,14 @@ function Profle(props: any) {
             method: 'GET'
         })
 
-        const data = await res.json()
+        // const data = await res.json()
+        // const message = data?.message as any
 
-        const message = data?.message as any
-
-        if (message === 'ok') {
-            router.push('/')
-        } else {
-            console.log('error');
-        }
+        // if (message === 'ok') {
+        //     router.push('/')
+        // } else {
+        //     console.log('error');
+        // }
     }
 
     
@@ -107,4 +109,4 @@ function Profle(props: any) {
     )
 }
 
-export default Profle
+export default Profile
