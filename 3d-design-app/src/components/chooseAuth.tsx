@@ -9,8 +9,10 @@ import github from '../images/github.png'
 import facebook from '../images/facebook.png'
 import back from '../images/back.png'
 
-import { useRouter } from "next/navigation"
-import { useCookies } from "react-cookie";
+// import { useRouter } from "next/navigation"
+// import { useCookies } from "react-cookie";
+
+import { setCookie } from 'cookies-next'
 
 import { auth, db } from "../datalayer/config"
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
@@ -19,8 +21,8 @@ import { checkUser } from "../datalayer/querys";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 
 function ChooseAuth(props: any) {
-    const router = useRouter()
-    const [cookie, setCookie] = useCookies(['auth'])
+    // const router = useRouter()
+    // const [cookie, setCookie] = useCookies(['auth'])
 
     const googleProvider = new GoogleAuthProvider()
 
@@ -38,15 +40,27 @@ function ChooseAuth(props: any) {
             // router.push(`/${props.method}`)
         })
 
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
-                setCookie('auth', true)
+                await fetch('http://localhost:3000/api/cookieSetter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userState: true, userId: user.uid })
+                })
                 
             } else {
-                setCookie('auth', false)
+                await fetch('http://localhost:3000/api/cookieSetter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userState: false, userId: null })
+                })
             }
         })
-    }    
+    }
 
     return (
         <section className="w-full h-[100vh] bg-[#2D2D2D] flex justify-center text-white">
