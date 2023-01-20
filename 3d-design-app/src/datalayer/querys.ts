@@ -1,7 +1,7 @@
 import { db, auth } from "./config"
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
 
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
+import { createUserWithEmailAndPassword, EmailAuthCredential } from "firebase/auth"
 import { setCookie } from 'cookies-next'
 
 async function getUserData(data: object) {
@@ -46,33 +46,7 @@ async function checkUser (userInfo: any) {
     }
 }
 
-// async function googleAuth() {
-//     const googleProvider = new GoogleAuthProvider()
-
-//     signInWithPopup(auth, googleProvider)
-//     .then((result) => {
-//         const user = result.user
-//         const userName = user.email?.split('@')[0]
-//         checkUser({ userId: user.uid, userName: userName, userEmail: user.email })
-
-//         // router.push(`/dashboard/${user.uid}`)
-//     })
-//     .catch((err) => {
-//         console.log(err);
-//         // router.push(`/${props.method}`)
-//     })
-
-//     auth.onAuthStateChanged(user => {
-//         if (user) {
-//             setCookie('auth', JSON.stringify({ userStatus: true, userId: user.uid }), { httpOnly: true })
-            
-//         } else {
-//             setCookie('auth', JSON.stringify({ userStatus: false, userId: null }))
-//         }
-//     })
-// } 
-
 export {
     getUserData,
-    checkUser
+    checkUser,
 }

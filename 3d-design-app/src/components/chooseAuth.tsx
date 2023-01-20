@@ -9,19 +9,16 @@ import github from '../images/github.png'
 import facebook from '../images/facebook.png'
 import back from '../images/back.png'
 
-// import { useRouter } from "next/navigation"
-// import { useCookies } from "react-cookie";
+import { useRouter } from "next/navigation"
+import { setCookie } from "cookies-next";
 
-import { setCookie } from 'cookies-next'
-
-import { auth, db } from "../datalayer/config"
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { auth } from "../datalayer/config"
 import { checkUser } from "../datalayer/querys";
 
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
 
 function ChooseAuth(props: any) {
-    // const router = useRouter()
+    const router = useRouter()
     // const [cookie, setCookie] = useCookies(['auth'])
 
     const googleProvider = new GoogleAuthProvider()
@@ -32,35 +29,23 @@ function ChooseAuth(props: any) {
             const user = result.user
             const userName = user.email?.split('@')[0]
             checkUser({ userId: user.uid, userName: userName, userEmail: user.email })
-
-            // router.push(`/dashboard/${user.uid}`)
         })
         .catch((err) => {
             console.log(err);
-            // router.push(`/${props.method}`)
         })
 
-        auth.onAuthStateChanged(async (user) => {
+        auth.onAuthStateChanged(user => {
             if (user) {
-                await fetch('http://localhost:3000/api/cookieSetter', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userState: true, userId: user.uid })
-                })
-                
+                setCookie('auth', JSON.stringify({ userState: true, userId: user.uid }))
+                router.push(`/dashboard/${user.uid}`)
+
             } else {
-                await fetch('http://localhost:3000/api/cookieSetter', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userState: false, userId: null })
-                })
+                setCookie('auth', JSON.stringify({ userState: false, userId: null }))
+                router.push(`/${props.method}`)
             }
         })
     }
+
 
     return (
         <section className="w-full h-[100vh] bg-[#2D2D2D] flex justify-center text-white">

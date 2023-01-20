@@ -14,8 +14,9 @@ import Link from "next/link";
 
 function Profile(props: any) {
     const router = useRouter()
-    const user = auth.currentUser
-    console.log(user);
+    // const user = auth.currentUser
+    // console.log(user);
+    console.log(auth.currentUser);
     
 
     // if (props.userName.length <= 0 && props.userEmail.length <= 0) {

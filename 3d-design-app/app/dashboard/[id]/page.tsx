@@ -3,6 +3,7 @@ import { getUserData } from "../../../src/datalayer/querys";
 import Profile from "../../../src/components/profileCard";
 
 import Image from "next/image";
+import { setCookie } from "cookies-next";
 
 import addDoc from '../../../src/images/addDoc.png'
 import docMenu from '../../../src/images/docMenu.png'
@@ -21,7 +22,6 @@ async function UserHomePage({ params }: any) {
             console.log('no data');
         }
     })
-    
 
     let documents: any = []
     let userName: string = ''
