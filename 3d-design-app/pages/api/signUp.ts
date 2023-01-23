@@ -4,6 +4,8 @@ import { auth, db } from "../../src/datalayer/config";
 import { collection, addDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
+import { setCookie } from "cookies-next";
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
         res.status(405).json({ message: 'method not allowed' })
@@ -25,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 console.log(`New document created with id: ${docRef.id}`);
                 
+                setCookie('auth', JSON.stringify({ userState: true, userId: user.uid }), { req, res, httpOnly: true, secure: true, sameSite: 'strict' })
                 res.redirect(`/dashboard/${user.uid}`)
             }
             catch(err) {
@@ -34,6 +37,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         .catch((err) => {
             console.log(err);
+
+            setCookie('auth', JSON.stringify({ userState: false, userId: null }), { req, res, httpOnly: true, secure: true, sameSite: 'strict' })
             res.redirect('/signUp')
         })
 }

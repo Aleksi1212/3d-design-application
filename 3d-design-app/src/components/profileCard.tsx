@@ -10,22 +10,9 @@ import { useRouter } from "next/navigation";
 
 import { signOut, deleteUser, updateEmail, getAuth } from "firebase/auth";
 import { auth } from "../datalayer/config";
-import Link from "next/link";
 
 function Profile(props: any) {
     const router = useRouter()
-    // const user = auth.currentUser
-    // console.log(user);
-    console.log(auth.currentUser);
-    
-
-    // if (props.userName.length <= 0 && props.userEmail.length <= 0) {
-    //     router.push('/error/page-not-found')
-    // }
-
-    // if (!props.userState || props.userState.uid !== props.id) {
-    //     router.push('/logIn')
-    // }    
 
     const [userName, setUserName] = useState(props.userName)
     const [userEmail, setUserEmail] = useState(props.userEmail)
@@ -43,30 +30,39 @@ function Profile(props: any) {
             setShowicon('flex')
         }
     }, [readonly])
-    
-    // function deleteAccount() {
-    //     updateEmail(props.userState, 'new@gmail.com')
-    //     .then(() => {
-    //         console.log('email updtaed');
-    //     })
-    //     .catch((err) => {
-    //         console.log(err);
-    //     })
-    // }
 
     async function test() {
-        const res = await fetch('http://localhost:3000/api/signOut',{
-            method: 'GET'
+        router.refresh()
+        
+        signOut(auth)
+        .then(() => {
+            console.log('signed out');
+        })
+        .catch((err) => {
+            console.log(err);
         })
 
-        // const data = await res.json()
-        // const message = data?.message as any
-
-        // if (message === 'ok') {
-        //     router.push('/')
-        // } else {
-        //     console.log('error');
-        // }
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                await fetch('http://localhost:3000/api/cookieSetter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userState: true, userId: user.uid })
+                })
+                
+            } else {
+                await fetch('http://localhost:3000/api/cookieSetter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userState: false, userId: null })
+                })
+                
+            }
+        })
     }
 
     
@@ -101,7 +97,6 @@ function Profile(props: any) {
             <div className="pt-10">
                 <div className="flex flex-col h-[11rem] justify-evenly">
                     <button className="userButton bg-white" onClick={() => setReadonly(false)}>Edit</button>
-                    {/* <Link href={'/'} className="userButton bg-white flex justify-center items-center" onClick={test}>Sign Out</Link> */}
                     <button className="userButton bg-white" onClick={test}>Sign Out</button>
                     <button className="userButton bg-[#FA5252]">Delete</button>
                 </div>

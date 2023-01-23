@@ -10,42 +10,59 @@ import facebook from '../images/facebook.png'
 import back from '../images/back.png'
 
 import { useRouter } from "next/navigation"
-import { setCookie } from "cookies-next";
 
 import { auth } from "../datalayer/config"
-import { checkUser } from "../datalayer/querys";
+import { checkUser, cookieSetter } from "../datalayer/querys";
 
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth"
+import { GoogleAuthProvider, FacebookAuthProvider, GithubAuthProvider, signInWithPopup, signOut } from "firebase/auth"
 
 function ChooseAuth(props: any) {
     const router = useRouter()
-    // const [cookie, setCookie] = useCookies(['auth'])
 
     const googleProvider = new GoogleAuthProvider()
+    const githubprovider = new GithubAuthProvider()
+    const facebookProvider = new FacebookAuthProvider()
 
-    async function googleAuth() {
-        signInWithPopup(auth, googleProvider)
+    async function Auth(provider: any) {
+        const user = auth.currentUser
+
+        if (user && props.method === '/signUp') {
+            signOut(auth)
+            .then(() => {
+                console.log(`signed out with id: ${user.uid}`);
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        }
+
+        signInWithPopup(auth, provider)
         .then((result) => {
             const user = result.user
             const userName = user.email?.split('@')[0]
-            checkUser({ userId: user.uid, userName: userName, userEmail: user.email })
+            checkUser(user.uid, userName as string, user.email as string)
         })
         .catch((err) => {
             console.log(err);
         })
 
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
-                setCookie('auth', JSON.stringify({ userState: true, userId: user.uid }))
-                router.push(`/dashboard/${user.uid}`)
+                const setCookie = await cookieSetter(true, user.uid)
+
+                if (setCookie === 'cookie set') {
+                    router.push(`/dashboard/${user.uid}`)
+                }
 
             } else {
-                setCookie('auth', JSON.stringify({ userState: false, userId: null }))
-                router.push(`/${props.method}`)
+                const setCookie = await cookieSetter(false, null)
+
+                if (setCookie === 'cookie set') {
+                    router.push(`/${props.method}`)
+                }
             }
         })
     }
-
 
     return (
         <section className="w-full h-[100vh] bg-[#2D2D2D] flex justify-center text-white">
@@ -65,17 +82,17 @@ function ChooseAuth(props: any) {
                         <span className="buttonText text-center">{props.buttons.email}</span>
                     </Link>
 
-                    <button className="logInButton" onClick={googleAuth}>
+                    <button className="logInButton" onClick={() => Auth(googleProvider)}>
                         <Image src={google} alt="google" className="buttonImage"/>
                         <span className="buttonText">{props.buttons.google}</span>
                     </button>
 
-                    <button className="logInButton">
+                    <button className="logInButton" onClick={() => Auth(githubprovider)}>
                         <Image src={github} alt="github" className="buttonImage" />
                         <span className="buttonText">{props.buttons.github}</span>
                     </button>
 
-                    <button className="logInButton">
+                    <button className="logInButton" onClick={() => Auth(facebookProvider)}>
                         <Image src={facebook} alt="facebook" className="buttonImage" />
                         <span className="buttonText">{props.buttons.facebook}</span>
                     </button>

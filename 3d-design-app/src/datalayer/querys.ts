@@ -1,8 +1,6 @@
 import { db, auth } from "./config"
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
-
-import { createUserWithEmailAndPassword, EmailAuthCredential } from "firebase/auth"
-import { setCookie } from 'cookies-next'
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth"
 
 async function getUserData(data: object) {
     const res = await fetch('http://localhost:3000/api/getUserInfo', {
@@ -23,16 +21,16 @@ async function getUserData(data: object) {
     }
 }
 
-async function checkUser (userInfo: any) {
-    const que = query(collection(db, 'data'), where('userId', '==', userInfo.userId))
+async function checkUser(userId: string, userName: string, userEmail: string) {
+    const que = query(collection(db, 'data'), where('userId', '==', userId))
     const querySnapshot = await getDocs(que)
 
     if (querySnapshot.empty) {
         try {
             const docRef = await addDoc(collection(db, 'data'), {
-                userId: userInfo.userId,
-                username: userInfo.userName,
-                email: userInfo.userEmail,
+                userId: userId,
+                username: userName,
+                email: userEmail,
                 documents: []
             })
 
@@ -46,7 +44,21 @@ async function checkUser (userInfo: any) {
     }
 }
 
+async function cookieSetter(userState: boolean, userId: string | null) {
+    const res = await fetch('http://localhost:3000/api/cookieSetter', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userState: userState, userId: userId })
+    })
+
+    const message = await res.json()
+    return message.message as any
+}
+
 export {
     getUserData,
     checkUser,
+    cookieSetter
 }
