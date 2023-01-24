@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { auth, db } from "../../src/datalayer/config";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc } from "firebase/firestore";
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

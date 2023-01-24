@@ -4,25 +4,41 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 import back from '../images/back.png'
-import show from '../images/show.png'
-import hide from '../images/hide.png'
 
-import { useState, useEffect } from 'react'
+import useInputType from '../hooks/inputTypehook';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+import { cookieSetter } from '../datalayer/querys';
 
 function VerifyUser() {
     const [helper, setHelper] = useState(false)
-    const [type, setType] = useState('password')
-    const [image, setImage] = useState(show)
+    const inputType = useInputType(helper)
 
-    useEffect(() => {
-        if (helper) {
-            setType('text')
-            setImage(hide)
-        } else {
-            setType('password')
-            setImage(show)
+    const router = useRouter()
+
+    async function deleteUser(event: any) {
+        event.preventDefault()
+
+        const email = event.target.email.value
+        const password = event.target.password.value
+
+        const res = await fetch('http://localhost:3000/api/deleteUser', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email, password: password })
+        })
+
+        const responseMessage = await res.json()
+        const message = responseMessage as any
+
+        if (message.message === 'deleted succesfully') {
+            await cookieSetter(false, null)
+            router.push('/')
         }
-    }, [helper])
+    }
 
     return(
         <section className='w-full h-[100vh] bg-[#2D2D2D] flex justify-center'>
@@ -37,13 +53,13 @@ function VerifyUser() {
             <h1 className="formHeader">Verify Email</h1>
 
             <div className='formContainer'>
-                <form action="http://localhost:300/api/deleteUser" method='POST' className='form'>
-                    <input type="text" className='input' name='email' placeholder='Email Address' required />
+                <form method='POST' className='form' onSubmit={deleteUser}>
+                    <input type="text" className='input' placeholder='Email Address' name='email' required />
 
                     <div className='flex relative'>
-                        <input type={type} className="input" name='password' placeholder='password' required />
+                        <input type={inputType.type} className="input" placeholder='password' name='password' required />
                         <div className='absolute h-full right-2 flex flex-col justify-center'>
-                            <Image src={image} alt="image" onClick={() => setHelper(!helper)} className="cursor-pointer" />
+                            <Image src={inputType.image} alt="image" onClick={() => setHelper(!helper)} className="cursor-pointer" />
                         </div>
                     </div>
 

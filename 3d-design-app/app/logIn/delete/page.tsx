@@ -11,12 +11,17 @@ import facebook from '../../../src/images/facebook.png'
 
 import { auth, db } from "../../../src/datalayer/config"
 import { deleteUser, FacebookAuthProvider, GithubAuthProvider, GoogleAuthProvider, reauthenticateWithPopup } from "firebase/auth"
-import { deleteDoc, doc, where } from "firebase/firestore"
+import { deleteDoc, doc, where, collection, getDocs, query } from "firebase/firestore"
+
+import { cookieSetter } from "../../../src/datalayer/querys"
+import { useRouter } from 'next/navigation'
 
 function ReAuth() {
     const googleProvider = new GoogleAuthProvider()
     const githubProvider = new GithubAuthProvider()
     const facebookProvider = new FacebookAuthProvider()
+
+    const router = useRouter()
 
     async function reAuth(provider: any) {
         const user: any = auth.currentUser
@@ -29,8 +34,12 @@ function ReAuth() {
             deleteUser(userData)
             .then(async () => {
                 console.log('user deleted');
-                await deleteDoc(doc(db, 'data'), where('userId', '==', userData.uid))
                 
+                const que = query(collection(db, 'data'), where('userId', '==', userData.uid))
+                const querySnapshot = await getDocs(que)
+                const docId = querySnapshot.docs.map((doc) => doc.id)
+
+                await deleteDoc(doc(db, 'data', docId[0]))
             })
             .catch((err) => {
                 console.log(err);
@@ -38,6 +47,13 @@ function ReAuth() {
         })
         .catch((err) => {
             console.log(err);
+        })
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                await cookieSetter(false, null)
+                router.push('/')
+            }
         })
     }
     

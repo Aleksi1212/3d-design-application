@@ -1,29 +1,15 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import useInputType from "../hooks/inputTypehook";
 
 import Image from "next/image";
 import Link from "next/link";
-
-import show from '../images/show.png'
-import hide from '../images/hide.png'
 import back from '../images/back.png'
 
 function SignUp() {
-
-    const [helper, setHelper] = useState(true)
-    const [type, setType] = useState(String)
-    const [image, setImage] = useState(show)
-
-    useEffect(() => {
-        if (helper) {
-            setType('password')
-            setImage(show)
-        } else {
-            setType('text')
-            setImage(hide)
-        }
-    }, [helper])
+    const [helper, setHelper] = useState(false)
+    const inputType = useInputType(helper)
 
     return (
         <>
@@ -44,9 +30,9 @@ function SignUp() {
                             <input type="text" className="input" placeholder="Username" name="username" required />
 
                             <div className="flex relative">
-                                <input type={type} className="input" placeholder="Password" name="password" required />
+                                <input type={inputType.type} className="input" placeholder="Password" name="password" required />
                                 <div className="absolute h-full right-2 flex flex-col justify-center">
-                                    <Image src={image} alt="image" onClick={() => setHelper(!helper)} className="cursor-pointer" />
+                                    <Image src={inputType.image} alt="image" onClick={() => setHelper(!helper)} className="cursor-pointer" />
                                 </div>
                             </div>
 
