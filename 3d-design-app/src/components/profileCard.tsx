@@ -7,8 +7,9 @@ import close from '../images/close.png'
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-import { signOut, deleteUser, updateEmail, getAuth } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "../datalayer/config";
 
 function Profile(props: any) {
@@ -31,7 +32,7 @@ function Profile(props: any) {
         }
     }, [readonly])
 
-    async function test() {
+    async function userSignOut() {
         router.refresh()
         
         signOut(auth)
@@ -51,6 +52,8 @@ function Profile(props: any) {
                     },
                     body: JSON.stringify({ userState: true, userId: user.uid })
                 })
+
+                window.location.reload()
                 
             } else {
                 await fetch('http://localhost:3000/api/cookieSetter', {
@@ -61,6 +64,7 @@ function Profile(props: any) {
                     body: JSON.stringify({ userState: false, userId: null })
                 })
                 
+                window.location.reload()
             }
         })
     }
@@ -97,8 +101,8 @@ function Profile(props: any) {
             <div className="pt-10">
                 <div className="flex flex-col h-[11rem] justify-evenly">
                     <button className="userButton bg-white" onClick={() => setReadonly(false)}>Edit</button>
-                    <button className="userButton bg-white" onClick={test}>Sign Out</button>
-                    <button className="userButton bg-[#FA5252]">Delete</button>
+                    <button className="userButton bg-white" onClick={userSignOut}>Sign Out</button>
+                    <Link className="userButton bg-[#FA5252] flex justify-center items-center" href="/logIn/delete">Delete</Link>
                 </div>
             </div>
         </div>
