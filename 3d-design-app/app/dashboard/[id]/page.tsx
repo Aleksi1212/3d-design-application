@@ -3,12 +3,12 @@ import { getUserData } from "../../../src/datalayer/querys";
 import Profile from "../../../src/components/profileCard";
 
 import Image from "next/image";
+import Link from 'next/link'
 
 import addDoc from '../../../src/images/addDoc.png'
 import docMenu from '../../../src/images/docMenu.png'
 import docShare from '../../../src/images/docShare.png'
 import docRemove from '../../../src/images/docRemove.png'
-import { auth } from "../../../src/datalayer/config";
 
 async function UserHomePage({ params }: any) {
     const userData = await getUserData({ userId: params.id })
@@ -16,18 +16,19 @@ async function UserHomePage({ params }: any) {
     let documents: any = []
     let userName: string = ''
     let userEmail: string = ''
+    let userMethod: string = ''
 
-    userData.userData.map((card) => {
+    userData.map((card) => {
         card.documents.forEach((doc: any) => {
             documents.push(doc)
         })
 
         userName = card.username
-        userEmail = card.email        
+        userEmail = card.email
+        userMethod = card.method
     })
 
-    const user = auth.currentUser
-    console.log(user);
+
 
     return (
         <>
@@ -42,7 +43,7 @@ async function UserHomePage({ params }: any) {
                             </div>
                         </div>
 
-                    {        
+                    {
                         documents.map((docCard: any) => {
                             return <DocumentCard key={docCard.docId} document={docCard} />
                         })
@@ -51,7 +52,7 @@ async function UserHomePage({ params }: any) {
 
                 <hr className="bg-[#5D5D5D] opacity-40 w-[50rem] pb-[1.5px]" />
 
-                <Profile userName={userName} userEmail={userEmail} userState={userData.userState} id={params.id} />
+                <Profile userName={userName} userEmail={userEmail} id={params.id} method={userMethod} />
             </div>
             <UserHome />
         </>
@@ -59,10 +60,10 @@ async function UserHomePage({ params }: any) {
 }
 
 function DocumentCard({ document }: any) {
-    const { docName } = document || {}
+    const { docName, docId } = document || {}
 
     return (
-        <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-between flex-col cursor-pointer" id="doc">
+        <Link className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-between flex-col cursor-pointer" id="doc" href={`document/${docId}`}>
             <h1 className="pt-3 pl-4 text-xl">{docName}</h1>
 
             <div className="flex justify-between pb-3">
@@ -73,7 +74,7 @@ function DocumentCard({ document }: any) {
                     <Image src={docRemove} alt="docRemove" />
                 </div>
             </div>
-        </div>
+        </Link>
     )
 }
 

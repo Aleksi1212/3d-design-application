@@ -6,15 +6,14 @@ import check from '../images/check.png'
 import close from '../images/close.png'
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { signOut } from "firebase/auth";
 import { auth } from "../datalayer/config";
 
-function Profile(props: any) {
-    const router = useRouter()
+import { cookieSetter } from "../datalayer/querys";
 
+function Profile(props: any) {
     const [userName, setUserName] = useState(props.userName)
     const [userEmail, setUserEmail] = useState(props.userEmail)
 
@@ -33,43 +32,37 @@ function Profile(props: any) {
     }, [readonly])
 
     async function userSignOut() {
-        router.refresh()
-        
-        signOut(auth)
-        .then(() => {
-            console.log('signed out');
-        })
-        .catch((err) => {
-            console.log(err);
-        })
+        if (props.method === 'google') {
+            signOut(auth)
+            .then(() => {
+                console.log('signed out');
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    await cookieSetter(true, user.uid)    
+                } else {
+                    await cookieSetter(false, null)
+                    window.location.reload()
+                }
+            })
+        } else {
+            const res = await fetch('http://localhost:3000/api/signOut', {
+                method: 'GET'
+            })
 
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                await fetch('http://localhost:3000/api/cookieSetter', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userState: true, userId: user.uid })
-                })
+            const responseMessage = await res.json()
 
-                window.location.reload()
-                
-            } else {
-                await fetch('http://localhost:3000/api/cookieSetter', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userState: false, userId: null })
-                })
-                
+            if (responseMessage.message === 'ok') {
+                await cookieSetter(false, null)
                 window.location.reload()
             }
-        })
+        }    
     }
 
-    
     
     return (
         <div className="h-[20rem] w-[40rem] flex mt-[6rem]">

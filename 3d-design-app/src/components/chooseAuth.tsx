@@ -23,7 +23,7 @@ function ChooseAuth(props: any) {
     const githubprovider = new GithubAuthProvider()
     const facebookProvider = new FacebookAuthProvider()
 
-    async function Auth(provider: any) {
+    async function Auth(provider: any, method: string) {
         const user = auth.currentUser
 
         if (user && props.method === '/signUp') {
@@ -40,7 +40,7 @@ function ChooseAuth(props: any) {
         .then((result) => {
             const user = result.user
             const userName = user.email?.split('@')[0]
-            checkUser(user.uid, userName as string, user.email as string)
+            checkUser(user.uid, userName as string, user.email as string, method)
         })
         .catch((err) => {
             console.log(err);
@@ -82,17 +82,17 @@ function ChooseAuth(props: any) {
                         <span className="buttonText text-center">{props.buttons.email}</span>
                     </Link>
 
-                    <button className="logInButton" onClick={() => Auth(googleProvider)}>
+                    <button className="logInButton" onClick={() => Auth(googleProvider, 'google')}>
                         <Image src={google} alt="google" className="buttonImage"/>
                         <span className="buttonText">{props.buttons.google}</span>
                     </button>
 
-                    <button className="logInButton" onClick={() => Auth(githubprovider)}>
+                    <button className="logInButton" onClick={() => Auth(githubprovider, 'github')}>
                         <Image src={github} alt="github" className="buttonImage" />
                         <span className="buttonText">{props.buttons.github}</span>
                     </button>
 
-                    <button className="logInButton" onClick={() => Auth(facebookProvider)}>
+                    <button className="logInButton" onClick={() => Auth(facebookProvider, 'facebook')}>
                         <Image src={facebook} alt="facebook" className="buttonImage" />
                         <span className="buttonText">{props.buttons.facebook}</span>
                     </button>

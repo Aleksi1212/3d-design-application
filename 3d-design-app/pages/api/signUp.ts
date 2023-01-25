@@ -22,6 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     userId: user.uid,
                     username: username,
                     email: user.email,
+                    method: 'email',
                     documents: []
                 })
 

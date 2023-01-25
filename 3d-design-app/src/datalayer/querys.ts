@@ -1,25 +1,15 @@
-import { db, auth } from "./config"
+import { db } from "./config"
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth"
 
-async function getUserData(data: object) {
-    const res = await fetch('http://localhost:3000/api/getUserInfo', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
+async function getUserData(data: any) {
+    const que = query(collection(db, 'data'), where('userId', '==', data.userId))
+    const querySnapshot = await getDocs(que)
 
-    const userData = await res.json()
-
-    return {
-        userData: userData?.userData as any[],
-        userState: userData?.userState as any
-    }
+    const userData = querySnapshot.docs.map((doc) => doc.data())
+    return userData
 }
 
-async function checkUser(userId: string, userName: string, userEmail: string) {
+async function checkUser(userId: string, userName: string, userEmail: string, method: string) {
     const que = query(collection(db, 'data'), where('userId', '==', userId))
     const querySnapshot = await getDocs(que)
 
@@ -29,6 +19,7 @@ async function checkUser(userId: string, userName: string, userEmail: string) {
                 userId: userId,
                 username: userName,
                 email: userEmail,
+                method: method,
                 documents: []
             })
 
