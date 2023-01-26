@@ -20,29 +20,12 @@ import { db } from "../../../src/datalayer/config";
 import { updateDesign } from "../../../src/datalayer/querys";
 
 function UserHomePage({ params }: any) {
-    // const userData = await getUserData({ userId: params.id })
-
-    // let documents: any = []
-    // let userName: string = ''
-    // let userEmail: string = ''
-    // let userMethod: string = ''
-
-    // userData.map((card) => {
-    //     card.documents.forEach((doc: any) => {
-    //         documents.push(doc)
-    //     })
-
-    //     userName = card.username
-    //     userEmail = card.email
-    //     userMethod = card.method
-    // })
-
     const [userData, setUserData] = useState([])
 
     useEffect(() => {
         const que = query(collection(db, 'data'), where('userId', '==', params.id))
 
-        const getUserData = onSnapshot(que, (querySnapshot) => {
+        const getUserDocs = onSnapshot(que, (querySnapshot) => {
             let data: any = []
             querySnapshot.forEach((doc) => {
                 data.push(doc.data())
@@ -51,21 +34,28 @@ function UserHomePage({ params }: any) {
             setUserData(data)
         })
 
-        return () => getUserData()
+        return () => getUserDocs()
     }, [])
 
     let docs: any = []
+    let userName: string = ''
+    let userEmail: string = ''
+    let userMethod: string = ''
 
-    userData.map((data) => {
+    userData.map(async (data) => {
         data.documents.forEach((doc) => {
             docs.push(doc)
         })
+
+        userName = data.username
+        userEmail = data.email
+        userMethod = data.method
     })
 
     return (
         <>
             <div className="absolute top-0 w-full h-[150vh] flex items-center flex-col">
-                <h1 className="text-white text-5xl mt-24">Welcome Back {'test'}</h1>
+                <h1 className="text-white text-5xl mt-24">Welcome Back {userName}</h1>
 
                 <div className="max-w-[66rem] my-[6rem] flex gap-y-12 gap-x-12 flex-wrap ">
                         <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc"
@@ -85,7 +75,12 @@ function UserHomePage({ params }: any) {
 
                 <hr className="bg-[#5D5D5D] opacity-40 w-[50rem] pb-[1.5px]" />
 
-                <Profile userName={'test'} userEmail={'test'} id={params.id} method={'test'} />
+                <Profile userData={{
+                    name: userName,
+                    email: userEmail,
+                    userId: params.id,
+                    method: userMethod
+                }} />
             </div>
             <UserHome />
         </>
@@ -93,11 +88,11 @@ function UserHomePage({ params }: any) {
 }
 
 function DocumentCard(props: any) {
-    console.log(props.userId);
-
     return (
         <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-between flex-col cursor-pointer" id="doc">
-            <h1 className="pt-3 pl-4 text-xl">{props.docName}</h1>
+            <Link href={`document/${props.userId}/${props.docId}=${props.docName}`} className="h-[85%]">
+                <h1 className="pt-3 pl-4 text-xl">{props.docName}</h1>
+            </Link>
 
             <div className="flex justify-between pb-3">
                 <Image src={docMenu} alt="docMenu" className="ml-4" />

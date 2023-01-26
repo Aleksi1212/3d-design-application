@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 import '../styles/index.css'
-import '../styles/borderEffect.css'
+import '../styles/loadingEffect.css'
 import { Raleway } from '@next/font/google'
 
 const raleway = Raleway({

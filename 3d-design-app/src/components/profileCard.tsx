@@ -2,10 +2,7 @@
 
 import Image from "next/image";
 import userProfile from '../images/userProfile.png'
-import check from '../images/check.png'
-import close from '../images/close.png'
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 
 import { signOut } from "firebase/auth";
@@ -13,26 +10,11 @@ import { auth } from "../datalayer/config";
 
 import { cookieSetter } from "../datalayer/querys";
 
-function Profile(props: any) {
-    const [userName, setUserName] = useState(props.userName)
-    const [userEmail, setUserEmail] = useState(props.userEmail)
-
-    const [readonly, setReadonly] = useState(true)
-    const [cursor, setCursor] = useState('default')
-    const [showicon, setShowicon] = useState('none')
-
-    useEffect(() => {
-        if (readonly) {
-            setCursor('default')
-            setShowicon('none')
-        } else {
-            setCursor('text')
-            setShowicon('flex')
-        }
-    }, [readonly])
+function Profile({ userData }: any) {
+    const { name, email, userId, method } = userData || {}
 
     async function userSignOut() {
-        if (props.method === 'google') {
+        if (method !== 'email') {
             signOut(auth)
             .then(() => {
                 console.log('signed out');
@@ -72,20 +54,8 @@ function Profile(props: any) {
                 </div>
             
                 <div className="pl-2 text-[#737373] flex flex-col text-xl">
-                    <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} readOnly={readonly} 
-                            className="editUser" 
-                            style={{'cursor': cursor}} />
-
-                    <input type="text" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} readOnly={readonly} 
-                            className="editUser" 
-                            style={{'cursor': cursor}} />
-                    
-                </div>
-
-                <div className="flex absolute bottom-0 left-12 w-[5rem] justify-between">
-                    <Image src={check} alt="check" className="cursor-pointer" style={{'display': showicon}} />
-                    <Image src={close} alt="close" className="cursor-pointer" style={{'display': showicon}} width={30}
-                            onClick={() => {setReadonly(true); setUserName(props.userName); setUserEmail(props.userEmail)}} />
+                    <h1>{name}</h1>
+                    <h1>{email}</h1>
                 </div>
             </div>
 
@@ -93,7 +63,7 @@ function Profile(props: any) {
 
             <div className="pt-10">
                 <div className="flex flex-col h-[11rem] justify-evenly">
-                    <button className="userButton bg-white" onClick={() => setReadonly(false)}>Edit</button>
+                    <button className="userButton bg-white">Show Profile</button>
                     <button className="userButton bg-white" onClick={userSignOut}>Sign Out</button>
                     <Link className="userButton bg-[#FA5252] flex justify-center items-center" href="/logIn/delete">Delete</Link>
                 </div>

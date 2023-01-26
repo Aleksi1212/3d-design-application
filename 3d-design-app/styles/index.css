@@ -62,6 +62,10 @@
   .editUser:focus {
     outline: none;
   }
+
+  .editorBox {
+    @apply w-[65%] ml-16 flex justify-between
+  }
 }
 
 
