@@ -1,5 +1,5 @@
 import { db } from "./config"
-import { addDoc, collection, getDocs, query, where, doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore"
+import { addDoc, collection, getDocs, query, where, doc, updateDoc, arrayUnion, arrayRemove, setDoc, collectionGroup } from "firebase/firestore"
 
 async function getUserData(data: any) {
     const que = query(collection(db, 'data'), where('userId', '==', data.userId))
@@ -19,8 +19,7 @@ async function checkUser(userId: string, userName: string, userEmail: string, me
                 userId: userId,
                 username: userName,
                 email: userEmail,
-                method: method,
-                documents: []
+                method: method
             })
 
             console.log(`Data added with id: ${docRef.id}`);
@@ -62,14 +61,46 @@ async function updateDesign(userId: string, type: string, desId: string | null, 
 
     if (type === 'add') {
         await updateDoc(docRef, {
-            documents: arrayUnion({ docId: designId, docName: 'Untitled' })
+            documents: arrayUnion({ docId: designId, docName: desName })
         })
 
     } else if (type === 'remove') {
         await updateDoc(docRef, {
             documents: arrayRemove({ docId: desId, docName: desName })
         })
+    } else if (type === 'update') {
+        await updateDoc(docRef, {
+            documents: arrayUnion({ docId: desId, docName: desName })
+        })
     }
+}
+
+async function addNewDesign(userId: string) {
+    let desId = ''
+    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+    for (let i = 0; i < 8; i++) {
+        desId += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+
+    // await setDoc(collectionGroup(db, 'designs'), {
+    //     design: {
+    //         docId: desId,
+    //         docName: 'Untitled'
+    //     },
+    //     user: userId
+    // })
+
+    const que = query(collection(db, 'data'), where('userId', '==', userId))
+    const querySnapshot = await getDocs(que)
+    const docId = querySnapshot.docs.map((doc) => doc.id)
+
+    const docRef = doc(db, 'data', docId[0], 'designs', desId)
+
+    setDoc(docRef, {
+        test: 'test'
+    })
+    
 }
 
 export {
@@ -77,4 +108,5 @@ export {
     checkUser,
     cookieSetter,
     updateDesign,
+    addNewDesign
 }

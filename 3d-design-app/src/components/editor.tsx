@@ -5,18 +5,39 @@ import Image from "next/image"
 import expand from '../images/expand.png'
 import add from '../images/add.png'
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
-function DocEditor() {
+import { updateDesign } from "../datalayer/querys";
+
+function DocEditor({ designData }: any) {
+    const { docId, docName } = designData[1] || {}
+
+    console.log(designData[2]);
+    
+
     const [system, setSystem] = useState('metric')
     const [mesTypes, setMesTypes] = useState({ large: ['m', 'kg'], small: ['cm', 'g'] })
+
+    const [desName, setDesName] = useState(docName)
+    const nameRef = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        if (nameRef.current) {
+            nameRef.current.addEventListener('blur', async () => {
+                console.log('not focued');
+
+                await updateDesign(designData[0], 'update', 'test', 'test')
+            })
+        }
+    }, [])
 
     return (
         <section className="w-full h-full absolute bg-[#2D2D2D] text-white">
             <nav className="w-full h-[5rem] absolute flex justify-center items-center border-b-[1px] border-[#808080] bg-[#2D2D2D]">
                 <div className="flex text-xl">
                     <h1>Design/</h1>
-                    <h1 className="opacity-50">Untitled</h1>
+                    <input type="text" value={desName} className="bg-[#2D2D2D] outline-none opacity-50"
+                        onChange={(e) => setDesName(e.target.value)} ref={nameRef} />
                 </div>
             </nav>
 
