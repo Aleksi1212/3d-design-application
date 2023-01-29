@@ -1,5 +1,5 @@
 import { db } from "./config"
-import { addDoc, collection, getDocs, query, where, doc, updateDoc, arrayUnion, arrayRemove, setDoc, collectionGroup } from "firebase/firestore"
+import { addDoc, collection, getDocs, query, where, doc, setDoc, deleteDoc } from "firebase/firestore"
 
 async function getUserData(data: any) {
     const que = query(collection(db, 'data'), where('userId', '==', data.userId))
@@ -45,37 +45,8 @@ async function cookieSetter(userState: boolean, userId: string | null) {
     return message.message as any
 }
 
-async function updateDesign(userId: string, type: string, desId: string | null, desName: string | null) {
-    let designId = ''
-    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
-    for (let i = 0; i < 8; i++) {
-        designId += chars.charAt(Math.floor(Math.random() * chars.length))
-    }
-
-    const que = query(collection(db, 'data'), where('userId', '==', userId))
-    const querySnapshot = await getDocs(que)
-    const docId = querySnapshot.docs.map((doc) => doc.id)
-
-    const docRef = doc(db, 'data', docId[0])
-
-    if (type === 'add') {
-        await updateDoc(docRef, {
-            documents: arrayUnion({ docId: designId, docName: desName })
-        })
-
-    } else if (type === 'remove') {
-        await updateDoc(docRef, {
-            documents: arrayRemove({ docId: desId, docName: desName })
-        })
-    } else if (type === 'update') {
-        await updateDoc(docRef, {
-            documents: arrayUnion({ docId: desId, docName: desName })
-        })
-    }
-}
-
-async function addNewDesign(userId: string) {
+async function updateDesign(userId: string, action: string, id: string) {
     let desId = ''
     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
@@ -83,30 +54,31 @@ async function addNewDesign(userId: string) {
         desId += chars.charAt(Math.floor(Math.random() * chars.length))
     }
 
-    // await setDoc(collectionGroup(db, 'designs'), {
-    //     design: {
-    //         docId: desId,
-    //         docName: 'Untitled'
-    //     },
-    //     user: userId
-    // })
-
     const que = query(collection(db, 'data'), where('userId', '==', userId))
     const querySnapshot = await getDocs(que)
     const docId = querySnapshot.docs.map((doc) => doc.id)
 
-    const docRef = doc(db, 'data', docId[0], 'designs', desId)
-
-    setDoc(docRef, {
-        test: 'test'
-    })
+    if (action === 'add') {
+        const docRef = doc(db, 'data', docId[0], 'designs', desId)
     
+        await setDoc(docRef, {
+            designData: {
+                docId: desId,
+                docName: 'Untitled'
+            },
+            user: userId
+        })
+
+    } else if (action === 'remove') {
+        const docRef = doc(db, 'data', docId[0], 'designs', id)
+
+        await deleteDoc(docRef)
+    }
 }
 
 export {
     getUserData,
     checkUser,
     cookieSetter,
-    updateDesign,
-    addNewDesign
+    updateDesign
 }

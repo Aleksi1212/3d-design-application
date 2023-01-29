@@ -14,43 +14,29 @@ import docRemove from '../../../src/images/docRemove.png'
 
 import { useEffect, useState } from "react";
 
-import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
+import { collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../../src/datalayer/config";
 
-import { updateDesign, addNewDesign } from "../../../src/datalayer/querys";
+import { updateDesign } from "../../../src/datalayer/querys";
 
 function UserHomePage({ params }: any) {
-    const [userData, setUserData] = useState([])
+    const [designData, setDesignData] = useState([])
 
     useEffect(() => {
-        const que = query(collection(db, 'data'), where('userId', '==', params.id))
+        const que = query(collectionGroup(db, 'designs'), where('user', '==', params.id))
 
         const getUserDocs = onSnapshot(que, (querySnapshot) => {
             let data: any = []
+
             querySnapshot.forEach((doc) => {
-                data.push(doc.data())
+                data.push(doc.data().designData)
             })
 
-            setUserData(data)
+            setDesignData(data)
         })
 
         return () => getUserDocs()
     }, [])
-
-    let docs: any = []
-    let userName: string = ''
-    let userEmail: string = ''
-    let userMethod: string = ''
-
-    userData.map(async (data) => {
-        data.documents.forEach((doc) => {
-            docs.push(doc)
-        })
-
-        userName = data.username
-        userEmail = data.email
-        userMethod = data.method
-    })
 
     return (
         <>
@@ -59,7 +45,7 @@ function UserHomePage({ params }: any) {
 
                 <div className="max-w-[66rem] my-[6rem] flex gap-y-12 gap-x-12 flex-wrap ">
                         <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc"
-                            onClick={() => addNewDesign(params.id)}>
+                            onClick={() => updateDesign(params.id, 'add', '')}>
                             <div className="flex flex-col items-center text-[#1A73E8] gap-y-8 mt-8">
                                 <Image src={addDoc} alt="addDoc" />
                                 <h1>Add New Design</h1>
@@ -67,7 +53,7 @@ function UserHomePage({ params }: any) {
                         </div>
 
                         {
-                            docs.map((docCard: any) => {
+                            designData.map((docCard: any) => {
                                 return <DocumentCard key={docCard.docId} userId={params.id} docId={docCard.docId} docName={docCard.docName} />
                             })
                         }
@@ -99,7 +85,7 @@ function DocumentCard(props: any) {
                 
                 <div className="flex justify-evenly w-[6rem]">
                     <Image src={docShare} alt="docShare" />
-                    <Image src={docRemove} alt="docRemove" onClick={() => updateDesign(props.userId, 'remove', props.docId, props.docName)} />
+                    <Image src={docRemove} alt="docRemove" onClick={() => updateDesign(props.userId, 'remove', props.docId)} />
                 </div>
             </div>
         </div>

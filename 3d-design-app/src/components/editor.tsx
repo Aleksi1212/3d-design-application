@@ -7,28 +7,32 @@ import add from '../images/add.png'
 
 import { useEffect, useRef, useState } from "react"
 
-import { updateDesign } from "../datalayer/querys";
+import { db } from "../datalayer/config";
+import { collectionGroup, query, where } from "firebase/firestore";
 
 function DocEditor({ designData }: any) {
-    const { docId, docName } = designData[1] || {}
-
-    console.log(designData[2]);
-    
+    const { user, docId, docName } = designData || {}    
 
     const [system, setSystem] = useState('metric')
     const [mesTypes, setMesTypes] = useState({ large: ['m', 'kg'], small: ['cm', 'g'] })
+    const [docData, setDocData] = useState([])
 
     const [desName, setDesName] = useState(docName)
     const nameRef = useRef<HTMLInputElement>(null)
 
-    useEffect(() => {
-        if (nameRef.current) {
-            nameRef.current.addEventListener('blur', async () => {
-                console.log('not focued');
 
-                await updateDesign(designData[0], 'update', 'test', 'test')
-            })
-        }
+    // useEffect(() => {
+    //     if (nameRef.current) {
+    //         nameRef.current.addEventListener('blur', async () => {
+    //             console.log('not focued');
+
+    //             await updateDesign(designData[0], 'update', 'test', 'test')
+    //         })
+    //     }
+    // }, [])
+
+    useEffect(() => {
+        const que = query(collectionGroup(db, 'designs'), where('user', '==', user))
     }, [])
 
     return (
