@@ -6,42 +6,66 @@ import expand from '../images/expand.png'
 import add from '../images/add.png'
 
 import { useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation";
 
 import { db } from "../datalayer/config";
-import { collectionGroup, query, where } from "firebase/firestore";
+import { updateDesign } from "../datalayer/querys";
+import { collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 
 function DocEditor({ designData }: any) {
-    const { user, docId, docName } = designData || {}    
+    const { user, docId, docName } = designData || {}
+
+    const router = useRouter()
 
     const [system, setSystem] = useState('metric')
     const [mesTypes, setMesTypes] = useState({ large: ['m', 'kg'], small: ['cm', 'g'] })
-    const [docData, setDocData] = useState([])
 
     const [desName, setDesName] = useState(docName)
-    const nameRef = useRef<HTMLInputElement>(null)
 
-
-    // useEffect(() => {
-    //     if (nameRef.current) {
-    //         nameRef.current.addEventListener('blur', async () => {
-    //             console.log('not focued');
-
-    //             await updateDesign(designData[0], 'update', 'test', 'test')
-    //         })
-    //     }
-    // }, [])
+    const editProps = ['Hat', 'Glasses', 'Shirt', 'Hoodie / Jacket', 'Pants', 'Socks', 'Shoes']
 
     useEffect(() => {
-        const que = query(collectionGroup(db, 'designs'), where('user', '==', user))
+        const que = query(collectionGroup(db, 'designs'), where('user', '==', user), where('designData.docId', '==', docId))
+
+        const getDocNameRealTime = onSnapshot(que, (querySnapshot) => {
+            let data: any = []
+            querySnapshot.forEach((doc) => {
+                data.push(doc.data().designData.docName)
+            })
+
+            setDesName(data[0])
+        }) 
+
+        return () => getDocNameRealTime()
     }, [])
 
+    function updateName(event: any) {
+        event.preventDefault()
+
+        const newName = event.target.desName.value
+        updateDesign(user, 'update', docId, newName)
+
+        router.replace(`/document/${user}/${docId}=${desName}`)
+    }
+
+    const inputRef = useRef<HTMLInputElement | null>(null)
+
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.style.width = `${(inputRef.current.value.length + 1) * 15}px`
+        }
+    }, [inputRef.current])
+    
     return (
         <section className="w-full h-full absolute bg-[#2D2D2D] text-white">
             <nav className="w-full h-[5rem] absolute flex justify-center items-center border-b-[1px] border-[#808080] bg-[#2D2D2D]">
                 <div className="flex text-xl">
-                    <h1>Design/</h1>
-                    <input type="text" value={desName} className="bg-[#2D2D2D] outline-none opacity-50"
-                        onChange={(e) => setDesName(e.target.value)} ref={nameRef} />
+                    <h1>Design /</h1>
+                    
+                    <form onSubmit={updateName} className="w-auto">
+                        <input type="text" value={desName} className="bg-[#2D2D2D] outline-none opacity-50 pl-1" name="desName" ref={inputRef}
+                            onChange={(e) => setDesName(e.target.value)} />
+                    </form>
                 </div>
             </nav>
 
@@ -53,41 +77,13 @@ function DocEditor({ designData }: any) {
                     </div>
 
                     <div className="relative top-[6rem] w-full">
-                        <div className="editorBox mb-4">
-                            <p>Hat</p>
-                            <Image src={add} alt="addHat" />
-                        </div>
-
-                        <div className="editorBox mb-4">
-                            <p>Glasses</p>
-                            <Image src={add} alt="addGlasses" />
-                        </div>
-
-                        <div className="editorBox mb-4">
-                            <p>Shirt</p>
-                            <Image src={add} alt="addShirt" />
-                        </div>
-
-                        <div className="editorBox mb-4">
-                            <p>Hoodie / Jacket</p>
-                            <Image src={add} alt="addOverShirt" />
-                        </div>
-
-                        <div className="editorBox mb-4">
-                            <p>Pants</p>
-                            <Image src={add} alt="addPants" />
-                        </div>
-
-                        <div className="editorBox mb-4">
-                            <p>Socks</p>
-                            <Image src={add} alt="addSocks" />
-                        </div>
-
-                        <div className="editorBox mb-4">
-                            <p>Shoes</p>
-                            <Image src={add} alt="addShoes" />
-                        </div>
+                        {
+                            editProps.map((editorBox) => {
+                                return <EditorBox data={editorBox} key={editorBox} />
+                            })
+                        }
                     </div>
+
                 </div>
 
                 <div className="h-full w-[80rem] bg-[#1D1D1D]"></div>
@@ -152,6 +148,15 @@ function DocEditor({ designData }: any) {
                 </div>
             </div>
         </section>
+    )
+}
+
+function EditorBox({ data }: any) {
+    return (
+        <div className="editorBox mb-4">
+            <p>{data}</p>
+            <Image src={add} alt="add" />
+        </div>
     )
 }
 

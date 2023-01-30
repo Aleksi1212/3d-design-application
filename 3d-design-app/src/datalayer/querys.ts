@@ -1,5 +1,5 @@
 import { db } from "./config"
-import { addDoc, collection, getDocs, query, where, doc, setDoc, deleteDoc } from "firebase/firestore"
+import { addDoc, collection, getDocs, query, where, doc, setDoc, deleteDoc, updateDoc } from "firebase/firestore"
 
 async function getUserData(data: any) {
     const que = query(collection(db, 'data'), where('userId', '==', data.userId))
@@ -46,7 +46,7 @@ async function cookieSetter(userState: boolean, userId: string | null) {
 }
 
 
-async function updateDesign(userId: string, action: string, id: string) {
+async function updateDesign(userId: string, action: string, id: string, newName: string) {
     let desId = ''
     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
@@ -73,6 +73,13 @@ async function updateDesign(userId: string, action: string, id: string) {
         const docRef = doc(db, 'data', docId[0], 'designs', id)
 
         await deleteDoc(docRef)
+
+    } else if (action === 'update') {
+        const docRef = doc(db, 'data', docId[0], 'designs', id)
+
+        await updateDoc(docRef, {
+            'designData.docName': newName
+        })
     }
 }
 

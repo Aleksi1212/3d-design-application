@@ -66,6 +66,10 @@
   .editorBox {
     @apply w-[65%] ml-16 flex justify-between
   }
+
+  #editButton:active {
+    @apply scale-90
+  }
 }
 
 

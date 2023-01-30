@@ -1,7 +1,6 @@
 'use client';
 
 import UserHome from "../../../src/components/userHome";
-import { getUserData } from "../../../src/datalayer/querys";
 import Profile from "../../../src/components/profileCard";
 
 import Image from "next/image";
@@ -14,38 +13,59 @@ import docRemove from '../../../src/images/docRemove.png'
 
 import { useEffect, useState } from "react";
 
-import { collectionGroup, onSnapshot, query, where } from "firebase/firestore";
+import { collection, collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../../../src/datalayer/config";
 
 import { updateDesign } from "../../../src/datalayer/querys";
 
 function UserHomePage({ params }: any) {
     const [designData, setDesignData] = useState([])
+    const [userData, setUserData] = useState([])
+
+    let name: string = ''
+    userData.map((data: any) => {
+        name = data.username
+    })
 
     useEffect(() => {
-        const que = query(collectionGroup(db, 'designs'), where('user', '==', params.id))
+        const docQue = query(collectionGroup(db, 'designs'), where('user', '==', params.id))
 
-        const getUserDocs = onSnapshot(que, (querySnapshot) => {
-            let data: any = []
+        const getDesignDocs = onSnapshot(docQue, (querySnapshot) => {
+            let docData: any = []
 
-            querySnapshot.forEach((doc) => {
-                data.push(doc.data().designData)
+            querySnapshot.forEach((designDoc) => {
+                docData.push(designDoc.data().designData)
             })
 
-            setDesignData(data)
+            setDesignData(docData)
         })
 
-        return () => getUserDocs()
+        const userQue = query(collection(db, 'data'), where('userId', '==', params.id))
+
+        const getUserDocs = onSnapshot(userQue, (querySnapshot) => {
+            let userCredentials: any = []
+
+            querySnapshot.forEach((userDoc) => {
+                userCredentials.push(userDoc.data())
+            })
+
+            setUserData(userCredentials)
+        })
+
+        return () => {
+            getDesignDocs(); getUserDocs()
+        }
     }, [])
+    
 
     return (
         <>
             <div className="absolute top-0 w-full h-[150vh] flex items-center flex-col">
-                <h1 className="text-white text-5xl mt-24">Welcome Back test</h1>
+                <h1 className="text-white text-5xl mt-24">Welcome Back {name}</h1>
 
                 <div className="max-w-[66rem] my-[6rem] flex gap-y-12 gap-x-12 flex-wrap ">
                         <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc"
-                            onClick={() => updateDesign(params.id, 'add', '')}>
+                            onClick={() => updateDesign(params.id, 'add', '', '')}>
                             <div className="flex flex-col items-center text-[#1A73E8] gap-y-8 mt-8">
                                 <Image src={addDoc} alt="addDoc" />
                                 <h1>Add New Design</h1>
@@ -61,12 +81,11 @@ function UserHomePage({ params }: any) {
 
                 <hr className="bg-[#5D5D5D] opacity-40 w-[50rem] pb-[1.5px]" />
 
-                <Profile userData={{
-                    name: 'test',
-                    email: 'test',
-                    userId: params.id,
-                    method: 'test'
-                }} />
+                {
+                    userData.map((user: any) => {
+                        return <Profile userData={user} key={user.userId} />
+                    })
+                }
             </div>
             <UserHome />
         </>
@@ -85,7 +104,7 @@ function DocumentCard(props: any) {
                 
                 <div className="flex justify-evenly w-[6rem]">
                     <Image src={docShare} alt="docShare" />
-                    <Image src={docRemove} alt="docRemove" onClick={() => updateDesign(props.userId, 'remove', props.docId)} />
+                    <Image src={docRemove} alt="docRemove" onClick={() => updateDesign(props.userId, 'remove', props.docId, '')} />
                 </div>
             </div>
         </div>
