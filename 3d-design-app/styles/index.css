@@ -70,8 +70,37 @@
   #editButton:active {
     @apply scale-90
   }
-}
 
+  #profileAction, #otherAction {
+    @apply flex flex-col items-center
+  }
+
+  #profileBar, #otherBar {
+    @apply w-[3px] h-[3px] rounded-full transition-all duration-500
+  }
+
+  #profileAction:hover > #profileBar, #otherAction:hover > #otherBar, #otherAction:focus > #otherBar {
+    @apply w-full
+  }
+
+  .friendButton {
+    @apply w-[3rem] h-[3rem] rounded-full shadow-lg flex justify-center items-center bg-gray-300 hover:brightness-90
+  }
+
+  .friendButton:active, #profileAction:active {
+    @apply scale-95
+  }
+
+  
+  .friendActions {
+    @apply absolute -right-[.475rem] -top-6 w-[4rem] h-[2rem] bg-[#5D5D5D] rounded-md flex justify-center items-center
+    transition-all duration-200 scale-0 origin-bottom text-white
+  }
+
+  #menu:hover ~ .friendActions, #menu:focus ~ #friendMenu {
+    @apply scale-100
+  }
+}
 
 html, body {
   padding: 0;

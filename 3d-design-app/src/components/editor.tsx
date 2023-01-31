@@ -19,7 +19,6 @@ function DocEditor({ designData }: any) {
 
     const [system, setSystem] = useState('metric')
     const [mesTypes, setMesTypes] = useState({ large: ['m', 'kg'], small: ['cm', 'g'] })
-
     const [desName, setDesName] = useState(docName)
 
     const editProps = ['Hat', 'Glasses', 'Shirt', 'Hoodie / Jacket', 'Pants', 'Socks', 'Shoes']

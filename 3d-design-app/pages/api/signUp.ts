@@ -32,12 +32,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
             catch(err) {
                 console.log(err);
+                setCookie('auth', JSON.stringify({ userState: false, userId: null }), { req, res, httpOnly: true, secure: true, sameSite: 'strict' })
                 res.redirect('/signUp')
             }
         })
         .catch((err) => {
             console.log(err);
-
+            
             setCookie('auth', JSON.stringify({ userState: false, userId: null }), { req, res, httpOnly: true, secure: true, sameSite: 'strict' })
             res.redirect('/signUp')
         })
