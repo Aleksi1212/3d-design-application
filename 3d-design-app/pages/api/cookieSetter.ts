@@ -8,6 +8,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const { userState, userId } = req.body
 
-    setCookie('auth', JSON.stringify({ userState: userState, userId: userId }), { req, res, httpOnly: true, secure: true, sameSite: 'strict' })
+    setCookie('auth', JSON.stringify({ userState: userState, userId: userId }), { req, res, httpOnly: true, secure: true, path: '/', sameSite: 'strict' })
     res.status(200).json({ message: 'cookie set' })
 }

@@ -83,9 +83,21 @@ async function updateDesign(userId: string, action: string, id: string, newName:
     }
 }
 
+async function updateFriend(userId: string, action: string, friendId: string, friendName: string) {
+    const que = query(collection(db, 'data'), where('userId', '==', userId))
+    const querySnapshot = await getDocs(que)
+    const docId = querySnapshot.docs.map((doc) => doc.id)
+
+    if (action === 'remove') {
+        const docRef = doc(db, 'data', docId[0], 'friends', friendId)
+        await deleteDoc(docRef)
+    }
+}
+
 export {
     getUserData,
     checkUser,
     cookieSetter,
-    updateDesign
+    updateDesign,
+    updateFriend
 }

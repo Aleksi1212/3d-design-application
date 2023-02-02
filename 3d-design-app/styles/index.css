@@ -76,7 +76,7 @@
   }
 
   #profileBar, #otherBar {
-    @apply w-[3px] h-[3px] rounded-full transition-all duration-500
+    @apply w-[3px] h-[3px] rounded-full transition-all duration-300
   }
 
   #profileAction:hover > #profileBar, #otherAction:hover > #otherBar, #otherAction:focus > #otherBar {
@@ -92,13 +92,29 @@
   }
 
   
-  .friendActions {
-    @apply absolute -right-[.475rem] -top-6 w-[4rem] h-[2rem] bg-[#5D5D5D] rounded-md flex justify-center items-center
+  .friendActions, .messageFriend {
+    @apply absolute -right-[.475rem] -top-10 w-[4rem] h-[2rem] bg-[#5D5D5D] rounded-md flex justify-center items-center
     transition-all duration-200 scale-0 origin-bottom text-white
   }
 
-  #menu:hover ~ .friendActions, #menu:focus ~ #friendMenu {
+  #menu:hover ~ .friendActions {
     @apply scale-100
+  }
+
+  #message:hover ~ .messageFriend {
+    @apply scale-100
+  }
+
+  #friendContainer::-webkit-scrollbar, #friendContainer::-webkit-scrollbar-thumb {
+    @apply hidden
+  }
+
+  #friend:nth-child(-n + 1) {
+    @apply border-t-2
+  }
+
+  #friend:hover {
+    @apply opacity-70
   }
 }
 
@@ -148,8 +164,6 @@ html, body {
 
 .buttonText {
   transition: all .5s;
-  /* opacity: 1;
-  visibility: hidden; */
 }
 
 .logInButton:hover .buttonImage {
@@ -158,4 +172,24 @@ html, body {
 
 .logInButton:hover .buttonText {
   top: .75rem;
+}
+
+.actionBox {
+  width: calc(100% - 70px);
+  background-color: #5d5d5d;
+  margin-top: .25rem;
+  position: absolute;
+  top: 2.2rem;
+  border-radius: .375rem;
+  color: white;
+  font-size: 13px;
+  transition: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+  transform-origin: top;
+  transform: scale(0);
+}
+
+#profileAction:hover > .actionBox {
+  transform: scale(1);
 }
