@@ -47,7 +47,7 @@
     @apply w-[7rem] h-[2.5rem] rounded-lg shadow-xl
   }
 
-  .userButton:hover, #doc:hover {
+  .userButton:hover, #doc:hover, #friend:hover {
     @apply brightness-95
   }
 
@@ -105,7 +105,7 @@
     @apply scale-100
   }
 
-  #friendContainer::-webkit-scrollbar, #friendContainer::-webkit-scrollbar-thumb {
+  #friendContainer::-webkit-scrollbar, #friendContainer::-webkit-scrollbar-thumb, #userContainer::-webkit-scrollbar, #userContainer::-webkit-scrollbar-thumb {
     @apply hidden
   }
 
@@ -113,8 +113,12 @@
     @apply border-t-2
   }
 
-  #friend:hover {
-    @apply opacity-70
+  .actionBox {
+    @apply w-16 mt-1 bg-[#5D5D5D] absolute top-[2.2rem] rounded-md text-[13px] text-white transition-all duration-200 origin-top scale-0
+  }
+
+  #profileAction:hover > .actionBox {
+    @apply scale-100
   }
 }
 
@@ -172,24 +176,4 @@ html, body {
 
 .logInButton:hover .buttonText {
   top: .75rem;
-}
-
-.actionBox {
-  width: calc(100% - 70px);
-  background-color: #5d5d5d;
-  margin-top: .25rem;
-  position: absolute;
-  top: 2.2rem;
-  border-radius: .375rem;
-  color: white;
-  font-size: 13px;
-  transition: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-  transform-origin: top;
-  transform: scale(0);
-}
-
-#profileAction:hover > .actionBox {
-  transform: scale(1);
 }

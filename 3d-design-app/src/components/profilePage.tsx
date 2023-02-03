@@ -1,15 +1,16 @@
 'use client';
 
 import Image from "next/image";
-import Link from "next/link";
 
 import { db } from "../datalayer/config";
-import { collectionGroup, onSnapshot, query, where } from "firebase/firestore";
-import { updateFriend } from "../datalayer/querys";
+import { collection, collectionGroup, onSnapshot, query, where } from "firebase/firestore";
+import { updateFriendOrUser } from "../datalayer/querys";
 
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useReducer } from "react";
 import useImages  from '../hooks/importImages'
+
+import SearchUsers from "./searchUsers";
+import UserCard from "./userCard";
 
 function ProfilePage({ user }: any) {
     const { userId, userName, currentUser } = user || {}
@@ -17,51 +18,99 @@ function ProfilePage({ user }: any) {
     const images = useImages(require.context('../images', false, /\.(png|jpe?g|svg)$/))
 
     const [friendData, setFriendData] = useState([])
+    const [userData, setUserData] = useState({ state: null })
+    
+    useEffect(() => {
+        const friendQue = query(collectionGroup(db, 'friends'), where('user', '==', userId))
+        
+        const getFriendData = onSnapshot(friendQue, (querySnapshot) => {
+            let friends: any = []
+            querySnapshot.forEach((friend) => {
+                friends.push(friend.data().friendData)
+            })
+            
+            setFriendData(friends)
+        })
+        
+        const userQue = query(collection(db, 'data'), where('userId', '==', userId))
+        
+        const getUserData = onSnapshot(userQue, (querySnapshot) => {
+            let userState: any = { state: Boolean }
+            querySnapshot.forEach((user) => {
+                userState.state = user.data().locked
+            })
+            
+            setUserData(userState)
+        })
+        
+        return () => {
+            getFriendData()
+            getUserData()
+        }
+    }, [])
 
     const actions = userId === currentUser.userId ? [
-        { image: images['lockProfile.png'], color: '#5D5D5D', message: 'Lock', key: 'lock' },
-        { image: images['editProfile.png'], color: '#5D5D5D', message: 'Edit', key: 'edit' }
+        userData.state ? {
+            image: images['unlockProfile.png'], color: '#5D5D5D', message: 'Unlock', key: 'unlock'
+        } : {
+            image: images['lockProfile.png'], color: '#5D5D5D', message: 'Lock', key: 'lock'
+        },
+
+        { image: images['editProfile.png'], color: '#5D5D5D', message: 'Edit', key: 'edit' },
+        { image: images['signOut.png'], color: '#FA5252', message: 'Sign Out', key: 'signOut' }
     ] : [
         { image: images['message.png'], color: '#5D5D5D', message: 'Message', key: 'message'},
         { image: images['addFriend.png'], color: '#40C057', message: 'Add', key: 'add' },
         { image: images['block.png'], color: '#FA5252', message: 'Block', key: 'block' }
     ]
 
-    console.log(actions);
+    function reducer(state: any, action: any) {
+        if (action.payload.state) {
+            return {
+                message: 'Hide SearchBox',
+                state: true
+            }
+        } else {
+            return {
+                message: 'Show SearchBox',
+                state: false
+            }
+        }
+    }
 
-    useEffect(() => {
-        const que = query(collectionGroup(db, 'friends'), where('user', '==', userId))
-
-        const getFriendData = onSnapshot(que, (querySnapshot) => {
-            let friends: any = []
-            querySnapshot.forEach((friend) => {
-                friends.push(friend.data().friendData)
-            })
-
-            setFriendData(friends)
-        })
-
-        return () => getFriendData()
-    }, [])
-
+    const [state, dispatch] = useReducer(reducer, { message: 'Show SearchBox', state: false })
 
     return (
-        <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center">
-            <div className="w-[40rem] h-[50rem] bg-white shadow-lg flex flex-col items-center justify-evenly rounded-xl">
+        <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
+            <div className="w-[40rem] h-[50rem] bg-white shadow-lg flex flex-col items-center justify-evenly rounded-xl relative">
+                <button className="absolute top-4 right-4 hover:text-[#3D8ED9] hover:border-b-[1px] border-[#3D8ED9]"
+                        onClick={() => dispatch({ payload: { message: 'Hide SearchBox', state: !state.state } })}>
+                {state.message}</button>
+
                 <div className="w-full flex items-center justify-between pl-20 pr-20">
                     <div className="w-[12rem] h-[12rem] shadow-lg bg-gray-100 rounded-full flex justify-center items-center">
                         <Image src={images['userProfile.png']} alt="profileImage" />
                     </div>
 
-                    <div className="flex flex-col justify-between gap-y-4">
+                    <div className="flex flex-col justify-between gap-y-4 items-center">
                         <h1 className="text-3xl">{userName}</h1>
-                        <div className="flex justify-between relative">
+                        <div className="flex justify-between relative" style={{ width: 'calc(100% + 20px)' }}>
                             {
                                 actions.map((action: any) => {
                                     return (
-                                        <button id="profileAction" key={action.key}>
-                                            <Image src={action.image} alt="action" />
-                                            <div className={`bg-[${action.color}]`} id="profileBar"></div>
+                                        <button id="profileAction" key={action.key}
+                                            onClick={() => {
+                                                if (action.key === 'lock') {
+                                                    updateFriendOrUser(userId, 'update', null, null, null, 'user', true)
+                                                } else if (action.key === 'unlock') {
+                                                    updateFriendOrUser(userId, 'update', null, null, null, 'user', false)
+                                                }
+                                            }}>
+                                            
+                                            <Image src={action.image} alt="actionImage" width={25} height={25} />
+                                            <div style={{ backgroundColor: action.color, marginRight: action.key === 'signOut' ? '.25rem' : '0' }}
+                                                id="profileBar"></div>
+
                                             <div className="actionBox">{action.message}</div>
                                         </button>
                                     )
@@ -89,67 +138,22 @@ function ProfilePage({ user }: any) {
                     <div className="w-[110%] max-h-full h-full ml-[11.5rem] flex overflow-auto flex-col mt-2 pt-6" id="friendContainer">
                         {
                             friendData.map((friendCard: any) => {
-                                return <FriendCard key={friendCard.friendId} friend={{ user: userId, friendId: friendCard.friendId, friendName: friendCard.friendName }} />
+                                return <UserCard key={friendCard.friendId} 
+                                user={{ 
+                                    viewingUser: userId, 
+                                    usersId: friendCard.friendId, 
+                                    usersName: friendCard.friendName, 
+                                    messagingId: friendCard.messagingId, 
+                                    action: { message: 'Remove Friend', color: '#FA5252', action: 'remove' } 
+                                }} />
                             })
                         }
                     </div>
                 </div>
             </div>
 
+            <SearchUsers viewer={{ userId: currentUser.userId, hidden: state.state }} />
         </section>
-    )
-}
-
-function FriendCard({ friend }: any) {
-    const { user, friendId, friendName } = friend || {}
-
-    const [overUser, setOverUser] = useState(false)
-    const [overMenu, setOverMenu] = useState(false)
-    const [clicked, setClicked] = useState(false)
-
-    const images = useImages(require.context('../images', false, /\.(png|jpe?g|svg)$/))
-    
-    return (
-        <div className="w-[73%] h-[5rem] flex items-center justify-between border-b-2 border-gray-300 p-2" id="friend" 
-            onMouseEnter={() => setOverUser(true)} onMouseLeave={() => {setOverUser(false); setClicked(false)}}>
-            <Link className="w-[75%]" href={`/profile/${friendId}=${friendName}`}>
-                <div className="flex items-center text-lg gap-x-5">
-                    <div className="h-[4rem] w-[4rem] bg-gray-100 shadow-lg rounded-full flex justify-center items-center">
-                        <Image src={images['userProfile.png']} alt="profileImage" width={30} height={30} />
-                    </div>
-
-                    <h1>{friendName}</h1>
-                </div>
-            </Link>
-
-
-            <div className="flex w-[7rem] justify-between relative">
-                <button className="friendButton" id="message">
-                    <Image src={images['message.png']} alt="message" />
-                </button>
-                
-                <button className="friendButton" id="menu" onClick={() => setClicked(true)}>
-                    <Image src={images['userMenu.png']} alt="userMenu" />
-                </button>
-
-                <div className="messageFriend right-12 w-[5rem]">
-                    Message
-                </div>
-
-                <div className="friendActions">
-                    More
-                </div>
-
-                <div className="absolute w-[10rem] bg-[#5D5D5D] -right-[10.5rem] -top-[1.4rem] text-white rounded-md transition-all duration-200 origin-left" id="friendMenu"
-                    onMouseEnter={() => setOverMenu(true)} onMouseLeave={() => setOverMenu(false)}
-                    style={{ transform: overUser && clicked || overMenu && clicked ? 'scale(1)' : 'scale(0)' }}>
-
-                    <button className="w-full h-[2rem] rounded-tr-md rounded-tl-md hover:bg-[#40C057]">View Profile</button>
-                    <button className="w-full border-y-2 h-[2rem] hover:bg-[#FA5252]" onClick={() => updateFriend(user, 'remove', friendId, '')}>Remove Friend</button>
-                    <button className="w-full h-[2rem] rounded-bl-md rounded-br-md hover:bg-[#FA5252]">Block User</button>
-                </div>
-            </div>
-        </div>
     )
 }
 

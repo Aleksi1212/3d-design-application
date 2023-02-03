@@ -6,12 +6,15 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 
 import { setCookie } from "cookies-next";
 
+import { generateId } from "../../src/datalayer/querys";
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
         res.status(405).json({ message: 'method not allowed' })
     }
 
     const { email, username, password } = req.body
+    const messagingId = generateId(5)
 
     createUserWithEmailAndPassword(auth, email, password)
         .then(async (userCredentials) => {
@@ -22,7 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     userId: user.uid,
                     username: username,
                     email: user.email,
-                    method: 'email'
+                    method: 'email',
+                    locked: false,
+                    messagingId: messagingId
                 })
 
                 console.log(`New document created with id: ${docRef.id}`);
