@@ -83,6 +83,10 @@
     @apply w-full
   }
 
+  #backHome:hover ~ #profileBar {
+    @apply w-[55%]
+  }
+
   .friendButton {
     @apply w-[3rem] h-[3rem] rounded-full shadow-lg flex justify-center items-center bg-gray-300 hover:brightness-90
   }
@@ -97,7 +101,7 @@
     transition-all duration-200 scale-0 origin-bottom text-white
   }
 
-  #menu:hover ~ .friendActions {
+  #menu:hover ~ .friendActions, #backHome:hover ~ #homeMessage {
     @apply scale-100
   }
 

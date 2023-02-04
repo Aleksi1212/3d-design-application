@@ -30,7 +30,6 @@ function SearchUsers({ viewer }: any) {
     const { userId } = viewer || {}
 
     const [userData, setUserData] = useState([]) as any
-    const [hidden, setHidden] = useState(false)
     const [state, dispatch] = useReducer(reducer, { message: 'Hide Searchbox', hidden: false })
     
     async function searchUsers(userName: string) {
@@ -44,7 +43,6 @@ function SearchUsers({ viewer }: any) {
             setUserData([])
         }
     }
-
 
     return (
         <div className="h-[50rem] shadow-lg bg-white rounded-xl p-6 transition-all" style={{ width: state.hidden ? '5rem' : '30rem' }}>

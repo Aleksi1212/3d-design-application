@@ -1,6 +1,7 @@
 'use client';
 
 import Image from "next/image";
+import Link from "next/link";
 
 import { db } from "../datalayer/config";
 import { collection, collectionGroup, onSnapshot, query, where } from "firebase/firestore";
@@ -66,6 +67,17 @@ function ProfilePage({ user }: any) {
     
     return (
         <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
+            <div className="absolute left-20 top-20 flex flex-col items-center">
+                <Link href={`/dashboard/${currentUser.userId}`} id="backHome" className="active:scale-90">
+                    <Image src={images['home.png']} alt="home" width={40} height={40} />
+                </Link>
+                <div id="profileBar" className="bg-[#5D5D5D]"></div>
+
+                <div className="bg-[#5D5D5D] rounded-md text-sm text-white flex justify-center items-center mt-[.3rem] transition-all duration-200 origin-top scale-0" id="homeMessage" style={{ width: 'calc(100% + 10px)' }}>
+                    Dashboard
+                </div>
+            </div>
+
             <div className="w-[40rem] h-[50rem] bg-white shadow-lg flex flex-col items-center justify-evenly rounded-xl ">
                 <div className="w-full flex items-center justify-between pl-20 pr-20">
                     <div className="w-[12rem] h-[12rem] shadow-lg bg-gray-100 rounded-full flex justify-center items-center">
@@ -120,11 +132,12 @@ function ProfilePage({ user }: any) {
                             friendData.map((friendCard: any) => {
                                 return <UserCard key={friendCard.friendId} 
                                 user={{ 
-                                    viewingUser: userId, 
+                                    viewingUser: currentUser.userId, 
                                     usersId: friendCard.friendId, 
                                     usersName: friendCard.friendName, 
                                     messagingId: friendCard.messagingId, 
-                                    action: { message: 'Remove Friend', color: '#FA5252', action: 'remove' } 
+                                    action: friendCard.friendId === currentUser.userId ? { message: 'Edit Profile', color: '#40C057', action: '' } :  
+                                    { message: 'Remove Friend', color: '#FA5252', action: 'remove' } 
                                 }} />
                             })
                         }
