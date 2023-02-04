@@ -6,7 +6,7 @@ import { db } from "../datalayer/config";
 import { collection, collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 import { updateFriendOrUser } from "../datalayer/querys";
 
-import { useEffect, useState, useReducer } from "react";
+import { useEffect, useState } from "react";
 import useImages  from '../hooks/importImages'
 
 import SearchUsers from "./searchUsers";
@@ -63,30 +63,10 @@ function ProfilePage({ user }: any) {
         { image: images['addFriend.png'], color: '#40C057', message: 'Add', key: 'add' },
         { image: images['block.png'], color: '#FA5252', message: 'Block', key: 'block' }
     ]
-
-    function reducer(state: any, action: any) {
-        if (action.payload.state) {
-            return {
-                message: 'Hide SearchBox',
-                state: true
-            }
-        } else {
-            return {
-                message: 'Show SearchBox',
-                state: false
-            }
-        }
-    }
-
-    const [state, dispatch] = useReducer(reducer, { message: 'Show SearchBox', state: false })
-
+    
     return (
         <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
-            <div className="w-[40rem] h-[50rem] bg-white shadow-lg flex flex-col items-center justify-evenly rounded-xl relative">
-                <button className="absolute top-4 right-4 hover:text-[#3D8ED9] hover:border-b-[1px] border-[#3D8ED9]"
-                        onClick={() => dispatch({ payload: { message: 'Hide SearchBox', state: !state.state } })}>
-                {state.message}</button>
-
+            <div className="w-[40rem] h-[50rem] bg-white shadow-lg flex flex-col items-center justify-evenly rounded-xl ">
                 <div className="w-full flex items-center justify-between pl-20 pr-20">
                     <div className="w-[12rem] h-[12rem] shadow-lg bg-gray-100 rounded-full flex justify-center items-center">
                         <Image src={images['userProfile.png']} alt="profileImage" />
@@ -99,13 +79,13 @@ function ProfilePage({ user }: any) {
                                 actions.map((action: any) => {
                                     return (
                                         <button id="profileAction" key={action.key}
-                                            onClick={() => {
-                                                if (action.key === 'lock') {
-                                                    updateFriendOrUser(userId, 'update', null, null, null, 'user', true)
-                                                } else if (action.key === 'unlock') {
-                                                    updateFriendOrUser(userId, 'update', null, null, null, 'user', false)
-                                                }
-                                            }}>
+                                        onClick={() => {
+                                            if (action.key === 'lock') {
+                                                updateFriendOrUser(userId, 'update', null, null, null, 'user', true)
+                                            } else if (action.key === 'unlock') {
+                                                updateFriendOrUser(userId, 'update', null, null, null, 'user', false)
+                                            }
+                                        }}>
                                             
                                             <Image src={action.image} alt="actionImage" width={25} height={25} />
                                             <div style={{ backgroundColor: action.color, marginRight: action.key === 'signOut' ? '.25rem' : '0' }}
@@ -152,7 +132,7 @@ function ProfilePage({ user }: any) {
                 </div>
             </div>
 
-            <SearchUsers viewer={{ userId: currentUser.userId, hidden: state.state }} />
+            <SearchUsers viewer={{ userId: currentUser.userId }} />
         </section>
     )
 }

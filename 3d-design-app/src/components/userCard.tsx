@@ -54,7 +54,7 @@ function UserCard({ user }: any) {
                     More
                 </div>
 
-                <div className="absolute w-[10rem] bg-[#5D5D5D] -right-[10.5rem] -top-[1.4rem] text-white rounded-md transition-all duration-200 origin-left" id="friendMenu"
+                <div className="absolute w-[10rem] bg-[#5D5D5D] -right-[10.5rem] -top-[1.55rem] text-white rounded-md transition-all duration-200 origin-left" id="friendMenu"
                     onMouseEnter={() => setOverMenu(true)} onMouseLeave={() => setOverMenu(false)}
                     style={{ transform: overUser && clicked || overMenu && clicked ? 'scale(1)' : 'scale(0)' }}>
 

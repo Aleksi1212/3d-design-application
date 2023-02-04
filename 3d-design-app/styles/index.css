@@ -117,7 +117,7 @@
     @apply w-16 mt-1 bg-[#5D5D5D] absolute top-[2.2rem] rounded-md text-[13px] text-white transition-all duration-200 origin-top scale-0
   }
 
-  #profileAction:hover > .actionBox {
+  #profileAction:hover > .actionBox, #showSearch:hover ~ #messageBox  {
     @apply scale-100
   }
 }
