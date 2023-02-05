@@ -62,13 +62,14 @@ function UserCard({ user }: any) {
 
                     <button className={`w-full border-y-2 h-[2rem] hover:bg-[${action.color}]`} 
                     onClick={() => {
-                        if (action.action !== '') {
-                            updateFriendOrUser(viewingUser, action.action, usersId, usersName, messagingId, 'friend', null)
+                        if (action.action === 'add' || action.action === 'remove') {
+                            updateFriendOrUser(viewingUser, action.action, usersId, usersName, messagingId, 'friend', null, null)
                         }
                     }}>
                     {action.message}</button>
 
-                    <button className="w-full h-[2rem] rounded-bl-md rounded-br-md hover:bg-[#FA5252]">Block User</button>
+                    <button className="w-full h-[2rem] rounded-bl-md rounded-br-md hover:bg-[#FA5252]" 
+                    onClick={() => updateFriendOrUser(viewingUser, 'block', null, null, null, 'user', null, usersId)}>Block User</button>
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 import { db } from "./config"
-import { addDoc, collection, getDocs, query, where, doc, setDoc, deleteDoc, updateDoc } from "firebase/firestore"
+import { addDoc, collection, getDocs, query, where, doc, setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore"
 
 function generateId(length: number) {
     let id = ''
@@ -61,31 +61,31 @@ async function cookieSetter(userState: boolean, userId: string | null) {
 }
 
 
-async function updateDesign(userId: string, action: string, id: string, newName: string) {
-    const desId = generateId(8)
+async function updateDesign(userId: string, action: string, oldDesignId: string, newName: string) {
+    const newDesignId = generateId(8)
 
     const que = query(collection(db, 'data'), where('userId', '==', userId))
     const querySnapshot = await getDocs(que)
     const docId = querySnapshot.docs.map((doc) => doc.id)
 
     if (action === 'add') {
-        const docRef = doc(db, 'data', docId[0], 'designs', desId)
+        const docRef = doc(db, 'data', docId[0], 'designs', newDesignId)
     
         await setDoc(docRef, {
             designData: {
-                docId: desId,
+                docId: newDesignId,
                 docName: 'Untitled'
             },
             user: userId
         })
 
     } else if (action === 'remove') {
-        const docRef = doc(db, 'data', docId[0], 'designs', id)
+        const docRef = doc(db, 'data', docId[0], 'designs', oldDesignId)
 
         await deleteDoc(docRef)
 
     } else if (action === 'update') {
-        const docRef = doc(db, 'data', docId[0], 'designs', id)
+        const docRef = doc(db, 'data', docId[0], 'designs', oldDesignId)
 
         await updateDoc(docRef, {
             'designData.docName': newName
@@ -93,7 +93,7 @@ async function updateDesign(userId: string, action: string, id: string, newName:
     }
 }
 
-async function updateFriendOrUser(userId: string, action: string, friendId: string | any, friendName: string | any, messagingId: string | any, friendOrUser: string, state: boolean | null) {
+async function updateFriendOrUser(userId: string, action: string, friendId: string | any, friendName: string | any, messagingId: string | any, friendOrUser: string, state: boolean | null, blockedUser: string | null) {
     const que = query(collection(db, 'data'), where('userId', '==', userId))
     const querySnapshot = await getDocs(que)
     const docId = querySnapshot.docs.map((doc) => doc.id)
@@ -117,6 +117,27 @@ async function updateFriendOrUser(userId: string, action: string, friendId: stri
                 messagingId: messagingId
             },
             user: userId
+        })
+
+    } else if (action === 'block' && friendOrUser === 'user') {
+        const docRef = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
+
+        const result = await Promise.allSettled([
+            updateDoc(docRef, {
+                users: arrayUnion(blockedUser)
+            })
+        ])
+
+        if (result[0].status === 'rejected') {
+            await setDoc(docRef, {
+                users: [blockedUser]
+            })
+        }
+
+    } else if (action === 'unBlock' && friendOrUser === 'user') {
+        const docRef = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
+        await updateDoc(docRef, {
+            users: arrayRemove(blockedUser)
         })
     }
 }

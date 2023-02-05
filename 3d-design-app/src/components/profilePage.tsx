@@ -64,18 +64,24 @@ function ProfilePage({ user }: any) {
         { image: images['addFriend.png'], color: '#40C057', message: 'Add', key: 'add' },
         { image: images['block.png'], color: '#FA5252', message: 'Block', key: 'block' }
     ]
+
     
     return (
         <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
-            <div className="absolute left-20 top-20 flex flex-col items-center">
-                <Link href={`/dashboard/${currentUser.userId}`} id="backHome" className="active:scale-90">
-                    <Image src={images['home.png']} alt="home" width={40} height={40} />
-                </Link>
-                <div id="profileBar" className="bg-[#5D5D5D]"></div>
+            <div className="absolute left-20 top-20  flex flex-col items-center gap-y-1">
+                <Link href={`/dashboard/${currentUser.userId}`} className="flex w-[2.5rem] h-[2.5rem]" id="dashLink">
+                    <div className="flex flex-col h-full w-[50%] gap-y-[.1rem] ">
+                        <div className="dashIcon h-[70%] w-[95%]" id="icon"></div>
+                        <div className="dashIcon h-[30%] w-[95%]" id="icon"></div>
+                    </div>
 
-                <div className="bg-[#5D5D5D] rounded-md text-sm text-white flex justify-center items-center mt-[.3rem] transition-all duration-200 origin-top scale-0" id="homeMessage" style={{ width: 'calc(100% + 10px)' }}>
-                    Dashboard
-                </div>
+                    <div className="flex flex-col h-full w-[50%] gap-y-[.1rem] items-end ">
+                        <div className="dashIcon h-[30%] w-[95%]" id="icon"></div>
+                        <div className="dashIcon h-[70%] w-[95%]" id="icon"></div>
+                    </div>
+                </Link>
+
+                <div className="w-full text-white bg-[#5D5D5D] rounded-md text-sm px-2 transition-all origin-top scale-0 duration-200" id="dashMessage">Dashboard</div>
             </div>
 
             <div className="w-[40rem] h-[50rem] bg-white shadow-lg flex flex-col items-center justify-evenly rounded-xl ">
@@ -93,9 +99,9 @@ function ProfilePage({ user }: any) {
                                         <button id="profileAction" key={action.key}
                                         onClick={() => {
                                             if (action.key === 'lock') {
-                                                updateFriendOrUser(userId, 'update', null, null, null, 'user', true)
+                                                updateFriendOrUser(userId, 'update', null, null, null, 'user', true, null)
                                             } else if (action.key === 'unlock') {
-                                                updateFriendOrUser(userId, 'update', null, null, null, 'user', false)
+                                                updateFriendOrUser(userId, 'update', null, null, null, 'user', false, null)
                                             }
                                         }}>
                                             
