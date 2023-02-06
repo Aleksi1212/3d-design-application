@@ -132,6 +132,10 @@
   #dashLink:hover #icon {
     @apply h-[50%]
   }
+
+  .arrowLine {
+    @apply w-full h-1 bg-[#4D4D4D] absolute
+  }
 }
 
 html, body {

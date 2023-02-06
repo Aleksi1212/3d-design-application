@@ -1,5 +1,5 @@
 import { db } from "./config"
-import { addDoc, collection, getDocs, query, where, doc, setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore"
+import { addDoc, collection, getDocs, getDoc, query, where, doc, setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove, collectionGroup } from "firebase/firestore"
 
 function generateId(length: number) {
     let id = ''
@@ -81,7 +81,6 @@ async function updateDesign(userId: string, action: string, oldDesignId: string,
 
     } else if (action === 'remove') {
         const docRef = doc(db, 'data', docId[0], 'designs', oldDesignId)
-
         await deleteDoc(docRef)
 
     } else if (action === 'update') {
@@ -100,7 +99,13 @@ async function updateFriendOrUser(userId: string, action: string, friendId: stri
 
     if (action === 'remove' && friendOrUser === 'friend') {
         const docRef = doc(db, 'data', docId[0], 'friends', friendId)
-        await deleteDoc(docRef)
+        const docExists = await getDoc(docRef)
+        
+        if (docExists.data()) {
+            await deleteDoc(docRef)
+        } else {
+            console.log('no data');
+        }
 
     } else if (action === 'update' && friendOrUser === 'user') {
         const docRef = doc(db, 'data', docId[0])
@@ -122,22 +127,31 @@ async function updateFriendOrUser(userId: string, action: string, friendId: stri
     } else if (action === 'block' && friendOrUser === 'user') {
         const docRef = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
 
+        const que = query(collectionGroup(db, 'friends'), where('friendData.friendId', '==', blockedUser))
+        const querySnapshot = await getDocs(que)
+        const friendExists = querySnapshot.docs.map((doc) => doc.data())
+
         const result = await Promise.allSettled([
             updateDoc(docRef, {
-                users: arrayUnion(blockedUser)
+                'blockedusers': arrayUnion(blockedUser)
             })
         ])
 
         if (result[0].status === 'rejected') {
             await setDoc(docRef, {
-                users: [blockedUser]
+                blockedusers: [blockedUser],
+                user: userId
             })
+        }
+
+        if (friendExists.length > 0) {
+            updateFriendOrUser(userId, 'remove', blockedUser, null, null, 'friend', null, null)
         }
 
     } else if (action === 'unBlock' && friendOrUser === 'user') {
         const docRef = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
         await updateDoc(docRef, {
-            users: arrayRemove(blockedUser)
+            'blockedusers': arrayRemove(blockedUser)
         })
     }
 }

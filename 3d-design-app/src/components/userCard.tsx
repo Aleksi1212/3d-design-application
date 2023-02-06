@@ -3,30 +3,65 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import { useState } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
-import useImages from "../hooks/importImages";
+import images from "../hooks/importImages";
 
 import { updateFriendOrUser } from "../datalayer/querys";
+
+import { db } from "../datalayer/config";
+import { query, collectionGroup, where, onSnapshot } from "firebase/firestore";
 
 function UserCard({ user }: any) {
     const { viewingUser, usersId, usersName, messagingId, action } = user || {}
 
-    const [overUser, setOverUser] = useState(false)
-    const [overMenu, setOverMenu] = useState(false)
-    const [clicked, setClicked] = useState(false)
+    const [blockable, setBlockable] = useState(true)
 
-    const images = useImages(require.context('../images', false, /\.(png|jpe?g|svg)$/))
+    function reducer(state: any, action: any) {
+        if (!blockable || viewingUser === usersId) {
+            return {
+                overUser: action.payload.overUser,
+                overMenu: action.payload.overMenu,
+                clicked: action.payload.clicked,
+                children: 2
+            }
+        } else {
+            return {
+                overUser: action.payload.overUser,
+                overMenu: action.payload.overMenu,
+                clicked: action.payload.clicked,
+                children: 3
+            }
+        }
+    }
+
+    const [state, dispatch] = useReducer(reducer, { overUser: false, overMenu: false, clicked: false, children: 3 })
+
+    useEffect(() => {
+        const que = query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', usersId), where('user', '==', viewingUser))
+
+        const seeIfBlocked = onSnapshot(que, (querySnapshot) => {
+            let blocked: any = []
+            querySnapshot.forEach((user) => {
+                blocked.push(user.data())
+            })
+
+            blocked.length > 0 ? setBlockable(false) : setBlockable(true)
+        })
+
+        return () => seeIfBlocked()
+    }, [])
 
     const router = useRouter()
     
     return (
         <div className="w-[73%] h-[5rem] flex items-center justify-between border-b-2 border-gray-300 p-2 bg-white" id="friend" 
-            onMouseEnter={() => setOverUser(true)} onMouseLeave={() => {setOverUser(false); setClicked(false)}}>
+            onMouseEnter={() => dispatch({ payload: { overUser: true, overMenu: state.overMenu, clicked: state.clicked, children: state.children } })} 
+            onMouseLeave={() => dispatch({ payload: { overUser: false, overMenu: state.overMenu, clicked: false, children: state.children } })}>
             <Link className="w-[75%]" href={`/profile/${usersId}=${usersName}`}>
                 <div className="flex items-center text-lg gap-x-5">
                     <div className="h-[4rem] w-[4rem] bg-gray-100 shadow-lg rounded-full flex justify-center items-center">
-                        <Image src={images['userProfile.png']} alt="profileImage" width={30} height={30} />
+                        <Image src={images.userProfile} alt="profileImage" width={30} height={30} />
                     </div>
                     
                     <div>
@@ -39,37 +74,56 @@ function UserCard({ user }: any) {
 
             <div className="flex w-[7rem] justify-between relative">
                 <button className="friendButton" id="message">
-                    <Image src={images['message.png']} alt="message" />
-                </button>
-                
-                <button className="friendButton" id="menu" onClick={() => setClicked(true)}>
-                    <Image src={images['userMenu.png']} alt="userMenu" />
+                    <Image src={images.message} alt="message" />
                 </button>
 
-                <div className="messageFriend right-12 w-[5rem]">
-                    Message
-                </div>
+                <button className="friendButton" id="menu"
+                    onClick={() => dispatch({ payload: { overUser: state.overUser, overMenu: state.overMenu, clicked: true, children: state.children } })}>
+                    <Image src={images.userMenu} alt="userMenu" />
+                </button>
 
-                <div className="friendActions">
-                    More
-                </div>
+                <div className="messageFriend right-12 w-[5rem]">Message</div>
+                <div className="friendActions">More</div>
 
-                <div className="absolute w-[10rem] bg-[#5D5D5D] -right-[10.5rem] -top-[1.55rem] text-white rounded-md transition-all duration-200 origin-left" id="friendMenu"
-                    onMouseEnter={() => setOverMenu(true)} onMouseLeave={() => setOverMenu(false)}
-                    style={{ transform: overUser && clicked || overMenu && clicked ? 'scale(1)' : 'scale(0)' }}>
+                <div className="absolute w-[10rem] bg-[#5D5D5D] -right-[10.5rem] text-white rounded-md transition-all duration-200 origin-left" id="friendMenu"
+                    onMouseEnter={() => dispatch({ payload: { overUser: state.overUser, overMenu: true, clicked: state.clicked, children: state.children } })} 
+                    onMouseLeave={() => dispatch({ payload: { overUser: state.overUser, overMenu: false, clicked: state.clicked, children: state.clicked  } })}
 
-                    <button onClick={() => router.push(`/profile/${usersId}=${usersName}`)} className=" w-full h-[2rem] rounded-tr-md rounded-tl-md hover:bg-[#40C057]">View Profile</button>
+                    style={{ transform: state.overUser && state.clicked || state.overMenu && state.clicked ? 'scale(1)' : 'scale(0)', top: state.children === 3 ? '-1.55rem' : '-.5rem' }}>
 
-                    <button className={`w-full border-y-2 h-[2rem] hover:bg-[${action.color}]`} 
-                    onClick={() => {
-                        if (action.action === 'add' || action.action === 'remove') {
-                            updateFriendOrUser(viewingUser, action.action, usersId, usersName, messagingId, 'friend', null, null)
-                        }
-                    }}>
-                    {action.message}</button>
+                    <button onClick={() => router.push(`/profile/${usersId}=${usersName}`)} className=" w-full h-[2rem] border-b-2 rounded-tr-md rounded-tl-md hover:bg-[#40C057]">View Profile</button>
 
-                    <button className="w-full h-[2rem] rounded-bl-md rounded-br-md hover:bg-[#FA5252]" 
-                    onClick={() => updateFriendOrUser(viewingUser, 'block', null, null, null, 'user', null, usersId)}>Block User</button>
+                    {
+                        blockable ? (
+                            <button className={`w-full h-[2rem] hover:bg-[${action.color}]`} style={{ 
+                                borderBottom: viewingUser === usersId ? '0px' : '2px solid lightgray',
+                                borderBottomLeftRadius: viewingUser === usersId ? '.375rem' : '0', borderBottomRightRadius: viewingUser === usersId ? '.375rem' : '0'
+                            }}
+                            onClick={() => {
+                                if (action.action === 'add' || action.action === 'remove') {
+                                    updateFriendOrUser(viewingUser, action.action, usersId, usersName, messagingId, 'friend', null, null)
+                                }
+                            }}>
+                            {action.message}</button>
+                        ) : (
+                            null
+                        )
+                    }
+
+                    {
+                        viewingUser !== usersId ? (
+                            <button className="w-full h-[2rem] rounded-bl-md rounded-br-md hover:bg-[#FA5252]"
+                            onClick={() => {
+                                if (blockable) {
+                                    updateFriendOrUser(viewingUser, 'block', null, null, null, 'user', null, usersId)
+                                } else {
+                                    updateFriendOrUser(viewingUser, 'unBlock', null, null, null, 'user', null, usersId)
+                                }
+                            }}>{ blockable ? 'Block User' : 'Unblock User' }</button>
+                        ) : (
+                            null
+                        )
+                    }
                 </div>
             </div>
         </div>
