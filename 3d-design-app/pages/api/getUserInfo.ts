@@ -20,5 +20,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const user = auth.currentUser
     
     res.status(200).json({ userData: data, userState: user})
-
 }

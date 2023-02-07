@@ -13,7 +13,8 @@ const importAll = useImages(require.context('../images', false, /\.(png|jpe?g|sv
 const images = {
     add: importAll['add.png'], 
     addDoc: importAll['addDoc.png'],
-    addFriend: importAll['addFriend.png'], 
+    addFriend: importAll['addFriend.png'],
+    addProfileImage: importAll['addProfileImage.png'],
     arrow1: importAll['arrow1.svg'],
     arrow2: importAll['arrow2.svg'], 
     arrow3: importAll['arrow3.png'],

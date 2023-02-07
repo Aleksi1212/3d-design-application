@@ -5,17 +5,21 @@ import Image from "next/image";
 
 import { useState, useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
-import images from "../hooks/importImages";
+import images from "../functions/importImages";
 
-import { updateFriendOrUser } from "../datalayer/querys";
+import { updateFriendOrUser, getUserData } from "../datalayer/querys";
 
 import { db } from "../datalayer/config";
-import { query, collectionGroup, where, onSnapshot } from "firebase/firestore";
+import { query, collectionGroup, where, onSnapshot, collection } from "firebase/firestore";
+
+import useProfileImage from "../hooks/profileImagehook";
 
 function UserCard({ user }: any) {
     const { viewingUser, usersId, usersName, messagingId, action } = user || {}
 
     const [blockable, setBlockable] = useState(true)
+    const [profileUrl, setProfileUrl] = useState([''])
+    const profileImage = useProfileImage(profileUrl[0])
 
     function reducer(state: any, action: any) {
         if (!blockable || viewingUser === usersId) {
@@ -38,9 +42,8 @@ function UserCard({ user }: any) {
     const [state, dispatch] = useReducer(reducer, { overUser: false, overMenu: false, clicked: false, children: 3 })
 
     useEffect(() => {
-        const que = query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', usersId), where('user', '==', viewingUser))
-
-        const seeIfBlocked = onSnapshot(que, (querySnapshot) => {
+        const blockedQue = query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', usersId), where('user', '==', viewingUser))
+        const seeIfBlocked = onSnapshot(blockedQue, (querySnapshot) => {
             let blocked: any = []
             querySnapshot.forEach((user) => {
                 blocked.push(user.data())
@@ -49,7 +52,20 @@ function UserCard({ user }: any) {
             blocked.length > 0 ? setBlockable(false) : setBlockable(true)
         })
 
-        return () => seeIfBlocked()
+        const userProfileQue = query(collection(db, 'data'), where('userId', '==', usersId))
+        const getProfileImage = onSnapshot(userProfileQue, (querySnapshot) => {
+            let imageUrl: any = []
+            querySnapshot.forEach((image) => {
+                imageUrl.push(image.data().profileUrl)
+            })
+
+            setProfileUrl(imageUrl)
+        })
+
+        return () => {
+            seeIfBlocked()
+            getProfileImage()
+        }
     }, [])
 
     const router = useRouter()
@@ -61,7 +77,13 @@ function UserCard({ user }: any) {
             <Link className="w-[75%]" href={`/profile/${usersId}=${usersName}`}>
                 <div className="flex items-center text-lg gap-x-5">
                     <div className="h-[4rem] w-[4rem] bg-gray-100 shadow-lg rounded-full flex justify-center items-center">
-                        <Image src={images.userProfile} alt="profileImage" width={30} height={30} />
+                        {
+                            profileImage.errors.includes(profileImage.profileImage) || profileImage.profileImage.length <= 0 ? (
+                                <h1>{profileImage.profileImage}</h1>
+                            ) : (
+                                <Image src={images.userProfile} alt="profileImage" width={30} height={30} />
+                            )
+                        }
                     </div>
                     
                     <div>
@@ -101,7 +123,7 @@ function UserCard({ user }: any) {
                             }}
                             onClick={() => {
                                 if (action.action === 'add' || action.action === 'remove') {
-                                    updateFriendOrUser(viewingUser, action.action, usersId, usersName, messagingId, 'friend', null, null)
+                                    updateFriendOrUser(viewingUser, action.action, usersId, usersName, messagingId, 'friend', null, null, null)
                                 }
                             }}>
                             {action.message}</button>
@@ -115,9 +137,9 @@ function UserCard({ user }: any) {
                             <button className="w-full h-[2rem] rounded-bl-md rounded-br-md hover:bg-[#FA5252]"
                             onClick={() => {
                                 if (blockable) {
-                                    updateFriendOrUser(viewingUser, 'block', null, null, null, 'user', null, usersId)
+                                    updateFriendOrUser(viewingUser, 'block', null, null, null, 'user', null, usersId, null)
                                 } else {
-                                    updateFriendOrUser(viewingUser, 'unBlock', null, null, null, 'user', null, usersId)
+                                    updateFriendOrUser(viewingUser, 'unBlock', null, null, null, 'user', null, usersId, null)
                                 }
                             }}>{ blockable ? 'Block User' : 'Unblock User' }</button>
                         ) : (

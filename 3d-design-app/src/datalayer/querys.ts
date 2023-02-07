@@ -1,5 +1,6 @@
-import { db } from "./config"
+import { db, storage } from "./config"
 import { addDoc, collection, getDocs, getDoc, query, where, doc, setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove, collectionGroup } from "firebase/firestore"
+import { ref, uploadBytes } from "firebase/storage"
 
 function generateId(length: number) {
     let id = ''
@@ -34,7 +35,8 @@ async function checkUser(userId: string, userName: string, userEmail: string, me
                 email: userEmail,
                 method: method,
                 locked: false,
-                messagingId: messagingId
+                messagingId: messagingId,
+                profileUrl: 'profileImages/defaultProfile.png'
             })
 
             console.log(`Data added with id: ${docRef.id}`);
@@ -92,7 +94,7 @@ async function updateDesign(userId: string, action: string, oldDesignId: string,
     }
 }
 
-async function updateFriendOrUser(userId: string, action: string, friendId: string | any, friendName: string | any, messagingId: string | any, friendOrUser: string, state: boolean | null, blockedUser: string | null) {
+async function updateFriendOrUser(userId: string, action: string, friendId: string | any, friendName: string | any, messagingId: string | any, friendOrUser: string, state: boolean | null, blockedUser: string | null, image: any) {
     const que = query(collection(db, 'data'), where('userId', '==', userId))
     const querySnapshot = await getDocs(que)
     const docId = querySnapshot.docs.map((doc) => doc.id)
@@ -145,13 +147,30 @@ async function updateFriendOrUser(userId: string, action: string, friendId: stri
         }
 
         if (friendExists.length > 0) {
-            updateFriendOrUser(userId, 'remove', blockedUser, null, null, 'friend', null, null)
+            updateFriendOrUser(userId, 'remove', blockedUser, null, null, 'friend', null, null, null)
         }
 
     } else if (action === 'unBlock' && friendOrUser === 'user') {
         const docRef = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
         await updateDoc(docRef, {
             'blockedusers': arrayRemove(blockedUser)
+        })
+
+    } else if (action === 'updateProfile' && friendOrUser === 'user') {
+        const imageId = generateId(5)
+        const testRef = ref(storage, `profileImages/${imageId+image.name}`)
+
+        uploadBytes(testRef, image)
+        .then(async (snapshot) => {
+            console.log('yay');
+
+            const docRef = doc(db, 'data', docId[0])
+            await updateDoc(docRef, {
+                'profileUrl': `profileImages/${imageId+image.name}`
+            })
+        })
+        .catch((err) => {
+            console.log(err);
         })
     }
 }

@@ -6,7 +6,7 @@ import { db } from "../datalayer/config";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 import { useState, useReducer, useEffect, useRef } from "react";
-import images from "../hooks/importImages";
+import images from "../functions/importImages";
 
 import UserCard from "./userCard";
 
@@ -59,7 +59,7 @@ function SearchUsers({ viewer }: any) {
             <div className="absolute transition-all flex items-center gap-x-2 w-[12rem] h-[2.5rem]" style={{ right: state.hidden ? '23.5rem' : '11rem' }}>
 
                 <button className="h-full w-[35%]" id="showSearch" onClick={() => dispatch({ payload: { message: '', hidden: !state.hidden } })}>
-                    <Image src={images.showSearch} alt="showSearch" className="transitiom-all duration-200" width={40} height={40} style={{ WebkitTransform: state.hidden ? 'rotate(180deg)' : 'rotate(0deg)', rotate: state.hidden ? '90deg' : '0deg' }} />
+                    <Image src={images.showSearch} alt="showSearch" className="transitiom-all duration-200" width={40} height={40} style={{ WebkitTransform: state.hidden ? 'rotate(180deg)' : 'rotate(0deg)' }} />
                 </button>
                 <div className="bg-[#5D5D5D] rounded-md text-white text-sm h-[1.5rem] flex items-center justify-center transition-all duration-200 origin-left scale-0" id="messageBox" style={{ width: 'calc(100% + 20px)' }}>{state.message}</div>
             </div>

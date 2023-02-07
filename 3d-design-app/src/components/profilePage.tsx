@@ -8,10 +8,13 @@ import { collection, collectionGroup, onSnapshot, query, where } from "firebase/
 import { updateFriendOrUser } from "../datalayer/querys";
 
 import { useEffect, useState } from "react";
-import images  from '../hooks/importImages'
+import useProfileImage from "../hooks/profileImagehook";
 
 import SearchUsers from "./searchUsers";
 import UserCard from "./userCard";
+
+import userActions from "../functions/actions";
+import images from "../functions/importImages";
 
 function ProfilePage({ user }: any) {
     const { userId, userName, currentUser } = user || {}
@@ -21,6 +24,12 @@ function ProfilePage({ user }: any) {
 
     const [userData, setUserData] = useState({ state: null })
     const [blocked, setBlocked] = useState(false)
+    const [messagingId, setMessagingId] = useState(String)
+
+    const [profileUrl, setProfileUrl] = useState(String)
+    const profileImage = useProfileImage(profileUrl)
+
+    const [hovered, setHovered] = useState(false)
     
     useEffect(() => {
         const friendQue = query(collectionGroup(db, 'friends'), where('user', '==', userId))
@@ -49,12 +58,18 @@ function ProfilePage({ user }: any) {
         const userQue = query(collection(db, 'data'), where('userId', '==', userId))
         const getUserData = onSnapshot(userQue, (querySnapshot) => {
             let userState: any = { state: Boolean }
+            let profileUrl: string = ''
+            let messagingId: string = ''
 
             querySnapshot.forEach((user) => {
                 userState.state = user.data().locked
+                profileUrl = user.data().profileUrl
+                messagingId = user.data().messagingId
             })
             
             setUserData(userState)
+            setProfileUrl(profileUrl)
+            setMessagingId(messagingId)
         })
 
         const blockedQue = query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', userId), where('user', '==', currentUser.userId))
@@ -81,25 +96,7 @@ function ProfilePage({ user }: any) {
         currentUserFriends.push(friend.friendId)
     })
 
-    const actions = userId === currentUser.userId ? [
-        userData.state ? {
-            image: images.unlockProfile, color: '#5D5D5D', message: 'Unlock', key: 'unlock', action: updateFriendOrUser, params: {
-                userId: currentUser.userId, action: 'update', 
-            }
-        } : {
-            image: images.lockProfile, color: '#5D5D5D', message: 'Lock', key: 'lock', action: updateFriendOrUser
-        },
-
-        { image: images.editProfile, color: '#5D5D5D', message: 'Edit', key: 'edit' },
-        { image: images.signOut, color: '#FA5252', message: 'Sign Out', key: 'signOut' }
-    ] : !blocked ? [
-        { image: images.message, color: '#5D5D5D', message: 'Message', key: 'message'},
-        { image: images.addFriend, color: '#40C057', message: 'Add', key: 'add' },
-        { image: images.block, color: '#FA5252', message: 'Block', key: 'block' }
-    ] : [
-        { image: images.block, color: '#FA5252', message: 'Unblock', key: 'unblock' }
-    ]
-
+    const actions = userActions(userId, userName, messagingId, currentUser.userId, userData.state, blocked)
     
     return (
         <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
@@ -121,8 +118,22 @@ function ProfilePage({ user }: any) {
 
             <div className="w-[40rem] h-[50rem] bg-white shadow-lg flex flex-col items-center justify-evenly rounded-xl ">
                 <div className="w-full flex items-center justify-between pl-20 pr-20">
-                    <div className="w-[12rem] h-[12rem] shadow-lg bg-gray-100 rounded-full flex justify-center items-center">
-                        <Image src={images.userProfile} alt="profileImage" />
+                    <div className="w-[12rem] h-[12rem] shadow-lg bg-gray-100 rounded-full flex justify-center items-center relative" id="addNewProfileImage"
+                        onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+                        {
+                            profileImage.errors.includes(profileImage.profileImage) || profileImage.profileImage.length <= 0 ? (
+                                <h1>{profileImage.profileImage}</h1>
+                            ) : (
+                                <Image src={hovered ? images.addProfileImage : profileImage.profileImage} alt="profileImage" width={50} height={50} />
+                            )
+                        }
+
+                        <label className="bg-black w-full h-full rounded-full cursor-pointer absolute" style={{ opacity: hovered ? '10%' : '0' }}>
+                            <input type="file" className="hidden" accept="image/png, image/jpeg" onChange={(e: any) => 
+                                updateFriendOrUser(currentUser.userId, 'updateProfile', null, null, null, 'user', null, null, e.target.files[0])
+                            } />
+                        </label>
+
                     </div>
 
                     <div className="flex flex-col justify-between gap-y-4 items-center">
@@ -133,11 +144,7 @@ function ProfilePage({ user }: any) {
                                     return (
                                         <button id="profileAction" key={action.key}
                                         onClick={() => {
-                                            if (action.key === 'lock') {
-                                                updateFriendOrUser(currentUser.userId, 'update', null, null, null, 'user', true, null)
-                                            } else if (action.key === 'unlock') {
-                                                updateFriendOrUser(currentUser.userId, 'update', null, null, null, 'user', false, null)
-                                            }
+                                            action.action(action.params.userId, action.params.action, action.params.friendId, action.params.friendName, action.params.messagingId, action.params.friendOrUser, action.params.state, action.params.blockedUser)
                                         }}>
                                             
                                             <Image src={action.image} alt="actionImage" width={25} height={25} />

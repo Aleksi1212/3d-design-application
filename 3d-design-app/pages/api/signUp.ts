@@ -27,7 +27,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     email: user.email,
                     method: 'email',
                     locked: false,
-                    messagingId: messagingId
+                    messagingId: messagingId,
+                    profileUrl: 'profileImages/defaultProfile.png'
                 })
 
                 console.log(`New document created with id: ${docRef.id}`);
