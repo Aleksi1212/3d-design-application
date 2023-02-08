@@ -1,6 +1,7 @@
 import { db, storage } from "./config"
 import { addDoc, collection, getDocs, getDoc, query, where, doc, setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove, collectionGroup } from "firebase/firestore"
 import { ref, uploadBytes } from "firebase/storage"
+import { imageConfigDefault } from "next/dist/shared/lib/image-config"
 
 function generateId(length: number) {
     let id = ''
@@ -94,13 +95,27 @@ async function updateDesign(userId: string, action: string, oldDesignId: string,
     }
 }
 
-async function updateFriendOrUser(userId: string, action: string, friendId: string | any, friendName: string | any, messagingId: string | any, friendOrUser: string, state: boolean | null, blockedUser: string | null, image: any) {
-    const que = query(collection(db, 'data'), where('userId', '==', userId))
+interface types {
+    userId: string,
+    userName: string | any,
+    action: string,
+    friendId: string | any,
+    friendName: string | any,
+    friendMessagingId: string | any,
+    userMessagingId: string | any,
+    friendOrUser: string,
+    state: boolean | any,
+    blockedUser: string | any,
+    image: any
+}
+
+async function updateFriendOrUser(friendOrUserData: types) {
+    const que = query(collection(db, 'data'), where('userId', '==', friendOrUserData.userId))
     const querySnapshot = await getDocs(que)
     const docId = querySnapshot.docs.map((doc) => doc.id)
 
-    if (action === 'remove' && friendOrUser === 'friend') {
-        const docRef = doc(db, 'data', docId[0], 'friends', friendId)
+    if (friendOrUserData.action === 'remove' && friendOrUserData.friendOrUser === 'friend') {
+        const docRef = doc(db, 'data', docId[0], 'friends', friendOrUserData.friendId)
         const docExists = await getDoc(docRef)
         
         if (docExists.data()) {
@@ -109,64 +124,87 @@ async function updateFriendOrUser(userId: string, action: string, friendId: stri
             console.log('no data');
         }
 
-    } else if (action === 'update' && friendOrUser === 'user') {
+    } else if (friendOrUserData.action === 'update' && friendOrUserData.friendOrUser === 'user') {
         const docRef = doc(db, 'data', docId[0])
         await updateDoc(docRef, {
-            'locked': state
+            'locked': friendOrUserData.state
         })
 
-    } else if (action === 'add' && friendOrUser === 'friend') {
-        const docRef = doc(db, 'data', docId[0], 'friends', friendId)
-        await setDoc(docRef, {
-            friendData: {
-                friendId: friendId,
-                friendName: friendName,
-                messagingId: messagingId
-            },
-            user: userId
-        })
+    } else if (friendOrUserData.action === 'add' && friendOrUserData.friendOrUser === 'friend') {
+        const docRef = doc(db, 'data', docId[0], 'friends', friendOrUserData.friendId)
 
-    } else if (action === 'block' && friendOrUser === 'user') {
+        const result = await Promise.allSettled([
+            setDoc(docRef, {
+                friendData: {
+                    friendId: friendOrUserData.friendId,
+                    friendName: friendOrUserData.friendName,
+                    messagingId: friendOrUserData.friendMessagingId
+                },
+                user: friendOrUserData.userId,
+                state: 'pending'
+            })
+        ])
+
+        if (result[0].status === 'fulfilled') {
+            const newQue = query(collection(db, 'data'), where('userId', '==', friendOrUserData.friendId))
+            const querySnapshot = await getDocs(newQue)
+            const friendDocId = querySnapshot.docs.map((doc) => doc.id)
+
+            const friendDocRef = doc(db, 'data', friendDocId[0], 'friendRequests', friendOrUserData.userId)
+            await setDoc(friendDocRef, {
+                requestData: {
+                    requestFromId: friendOrUserData.userId,
+                    requestFromName: friendOrUserData.userName,
+                    messagingId: friendOrUserData.userMessagingId
+                },
+                sentTo: friendOrUserData.friendId
+            })
+        }
+
+    } else if (friendOrUserData.action === 'block' && friendOrUserData.friendOrUser === 'user') {
         const docRef = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
 
-        const que = query(collectionGroup(db, 'friends'), where('friendData.friendId', '==', blockedUser))
+        const que = query(collectionGroup(db, 'friends'), where('friendData.friendId', '==', friendOrUserData.blockedUser))
         const querySnapshot = await getDocs(que)
         const friendExists = querySnapshot.docs.map((doc) => doc.data())
 
         const result = await Promise.allSettled([
             updateDoc(docRef, {
-                'blockedusers': arrayUnion(blockedUser)
+                'blockedusers': arrayUnion(friendOrUserData.blockedUser)
             })
         ])
 
         if (result[0].status === 'rejected') {
             await setDoc(docRef, {
-                blockedusers: [blockedUser],
-                user: userId
+                blockedusers: [friendOrUserData.blockedUser],
+                user: friendOrUserData.userId
             })
         }
 
         if (friendExists.length > 0) {
-            updateFriendOrUser(userId, 'remove', blockedUser, null, null, 'friend', null, null, null)
+            updateFriendOrUser({
+                userId: friendOrUserData.userId, userName: null, action: 'remove', friendId: friendOrUserData.blockedUser,
+                friendName: null, friendMessagingId: null, userMessagingId: null, friendOrUser: 'friend', state: null, blockedUser: null, image: null,
+            })
         }
 
-    } else if (action === 'unBlock' && friendOrUser === 'user') {
+    } else if (friendOrUserData.action === 'unBlock' && friendOrUserData.friendOrUser === 'user') {
         const docRef = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
         await updateDoc(docRef, {
-            'blockedusers': arrayRemove(blockedUser)
+            'blockedusers': arrayRemove(friendOrUserData.blockedUser)
         })
 
-    } else if (action === 'updateProfile' && friendOrUser === 'user') {
+    } else if (friendOrUserData.action === 'updateProfile' && friendOrUserData.friendOrUser === 'user') {
         const imageId = generateId(5)
-        const testRef = ref(storage, `profileImages/${imageId+image.name}`)
+        const testRef = ref(storage, `profileImages/${imageId+friendOrUserData.image.name}`)
 
-        uploadBytes(testRef, image)
+        uploadBytes(testRef, friendOrUserData.image)
         .then(async (snapshot) => {
             console.log('yay');
 
             const docRef = doc(db, 'data', docId[0])
             await updateDoc(docRef, {
-                'profileUrl': `profileImages/${imageId+image.name}`
+                'profileUrl': `profileImages/${imageId+friendOrUserData.image.name}`
             })
         })
         .catch((err) => {

@@ -13,6 +13,7 @@ import { db } from "../datalayer/config";
 import { query, collectionGroup, where, onSnapshot, collection } from "firebase/firestore";
 
 import useProfileImage from "../hooks/profileImagehook";
+import useUserData from "../hooks/userDataHook";
 
 function UserCard({ user }: any) {
     const { viewingUser, usersId, usersName, messagingId, action } = user || {}
@@ -20,6 +21,8 @@ function UserCard({ user }: any) {
     const [blockable, setBlockable] = useState(true)
     const [profileUrl, setProfileUrl] = useState([''])
     const profileImage = useProfileImage(profileUrl[0])
+
+    const userData = useUserData(usersId, viewingUser)
 
     function reducer(state: any, action: any) {
         if (!blockable || viewingUser === usersId) {
@@ -74,6 +77,7 @@ function UserCard({ user }: any) {
         <div className="w-[73%] h-[5rem] flex items-center justify-between border-b-2 border-gray-300 p-2 bg-white" id="friend" 
             onMouseEnter={() => dispatch({ payload: { overUser: true, overMenu: state.overMenu, clicked: state.clicked, children: state.children } })} 
             onMouseLeave={() => dispatch({ payload: { overUser: false, overMenu: state.overMenu, clicked: false, children: state.children } })}>
+
             <Link className="w-[75%]" href={`/profile/${usersId}=${usersName}`}>
                 <div className="flex items-center text-lg gap-x-5">
                     <div className="h-[4rem] w-[4rem] bg-gray-100 shadow-lg rounded-full flex justify-center items-center">
@@ -123,7 +127,11 @@ function UserCard({ user }: any) {
                             }}
                             onClick={() => {
                                 if (action.action === 'add' || action.action === 'remove') {
-                                    updateFriendOrUser(viewingUser, action.action, usersId, usersName, messagingId, 'friend', null, null, null)
+                                    updateFriendOrUser({
+                                        userId: viewingUser, userName: userData.currentUserName, action: action.action, friendId: usersId, friendName: usersName,
+                                        friendMessagingId: messagingId, userMessagingId: userData.currentUserMessagingId, friendOrUser: 'friend', state: null,
+                                        blockedUser: null, image: null
+                                    })
                                 }
                             }}>
                             {action.message}</button>
@@ -137,9 +145,17 @@ function UserCard({ user }: any) {
                             <button className="w-full h-[2rem] rounded-bl-md rounded-br-md hover:bg-[#FA5252]"
                             onClick={() => {
                                 if (blockable) {
-                                    updateFriendOrUser(viewingUser, 'block', null, null, null, 'user', null, usersId, null)
+                                    updateFriendOrUser({
+                                        userId: viewingUser, userName: null, action: 'block', friendId: null, friendName: null,
+                                        friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null,
+                                        blockedUser: usersId, image: null
+                                    })
                                 } else {
-                                    updateFriendOrUser(viewingUser, 'unBlock', null, null, null, 'user', null, usersId, null)
+                                    updateFriendOrUser({
+                                        userId: viewingUser, userName: null, action: 'unBlock', friendId: null, friendName: null,
+                                        friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null,
+                                        blockedUser: usersId, image: null
+                                    })
                                 }
                             }}>{ blockable ? 'Block User' : 'Unblock User' }</button>
                         ) : (

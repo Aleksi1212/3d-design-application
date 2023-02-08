@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { db } from "../datalayer/config";
-import { collection, collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 import { updateFriendOrUser } from "../datalayer/querys";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRouter } from 'next/navigation'
 import useProfileImage from "../hooks/profileImagehook";
+import useUserData from "../hooks/userDataHook";
 
 import SearchUsers from "./searchUsers";
 import UserCard from "./userCard";
@@ -17,87 +17,21 @@ import userActions from "../functions/actions";
 import images from "../functions/importImages";
 
 function ProfilePage({ user }: any) {
-    const { userId, userName, currentUser } = user || {}
+    const { userId, userName, currentUser, pendingCount } = user || {}
 
-    const [friendData, setFriendData] = useState([])
-    const [currentUserFriendData, setCurrentUserFriendData] = useState([])
-
-    const [userData, setUserData] = useState({ state: null })
-    const [blocked, setBlocked] = useState(false)
-    const [messagingId, setMessagingId] = useState(String)
-
-    const [profileUrl, setProfileUrl] = useState(String)
-    const profileImage = useProfileImage(profileUrl)
-
-    const [hovered, setHovered] = useState(false)
+    const userData = useUserData(userId, currentUser.userId)
+    const profileImage = useProfileImage(userData.profileUrl)
     
-    useEffect(() => {
-        const friendQue = query(collectionGroup(db, 'friends'), where('user', '==', userId))
-        const getFriendData = onSnapshot(friendQue, (querySnapshot) => {
-            let friends: any = []
-
-            querySnapshot.forEach((friend) => {
-                friends.push(friend.data().friendData)
-            })
-            
-            setFriendData(friends)
-        })
-
-        const currentUserFriendQue = query(collectionGroup(db, 'friends'), where('user', '==', currentUser.userId))
-        const getCurrendUserFriends = onSnapshot(currentUserFriendQue, (querySnapshot) => {
-            let currentUserFriends: any = []
-
-            querySnapshot.forEach((friend) => {
-                currentUserFriends.push(friend.data().friendData)
-            })
-
-            setCurrentUserFriendData(currentUserFriends)
-        })
-
-        
-        const userQue = query(collection(db, 'data'), where('userId', '==', userId))
-        const getUserData = onSnapshot(userQue, (querySnapshot) => {
-            let userState: any = { state: Boolean }
-            let profileUrl: string = ''
-            let messagingId: string = ''
-
-            querySnapshot.forEach((user) => {
-                userState.state = user.data().locked
-                profileUrl = user.data().profileUrl
-                messagingId = user.data().messagingId
-            })
-            
-            setUserData(userState)
-            setProfileUrl(profileUrl)
-            setMessagingId(messagingId)
-        })
-
-        const blockedQue = query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', userId), where('user', '==', currentUser.userId))
-        const getBlockedData = onSnapshot(blockedQue, (querySnapshot) => {
-            let blockedData: any = []
-
-            querySnapshot.forEach((user) => {
-                blockedData.push(user.data())
-            })
-
-            blockedData.length > 0 ? setBlocked(true) : setBlocked(false)
-        })
-
-        return () => {
-            getFriendData()
-            getCurrendUserFriends()
-            getUserData()
-            getBlockedData()
-        }
-    }, [])
+    const [hovered, setHovered] = useState(false)
+    const router = useRouter()
 
     let currentUserFriends: any = []
-    currentUserFriendData.map((friend: any) => {
+    userData.currentUserFriendData.map((friend: any) => {
         currentUserFriends.push(friend.friendId)
     })
 
-    const actions = userActions(userId, userName, messagingId, currentUser.userId, userData.state, blocked)
-    
+    const actions = userActions(userId, userData.currentUserName, userData.currentUserMessagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
+
     return (
         <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
             <div className="absolute left-20 top-20  flex flex-col items-center gap-y-1">
@@ -130,7 +64,10 @@ function ProfilePage({ user }: any) {
 
                         <label className="bg-black w-full h-full rounded-full cursor-pointer absolute" style={{ opacity: hovered ? '10%' : '0' }}>
                             <input type="file" className="hidden" accept="image/png, image/jpeg" onChange={(e: any) => 
-                                updateFriendOrUser(currentUser.userId, 'updateProfile', null, null, null, 'user', null, null, e.target.files[0])
+                                updateFriendOrUser({ 
+                                    userId: currentUser.userId, userName: null, action: 'updateProfile', friendId: null, friendName: null,
+                                    friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null, blockedUser: null, image: e.target.files[0]
+                                })
                             } />
                         </label>
 
@@ -142,16 +79,33 @@ function ProfilePage({ user }: any) {
                             {
                                 actions.map((action: any) => {
                                     return (
-                                        <button id="profileAction" key={action.key}
+                                        <button id="profileAction" className="relative" key={action.key}
                                         onClick={() => {
-                                            action.action(action.params.userId, action.params.action, action.params.friendId, action.params.friendName, action.params.messagingId, action.params.friendOrUser, action.params.state, action.params.blockedUser)
+                                            if (action.type === 'func') {
+                                                action.action(action.params)
+                                            } else {
+                                                router.push(action.params)
+                                            }
                                         }}>
-                                            
+                                            {
+                                                action.key === 'notifications' && pendingCount > 0 ? (
+                                                    <div className="bg-[#FA5252] w-[1rem] h-[1rem] rounded-full absolute -right-1 flex justify-center items-center text-white text-xs">
+                                                        {pendingCount > 9 ? '9+' : pendingCount}
+                                                    </div>
+                                                ) : (
+                                                    null
+                                                )
+                                            }
                                             <Image src={action.image} alt="actionImage" width={25} height={25} />
                                             <div style={{ backgroundColor: action.color, marginRight: action.key === 'signOut' ? '.25rem' : '0' }}
                                                 id="profileBar"></div>
-
-                                            <div className="actionBox">{action.message}</div>
+                                            {
+                                                action.key === 'notifications' ? (
+                                                    <div className="actionBox w-24">{action.message}</div>
+                                                ): (
+                                                    <div className="actionBox w-16">{action.message}</div>
+                                                )
+                                            }
                                         </button>
                                     )
                                 })
@@ -164,7 +118,7 @@ function ProfilePage({ user }: any) {
 
                 <div className="w-full h-[30rem] flex flex-col items-center pt-2">
                     {
-                        !blocked ? (
+                        !userData.blocked ? (
                             <>
                                 <div className="w-full flex justify-evenly text-[1.5rem]">
                                     <button className="flex flex-col items-center" id="otherAction">
@@ -180,10 +134,10 @@ function ProfilePage({ user }: any) {
 
                                 <div className="w-[110%] max-h-full h-full ml-[11.5rem] flex overflow-auto flex-col mt-2 pt-6" id="friendContainer">
                                     {
-                                        friendData.map((friendCard: any) => {
+                                        userData.friendData.map((friendCard: any) => {
                                             return <UserCard key={friendCard.friendId} 
                                             user={{ 
-                                                viewingUser: currentUser.userId, 
+                                                viewingUser: currentUser.userId,
                                                 usersId: friendCard.friendId, 
                                                 usersName: friendCard.friendName, 
                                                 messagingId: friendCard.messagingId, 
