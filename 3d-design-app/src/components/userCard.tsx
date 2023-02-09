@@ -5,9 +5,9 @@ import Image from "next/image";
 
 import { useState, useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
-import images from "../functions/importImages";
 
-import { updateFriendOrUser, getUserData } from "../datalayer/querys";
+import images from "../functions/importImages";
+import { updateFriendOrUser } from "../datalayer/querys";
 
 import { db } from "../datalayer/config";
 import { query, collectionGroup, where, onSnapshot, collection } from "firebase/firestore";
@@ -15,8 +15,19 @@ import { query, collectionGroup, where, onSnapshot, collection } from "firebase/
 import useProfileImage from "../hooks/profileImagehook";
 import useUserData from "../hooks/userDataHook";
 
+interface reducerType {
+    overUser: boolean,
+    overMenu: boolean,
+    clicked: boolean,
+    children: number
+}
+
+interface payloadType {
+    payload: reducerType
+}
+
 function UserCard({ user }: any) {
-    const { viewingUser, usersId, usersName, messagingId, action } = user || {}
+    const { viewingUser, usersId, usersName, messagingId, initialAction, secondaryAction } = user || {}
 
     const [blockable, setBlockable] = useState(true)
     const [profileUrl, setProfileUrl] = useState([''])
@@ -24,25 +35,21 @@ function UserCard({ user }: any) {
 
     const userData = useUserData(usersId, viewingUser)
 
-    function reducer(state: any, action: any) {
+    function reducer(state: any, action: payloadType) {
         if (!blockable || viewingUser === usersId) {
             return {
-                overUser: action.payload.overUser,
-                overMenu: action.payload.overMenu,
-                clicked: action.payload.clicked,
-                children: 2
+                ...action.payload,
+                chilren: 3
             }
         } else {
             return {
-                overUser: action.payload.overUser,
-                overMenu: action.payload.overMenu,
-                clicked: action.payload.clicked,
-                children: 3
+                ...action.payload,
+                children: 2
             }
         }
     }
 
-    const [state, dispatch] = useReducer(reducer, { overUser: false, overMenu: false, clicked: false, children: 3 })
+    const [state, dispatch] = useReducer(reducer, { overUser: false, overMenu: false, clicked: false, children: 3 } as reducerType)
 
     useEffect(() => {
         const blockedQue = query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', usersId), where('user', '==', viewingUser))
@@ -80,12 +87,17 @@ function UserCard({ user }: any) {
 
             <Link className="w-[75%]" href={`/profile/${usersId}=${usersName}`}>
                 <div className="flex items-center text-lg gap-x-5">
-                    <div className="h-[4rem] w-[4rem] bg-gray-100 shadow-lg rounded-full flex justify-center items-center">
+                    <div className="h-[4rem] w-[4rem] bg-gray-100 shadow-lg rounded-full flex justify-center items-center overflow-hidden">
                         {
                             profileImage.errors.includes(profileImage.profileImage) || profileImage.profileImage.length <= 0 ? (
                                 <h1>{profileImage.profileImage}</h1>
                             ) : (
-                                <Image src={images.userProfile} alt="profileImage" width={30} height={30} />
+                                <Image src={profileImage.profileImage} alt="profileImage" width={500} height={500}
+                                style={{
+                                    objectFit: 'cover',
+                                    width: profileUrl[0] === 'profileImages/defaultProfile.png' || profileUrl[0] === '' ? '40%' : '100%',
+                                    height: profileUrl[0] === 'profileImages/defaultProfile.png' || profileUrl[0] === '' ? '40%' : '100%',
+                                }} />
                             )
                         }
                     </div>
@@ -100,7 +112,7 @@ function UserCard({ user }: any) {
 
             <div className="flex w-[7rem] justify-between relative">
                 <button className="friendButton" id="message">
-                    <Image src={images.message} alt="message" />
+                    <Image src={initialAction.image} alt="initialAction" />
                 </button>
 
                 <button className="friendButton" id="menu"
@@ -108,12 +120,12 @@ function UserCard({ user }: any) {
                     <Image src={images.userMenu} alt="userMenu" />
                 </button>
 
-                <div className="messageFriend right-12 w-[5rem]">Message</div>
+                <div className="messageFriend right-12 w-[5rem]">{initialAction.message}</div>
                 <div className="friendActions">More</div>
 
                 <div className="absolute w-[10rem] bg-[#5D5D5D] -right-[10.5rem] text-white rounded-md transition-all duration-200 origin-left" id="friendMenu"
                     onMouseEnter={() => dispatch({ payload: { overUser: state.overUser, overMenu: true, clicked: state.clicked, children: state.children } })} 
-                    onMouseLeave={() => dispatch({ payload: { overUser: state.overUser, overMenu: false, clicked: state.clicked, children: state.clicked  } })}
+                    onMouseLeave={() => dispatch({ payload: { overUser: state.overUser, overMenu: false, clicked: state.clicked, children: state.children  } })}
 
                     style={{ transform: state.overUser && state.clicked || state.overMenu && state.clicked ? 'scale(1)' : 'scale(0)', top: state.children === 3 ? '-1.55rem' : '-.5rem' }}>
 
@@ -121,20 +133,20 @@ function UserCard({ user }: any) {
 
                     {
                         blockable ? (
-                            <button className={`w-full h-[2rem] hover:bg-[${action.color}]`} style={{ 
+                            <button className={`w-full h-[2rem] hover:bg-[${secondaryAction.color}]`} style={{ 
                                 borderBottom: viewingUser === usersId ? '0px' : '2px solid lightgray',
                                 borderBottomLeftRadius: viewingUser === usersId ? '.375rem' : '0', borderBottomRightRadius: viewingUser === usersId ? '.375rem' : '0'
                             }}
                             onClick={() => {
-                                if (action.action === 'add' || action.action === 'remove') {
+                                if (secondaryAction.action === 'add' || secondaryAction.action === 'remove') {
                                     updateFriendOrUser({
-                                        userId: viewingUser, userName: userData.currentUserName, action: action.action, friendId: usersId, friendName: usersName,
+                                        userId: viewingUser, userName: userData.currentUserName, action: secondaryAction.action, friendId: usersId, friendName: usersName,
                                         friendMessagingId: messagingId, userMessagingId: userData.currentUserMessagingId, friendOrUser: 'friend', state: null,
                                         blockedUser: null, image: null
                                     })
                                 }
                             }}>
-                            {action.message}</button>
+                            {secondaryAction.message}</button>
                         ) : (
                             null
                         )

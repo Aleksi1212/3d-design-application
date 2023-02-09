@@ -200,8 +200,6 @@ async function updateFriendOrUser(friendOrUserData: types) {
 
         uploadBytes(testRef, friendOrUserData.image)
         .then(async (snapshot) => {
-            console.log('yay');
-
             const docRef = doc(db, 'data', docId[0])
             await updateDoc(docRef, {
                 'profileUrl': `profileImages/${imageId+friendOrUserData.image.name}`

@@ -8,7 +8,6 @@ import { collection, collectionGroup, onSnapshot, query, where } from "firebase/
 function useUserData(userId: string, currentUserId: string) {
     const [friendData, setFriendData] = useState([])
     const [currentUserFriendData, setCurrentUserFriendData] = useState([])
-    // const [pendingFriendData, setPendingFriendData] = useState([])
 
     const [userLocked, setUserLocked] = useState({ state: null })
     const [blocked, setBlocked] = useState(false)
@@ -23,21 +22,10 @@ function useUserData(userId: string, currentUserId: string) {
         const querys = {
             friendQuery: query(collectionGroup(db, 'friends'), where('user', '==', userId), where('state', '==', 'accepted')),
             currentUserFriendQuery: query(collectionGroup(db, 'friends'), where('user', '==', currentUserId), where('state', '==', 'accepted')),
-            pendingFriendsQuery: query(collectionGroup(db, 'friendRequests'), where('sentTo', '==', currentUserId)),
             userQuery: query(collection(db, 'data'), where('userId', '==', userId)),
             currendUserQuery: query(collection(db, 'data'), where('userId', '==', currentUserId)),
             blockedQuery: query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', userId), where('user', '==', currentUserId))
         }
-
-        // const getPendingFriendData = onSnapshot(querys.pendingFriendsQuery, (querySnapshot) => {
-        //     let pendingFriends: SetStateAction<any> = []
-
-        //     querySnapshot.forEach((pendingFriend) => {
-        //         pendingFriends.push(pendingFriend.data().requestData)
-        //     })
-
-        //     setPendingFriendData(pendingFriends)
-        // })
 
         const getFriendData = onSnapshot(querys.friendQuery, (querySnapshot) => {
             let friends: SetStateAction<any> = []

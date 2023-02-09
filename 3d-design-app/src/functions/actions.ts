@@ -15,7 +15,7 @@ function userActions(userId: string, currentUserName: string, userMessagingId: s
             }
         },
 
-        { image: images.editProfile, color: '#5D5D5D', message: 'Edit', key: 'edit', type: 'link', action: null, params: null },
+        { image: images.settings, color: '#5D5D5D', message: 'Settings', key: 'edit', type: 'link', action: null, params: null },
         { image: images.friendNoti, color: '#5D5D5D', message: 'Notifications', key: 'notifications', type: 'link', action: null, params: `/notifications/${currenUserId}=${currentUserName}` },
         { image: images.signOut, color: '#FA5252', message: 'Sign Out', key: 'signOut', type: '', action: null, params: null}
     ] : !blocked ? [

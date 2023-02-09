@@ -11,6 +11,7 @@ function useImages(directory: any) {
 const importAll = useImages(require.context('../images', false, /\.(png|jpe?g|svg)$/))
 
 const images = {
+    acceptRequest: importAll['acceptRequest.png'],
     add: importAll['add.png'], 
     addDoc: importAll['addDoc.png'],
     addFriend: importAll['addFriend.png'],
@@ -31,7 +32,6 @@ const images = {
     docRemove: importAll['docRemove.png'],
     docShare: importAll['docShare.png'],
 
-    editProfile: importAll['editProfile.png'],
     email: importAll['email.png'],
     expand: importAll['expand.png'],
 
@@ -49,6 +49,7 @@ const images = {
 
     message: importAll['message.png'],
     search: importAll['search.png'],
+    settings: importAll['settings.png'],
     show: importAll['show.png'],
     showSearch: importAll['showSearch.png'],
     signOut: importAll['signOut.png'],

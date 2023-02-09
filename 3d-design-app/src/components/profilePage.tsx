@@ -31,6 +31,7 @@ function ProfilePage({ user }: any) {
     })
 
     const actions = userActions(userId, userData.currentUserName, userData.currentUserMessagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
+    console.log(userData.profileUrl)
 
     return (
         <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
@@ -52,24 +53,35 @@ function ProfilePage({ user }: any) {
 
             <div className="w-[40rem] h-[50rem] bg-white shadow-lg flex flex-col items-center justify-evenly rounded-xl ">
                 <div className="w-full flex items-center justify-between pl-20 pr-20">
-                    <div className="w-[12rem] h-[12rem] shadow-lg bg-gray-100 rounded-full flex justify-center items-center relative" id="addNewProfileImage"
+                    <div className="w-[12rem] h-[12rem] shadow-lg bg-gray-100 rounded-full flex justify-center items-center relative overflow-hidden" id="addNewProfileImage"
                         onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
                         {
                             profileImage.errors.includes(profileImage.profileImage) || profileImage.profileImage.length <= 0 ? (
                                 <h1>{profileImage.profileImage}</h1>
                             ) : (
-                                <Image src={hovered ? images.addProfileImage : profileImage.profileImage} alt="profileImage" width={50} height={50} />
+                                <Image src={hovered && currentUser.userId === userId ? images.addProfileImage : profileImage.profileImage} alt="profileImage" width={500} height={500}
+                                style={{
+                                    objectFit: 'cover',
+                                    width: hovered || userData.profileUrl === 'profileImages/defaultProfile.png' || userData.profileUrl === '' ? '25%' : '100%',
+                                    height: hovered || userData.profileUrl === 'profileImages/defaultProfile.png' || userData.profileUrl === '' ? '25%' : '100%'
+                                }} />
                             )
                         }
 
-                        <label className="bg-black w-full h-full rounded-full cursor-pointer absolute" style={{ opacity: hovered ? '10%' : '0' }}>
-                            <input type="file" className="hidden" accept="image/png, image/jpeg" onChange={(e: any) => 
-                                updateFriendOrUser({ 
-                                    userId: currentUser.userId, userName: null, action: 'updateProfile', friendId: null, friendName: null,
-                                    friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null, blockedUser: null, image: e.target.files[0]
-                                })
-                            } />
-                        </label>
+                        {
+                            currentUser.userId === userId ? (
+                                <label className="bg-black w-full h-full rounded-full cursor-pointer absolute" style={{ opacity: hovered ? '10%' : '0' }}>
+                                    <input type="file" className="hidden" accept="image/png, image/jpeg" onChange={(e: any) => 
+                                        updateFriendOrUser({ 
+                                            userId: currentUser.userId, userName: null, action: 'updateProfile', friendId: null, friendName: null,
+                                            friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null, blockedUser: null, image: e.target.files[0]
+                                        })
+                                    } />
+                                </label>
+                            ) : (
+                                null
+                            )
+                        }
 
                     </div>
 
@@ -141,7 +153,8 @@ function ProfilePage({ user }: any) {
                                                 usersId: friendCard.friendId, 
                                                 usersName: friendCard.friendName, 
                                                 messagingId: friendCard.messagingId, 
-                                                action: friendCard.friendId === currentUser.userId ? { message: 'Edit Profile', color: '#40C057', action: '' } :  
+                                                initialAction: { message: 'Message', action: '', image: images.message },
+                                                secondaryAction: friendCard.friendId === currentUser.userId ? { message: 'Edit Profile', color: '#40C057', action: '' } :  
                                                 currentUserFriends.includes(friendCard.friendId) ? { message: 'Remove Friend', color: '#FA5252', action: 'remove' } : { message: 'Add Friend', color: '#40C057', action: 'add' }
                                             }} />
                                         })

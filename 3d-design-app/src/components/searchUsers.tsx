@@ -54,6 +54,7 @@ function SearchUsers({ viewer }: any) {
         }
     }, [state])
 
+
     return (
         <div className="h-[50rem] shadow-lg bg-white rounded-xl p-6 transition-all" style={{ width: state.hidden ? '5rem' : '30rem' }}>
             <div className="absolute transition-all flex items-center gap-x-2 w-[12rem] h-[2.5rem]" style={{ right: state.hidden ? '23.5rem' : '11rem' }}>
@@ -80,7 +81,8 @@ function SearchUsers({ viewer }: any) {
                             usersId: userCard.userId,
                             usersName: userCard.username,
                             messagingId: userCard.messagingId,
-                            action: userCard.userId === userId ? { message: 'Edit Profile', color: '#40C057', action: '' } : { message: 'Add Friend', color: '#40C057', action: 'add' }
+                            initialAction: { message: 'Message', action: '', image: images.message },
+                            secondaryAction: userCard.userId === userId ? { message: 'Settings', color: '#40C057', action: '' } : { message: 'Add Friend', color: '#40C057', action: 'add' }
                         }} />
                     })
                 }
