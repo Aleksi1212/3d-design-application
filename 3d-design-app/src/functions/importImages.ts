@@ -33,6 +33,7 @@ const images = {
     docShare: importAll['docShare.png'],
 
     email: importAll['email.png'],
+    error: importAll['error.png'],
     expand: importAll['expand.png'],
 
     facebook: importAll['facebook.png'],
@@ -53,6 +54,7 @@ const images = {
     show: importAll['show.png'],
     showSearch: importAll['showSearch.png'],
     signOut: importAll['signOut.png'],
+    success: importAll['success.png'],
 
     unfriend: importAll['unfriend.png'],
     unlockProfile: importAll['unlockProfile.png'],

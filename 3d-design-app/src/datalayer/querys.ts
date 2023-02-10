@@ -1,7 +1,8 @@
 import { db, storage } from "./config"
-import { addDoc, collection, getDocs, getDoc, query, where, doc, setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove, collectionGroup } from "firebase/firestore"
+import { addDoc, collection, getDocs, getDoc, query, where, doc, setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove, collectionGroup, deleteField } from "firebase/firestore"
 import { ref, uploadBytes } from "firebase/storage"
-import { imageConfigDefault } from "next/dist/shared/lib/image-config"
+
+import images from "../functions/importImages"
 
 function generateId(length: number) {
     let id = ''
@@ -126,9 +127,17 @@ async function updateFriendOrUser(friendOrUserData: types) {
 
     } else if (friendOrUserData.action === 'update' && friendOrUserData.friendOrUser === 'user') {
         const docRef = doc(db, 'data', docId[0])
-        await updateDoc(docRef, {
-            'locked': friendOrUserData.state
-        })
+
+        const result = await Promise.allSettled([
+            updateDoc(docRef, {
+                'locked': friendOrUserData.state
+            })
+        ])
+
+        if (result[0].status === 'fulfilled') {
+            return { message: friendOrUserData.state ? 'Succesfully Locked' : 'Succesfully Unlocked', image: images.success }
+        }
+        return { message: result[0].reason, image: images.error }
 
     } else if (friendOrUserData.action === 'add' && friendOrUserData.friendOrUser === 'friend') {
         const docRef = doc(db, 'data', docId[0], 'friends', friendOrUserData.friendId)

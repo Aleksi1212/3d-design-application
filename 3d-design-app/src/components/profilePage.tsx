@@ -1,11 +1,11 @@
 'use client';
 
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
 import { updateFriendOrUser } from "../datalayer/querys";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import useProfileImage from "../hooks/profileImagehook";
 import useUserData from "../hooks/userDataHook";
@@ -16,11 +16,20 @@ import UserCard from "./userCard";
 import userActions from "../functions/actions";
 import images from "../functions/importImages";
 
+interface alertType {
+    message: string,
+    image: StaticImageData,
+    top: string
+}
+
 function ProfilePage({ user }: any) {
     const { userId, userName, currentUser, pendingCount } = user || {}
 
     const userData = useUserData(userId, currentUser.userId)
     const profileImage = useProfileImage(userData.profileUrl)
+    
+    const [alert, setAlert] = useState<alertType>({ message: 'ok', image: images.success, top: '-2.5rem' })
+    // const alertRef = useRef<HTMLDivElement>(null)
     
     const [hovered, setHovered] = useState(false)
     const router = useRouter()
@@ -31,10 +40,22 @@ function ProfilePage({ user }: any) {
     })
 
     const actions = userActions(userId, userData.currentUserName, userData.currentUserMessagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
-    console.log(userData.profileUrl)
+
+    // useEffect(() => {
+    //     if (alertRef.current) {
+    //         alert.message !== 'ok' ? alertRef.current.style.top = '1.25rem' : alertRef.current.style.top = '-2.5rem'
+    //     }
+    // }, [alert])
+
 
     return (
         <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
+            <div className="bg-[#3D3D3D] absolute w-[15rem] h-[2rem] rounded-lg flex justify-between px-2 items-center text-white transition-all duration-200"
+                style={{ top: alert.top }}>
+                <Image src={alert?.image} alt="image" />
+                <h1>{alert.message}</h1>
+            </div>
+
             <div className="absolute left-20 top-20  flex flex-col items-center gap-y-1">
                 <Link href={`/dashboard/${currentUser.userId}`} className="flex w-[2.5rem] h-[2.5rem]" id="dashLink">
                     <div className="flex flex-col h-full w-[50%] gap-y-[.1rem] ">
@@ -48,7 +69,7 @@ function ProfilePage({ user }: any) {
                     </div>
                 </Link>
 
-                <div className="w-full text-white bg-[#5D5D5D] rounded-md text-sm px-2 transition-all origin-top scale-0 duration-200" id="dashMessage">Dashboard</div>
+                <div className="w-full text-white bg-[#5D5D5D] rounded-md text-sm px-2 transition-all origin-top scale-0 duration-300" id="dashMessage">Dashboard</div>
             </div>
 
             <div className="w-[40rem] h-[50rem] bg-white shadow-lg flex flex-col items-center justify-evenly rounded-xl ">
@@ -92,9 +113,14 @@ function ProfilePage({ user }: any) {
                                 actions.map((action: any) => {
                                     return (
                                         <button id="profileAction" className="relative" key={action.key}
-                                        onClick={() => {
+                                        onClick={async () => {
                                             if (action.type === 'func') {
-                                                action.action(action.params)
+                                                const alert = await action.action(action.params)
+                                                setAlert({ message: alert.message, image: alert.image, top: '1.25rem' })
+
+                                                setTimeout(() => {
+                                                    setAlert({ message: alert.messag, image: alert.image, top: '-2.5rem' })
+                                                }, 2000)
                                             } else {
                                                 router.push(action.params)
                                             }
