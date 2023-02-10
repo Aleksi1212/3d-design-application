@@ -9,7 +9,7 @@ function useUserData(userId: string, currentUserId: string) {
     const [friendData, setFriendData] = useState([])
     const [currentUserFriendData, setCurrentUserFriendData] = useState([])
 
-    const [userLocked, setUserLocked] = useState({ state: null })
+    const [userLocked, setUserLocked] = useState({ state: false })
     const [blocked, setBlocked] = useState(false)
     const [messagingId, setMessagingId] = useState(String)
     const [profileUrl, setProfileUrl] = useState(String)
@@ -87,7 +87,6 @@ function useUserData(userId: string, currentUserId: string) {
         })
 
         return () => {
-            // getPendingFriendData()
             getFriendData()
             getCurrentUserFriends()
             getUserData()
@@ -99,7 +98,6 @@ function useUserData(userId: string, currentUserId: string) {
     return {
         friendData: friendData,
         currentUserFriendData: currentUserFriendData,
-        // pendingFriendData: pendingFriendData,
 
         userLocked: userLocked,
         blocked: blocked,

@@ -35,7 +35,7 @@ function Notifications({ user }: any) {
 
     return (
         <section className="w-full h-[100vh] bg-[#F6F7F9] flex justify-center items-center">
-            <div className='absolute left-20 top-20 bg-red-500 flex justify-between w-[10rem]'>
+            <div className='absolute left-20 top-20  flex justify-between w-[10rem]'>
                 <div className="flex flex-col items-center gap-y-1">
                     <Link href={`/dashboard/${currentUserId}`} className="flex w-[2.5rem] h-[2.5rem]" id="dashLink">
                         <div className="flex flex-col h-full w-[50%] gap-y-[.1rem] ">
@@ -48,7 +48,22 @@ function Notifications({ user }: any) {
                             <div className="dashIcon h-[70%] w-[95%]" id="icon"></div>
                         </div>
                     </Link>
-                    <div className="w-full text-white bg-[#5D5D5D] rounded-md text-sm px-2 transition-all origin-top scale-0 duration-200" id="dashMessage">Dashboard</div>
+                    <div className="w-full text-white bg-[#5D5D5D] rounded-md text-sm px-2 transition-all origin-top scale-0 duration-300" id="dashMessage">Dashboard</div>
+                </div>
+
+                <div className='relative flex flex-col justify-end'>
+
+                    <div className='rounded-full w-[3rem] h-[3rem] absolute -top-[.4rem] left-[.4rem]' id='profileIcon'>
+                        <Link href={`/profile/${currentUserId}=${userName}`} className="w-full h-full flex justify-center items-center">
+                            <Image src={images.userProfile} alt="profile" width={30}height={30} />
+                        </Link>
+                    </div>
+
+                    <svg width="60" height="45" className='-mt-1 ml-[.3rem] transition-all duration-[400ms]' id='profileSvg'>
+                        <circle cx="26" cy="21" r="20" fill="none" stroke="#4D4D4D" strokeWidth="2"/>
+                    </svg>
+
+                    <div className='w-full text-white bg-[#5D5D5D] rounded-md text-sm transition-all origin-top scale-0 duration-200 flex justify-center' id='profileMessage'>Profile</div>
                 </div>
             </div>
 

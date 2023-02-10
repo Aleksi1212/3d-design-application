@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { updateFriendOrUser } from "../datalayer/querys";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'
 import useProfileImage from "../hooks/profileImagehook";
 import useUserData from "../hooks/userDataHook";
@@ -29,8 +29,6 @@ function ProfilePage({ user }: any) {
     const profileImage = useProfileImage(userData.profileUrl)
     
     const [alert, setAlert] = useState<alertType>({ message: 'ok', image: images.success, top: '-2.5rem' })
-    // const alertRef = useRef<HTMLDivElement>(null)
-    
     const [hovered, setHovered] = useState(false)
     const router = useRouter()
 
@@ -41,61 +39,82 @@ function ProfilePage({ user }: any) {
 
     const actions = userActions(userId, userData.currentUserName, userData.currentUserMessagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
 
-    // useEffect(() => {
-    //     if (alertRef.current) {
-    //         alert.message !== 'ok' ? alertRef.current.style.top = '1.25rem' : alertRef.current.style.top = '-2.5rem'
-    //     }
-    // }, [alert])
+    useEffect(() => {
+        if (alert.top !== '-2.5rem') {
+            setTimeout(() => {
+                setAlert({ message: alert.message, image: alert.image, top: '-2.5rem' })
+            }, 2000)
+        }
+    }, [alert])
 
+    console.log(userData.currentUserFriendData)
 
     return (
         <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
-            <div className="bg-[#3D3D3D] absolute w-[15rem] h-[2rem] rounded-lg flex justify-between px-2 items-center text-white transition-all duration-200"
+            <div className="bg-[#3D3D3D] absolute w-[15rem] h-[2rem] rounded-lg pl-2 flex items-center text-white transition-all duration-200"
                 style={{ top: alert.top }}>
                 <Image src={alert?.image} alt="image" />
+                <h1 className="px-2">|</h1>
                 <h1>{alert.message}</h1>
             </div>
 
-            <div className="absolute left-20 top-20  flex flex-col items-center gap-y-1">
-                <Link href={`/dashboard/${currentUser.userId}`} className="flex w-[2.5rem] h-[2.5rem]" id="dashLink">
-                    <div className="flex flex-col h-full w-[50%] gap-y-[.1rem] ">
-                        <div className="dashIcon h-[70%] w-[95%]" id="icon"></div>
-                        <div className="dashIcon h-[30%] w-[95%]" id="icon"></div>
+            <div className='absolute left-20 top-20  flex justify-between w-[10rem]'>
+                <div className="flex flex-col items-center gap-y-1">
+                    <Link href={`/dashboard/${currentUser.userId}`} className="flex w-[2.5rem] h-[2.5rem]" id="dashLink">
+                        <div className="flex flex-col h-full w-[50%] gap-y-[.1rem] ">
+                            <div className="dashIcon h-[70%] w-[95%]" id="icon"></div>
+                            <div className="dashIcon h-[30%] w-[95%]" id="icon"></div>
+                        </div>
+
+                        <div className="flex flex-col h-full w-[50%] gap-y-[.1rem] items-end ">
+                            <div className="dashIcon h-[30%] w-[95%]" id="icon"></div>
+                            <div className="dashIcon h-[70%] w-[95%]" id="icon"></div>
+                        </div>
+                    </Link>
+                    <div className="w-full text-white bg-[#5D5D5D] rounded-md text-sm px-2 transition-all origin-top scale-0 duration-200" id="dashMessage">Dashboard</div>
+                </div>
+
+                <div className='relative flex flex-col justify-end'>
+                    <div className='rounded-full w-[3rem] h-[3rem] absolute -top-[.4rem] left-[.4rem]' id='profileIcon'>
+                        <Link href={`/profile/${currentUser.userId}=${userData.currentUserName}`} className="w-full h-full flex justify-center items-center">
+                            <Image src={images.userProfile} alt="profile" width={30}height={30} />
+                        </Link>
                     </div>
 
-                    <div className="flex flex-col h-full w-[50%] gap-y-[.1rem] items-end ">
-                        <div className="dashIcon h-[30%] w-[95%]" id="icon"></div>
-                        <div className="dashIcon h-[70%] w-[95%]" id="icon"></div>
-                    </div>
-                </Link>
+                    <svg width="60" height="45" className='-mt-1 ml-[.3rem] transition-all duration-[400ms]' id='profileSvg'>
+                        <circle cx="26" cy="21" r="20" fill="none" stroke="#4D4D4D" strokeWidth="2"/>
+                    </svg>
 
-                <div className="w-full text-white bg-[#5D5D5D] rounded-md text-sm px-2 transition-all origin-top scale-0 duration-300" id="dashMessage">Dashboard</div>
+                    <div className='w-full text-white bg-[#5D5D5D] rounded-md text-sm transition-all origin-top scale-0 duration-200 flex justify-center' id='profileMessage'>Profile</div>
+                </div>
             </div>
 
             <div className="w-[40rem] h-[50rem] bg-white shadow-lg flex flex-col items-center justify-evenly rounded-xl ">
                 <div className="w-full flex items-center justify-between pl-20 pr-20">
                     <div className="w-[12rem] h-[12rem] shadow-lg bg-gray-100 rounded-full flex justify-center items-center relative overflow-hidden" id="addNewProfileImage"
-                        onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+                        onMouseEnter={() => currentUser.userId === userId ?  setHovered(true) : null} onMouseLeave={() => currentUser.userId === userId ?  setHovered(false) : null}>
                         {
                             profileImage.errors.includes(profileImage.profileImage) || profileImage.profileImage.length <= 0 ? (
                                 <h1>{profileImage.profileImage}</h1>
                             ) : (
-                                <Image src={hovered && currentUser.userId === userId ? images.addProfileImage : profileImage.profileImage} alt="profileImage" width={500} height={500}
+                                <Image src={profileImage.profileImage} alt="profileImage" width={500} height={500}
                                 style={{
                                     objectFit: 'cover',
-                                    width: hovered || userData.profileUrl === 'profileImages/defaultProfile.png' || userData.profileUrl === '' ? '25%' : '100%',
-                                    height: hovered || userData.profileUrl === 'profileImages/defaultProfile.png' || userData.profileUrl === '' ? '25%' : '100%'
+                                    width: userData.profileUrl === 'profileImages/defaultProfile.png' || userData.profileUrl === '' ? '25%' : '100%',
+                                    height: userData.profileUrl === 'profileImages/defaultProfile.png' || userData.profileUrl === '' ? '25%' : '100%',
+                                    opacity: hovered ? '20%' : '100%'
                                 }} />
                             )
                         }
 
                         {
                             currentUser.userId === userId ? (
-                                <label className="bg-black w-full h-full rounded-full cursor-pointer absolute" style={{ opacity: hovered ? '10%' : '0' }}>
+                                <label className="w-full h-full rounded-full absolute cursor-pointer">
                                     <input type="file" className="hidden" accept="image/png, image/jpeg" onChange={(e: any) => 
                                         updateFriendOrUser({ 
                                             userId: currentUser.userId, userName: null, action: 'updateProfile', friendId: null, friendName: null,
-                                            friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null, blockedUser: null, image: e.target.files[0]
+                                            friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null, blockedUser: null,
+                                            image: e.target.files[0]
                                         })
                                     } />
                                 </label>
@@ -104,6 +123,7 @@ function ProfilePage({ user }: any) {
                             )
                         }
 
+                        <h1 className="absolute pointer-events-none" style={{ display: hovered ? 'flex' : 'none' }}>Change Profile Picture</h1>
                     </div>
 
                     <div className="flex flex-col justify-between gap-y-4 items-center">
@@ -117,10 +137,6 @@ function ProfilePage({ user }: any) {
                                             if (action.type === 'func') {
                                                 const alert = await action.action(action.params)
                                                 setAlert({ message: alert.message, image: alert.image, top: '1.25rem' })
-
-                                                setTimeout(() => {
-                                                    setAlert({ message: alert.messag, image: alert.image, top: '-2.5rem' })
-                                                }, 2000)
                                             } else {
                                                 router.push(action.params)
                                             }
@@ -156,7 +172,11 @@ function ProfilePage({ user }: any) {
 
                 <div className="w-full h-[30rem] flex flex-col items-center pt-2">
                     {
-                        !userData.blocked ? (
+                        currentUser.userId !== userId && userData.blocked || currentUser.userId !== userId && userData.userLocked.state ? (
+                            <h1 className="text-xl">
+                                {userData.blocked ? 'User Blocked' : userData.userLocked.state ? 'Account Only Viewable For Friends' : null}
+                            </h1>
+                        ) : (
                             <>
                                 <div className="w-full flex justify-evenly text-[1.5rem]">
                                     <button className="flex flex-col items-center" id="otherAction">
@@ -187,8 +207,6 @@ function ProfilePage({ user }: any) {
                                     }
                                 </div>
                             </>
-                        ) : (
-                            <h1 className="text-xl">User blocked</h1>
                         )
                     }
                 </div>
