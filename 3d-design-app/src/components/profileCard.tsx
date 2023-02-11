@@ -23,14 +23,14 @@ function Profile({ userData }: any) {
                 console.log(err);
             })
     
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    await cookieSetter(true, user.uid)    
-                } else {
-                    await cookieSetter(false, null)
-                    window.location.reload()
-                }
-            })
+            // auth.onAuthStateChanged(async (user) => {
+            //     if (user) {
+            //         await cookieSetter(true, user.uid)
+            //     } else {
+            //         await cookieSetter(false, null)
+            //         window.location.reload()
+            //     }
+            // })
         } else {
             const res = await fetch('http://localhost:3000/api/signOut', {
                 method: 'GET'
@@ -40,7 +40,7 @@ function Profile({ userData }: any) {
 
             if (responseMessage.message === 'ok') {
                 await cookieSetter(false, null)
-                window.location.reload()
+                // window.location.reload()
             }
         }    
     }

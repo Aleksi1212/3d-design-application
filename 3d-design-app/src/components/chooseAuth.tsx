@@ -16,12 +16,34 @@ import { checkUser, cookieSetter } from "../datalayer/querys";
 
 import { GoogleAuthProvider, FacebookAuthProvider, GithubAuthProvider, signInWithPopup, signOut } from "firebase/auth"
 
+import { useState } from "react";
+
 function ChooseAuth(props: any) {
     const router = useRouter()
 
     const googleProvider = new GoogleAuthProvider()
     const githubprovider = new GithubAuthProvider()
     const facebookProvider = new FacebookAuthProvider()
+
+    const [loading, setLoading] = useState(false)
+
+    // console.log(loading)
+
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            const setCookiePromise = await Promise.allSettled([
+                cookieSetter(true, user.uid)
+            ])
+
+            if (setCookiePromise[0].status === 'fulfilled') {
+                console.log('signed in')
+                router.push(`/dashboard/${user.uid}`)
+                // setLoading(false)
+            }
+        } else {
+            setLoading(false)
+        }
+    })
 
     async function Auth(provider: any, method: string) {
         const user = auth.currentUser
@@ -41,28 +63,37 @@ function ChooseAuth(props: any) {
             const user = result.user
             const userName = user.email?.split('@')[0]
             checkUser(user.uid, userName as string, user.email as string, method)
+            setLoading(true)
         })
         .catch((err) => {
             console.log(err);
         })
 
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                const setCookie = await cookieSetter(true, user.uid)
+        // auth.onAuthStateChanged(async (user) => {
+        //     if (user) {
+        //         const setCookie = await cookieSetter(true, user.uid)
 
-                if (setCookie === 'cookie set') {
-                    router.push(`/dashboard/${user.uid}`)
-                }
+        //         if (setCookie === 'cookie set') {
+        //             router.push(`/dashboard/${user.uid}`)
+        //         }
 
-            } else {
-                const setCookie = await cookieSetter(false, null)
+        //     } else {
+        //         const setCookie = await cookieSetter(false, null)
 
-                if (setCookie === 'cookie set') {
-                    router.push(`/${props.method}`)
-                }
-            }
-        })
+        //         if (setCookie === 'cookie set') {
+        //             router.push(`/${props.method}`)
+        //         }
+        //     }
+        // })
     }
+
+    // if (loading) {
+    //     return (
+    //         <section className="bg-[#2D2D2D] w-full h-[100vh] flex items-center justify-center">
+    //             <div className="loader"></div>
+    //         </section>
+    //     )
+    // }
 
     return (
         <section className="w-full h-[100vh] bg-[#2D2D2D] flex justify-center text-white">

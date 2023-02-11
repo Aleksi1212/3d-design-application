@@ -5,9 +5,17 @@ import { useState, useEffect, SetStateAction } from "react";
 import { db } from "../datalayer/config";
 import { collection, collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 
+interface currentUserTypes {
+    messagingId: string,
+    name: string,
+    email: string,
+    method: string
+}
+
 function useUserData(userId: string, currentUserId: string) {
     const [friendData, setFriendData] = useState([])
     const [currentUserFriendData, setCurrentUserFriendData] = useState([])
+    const [designData, setDesignData] = useState([])
 
     const [userLocked, setUserLocked] = useState({ state: false })
     const [blocked, setBlocked] = useState(false)
@@ -16,7 +24,10 @@ function useUserData(userId: string, currentUserId: string) {
 
     const [currentUserMessagingId, setCurrentUserMessagingId] = useState(String)
     const [currentUserName, setCurrentUserName] = useState(String)
+    const [currentUserEmail, setCurrentUserEmail] = useState(String)
+    const [currentUserMethod, setCurrentUserMethod] = useState(String)
 
+    // const [currentUserData, setCurrentUserData] = useState<currentUserTypes>({ messagingId: '', name: '', email: '', method: '' })
     
     useEffect(() => {
         const querys = {
@@ -24,7 +35,8 @@ function useUserData(userId: string, currentUserId: string) {
             currentUserFriendQuery: query(collectionGroup(db, 'friends'), where('user', '==', currentUserId), where('state', '==', 'accepted')),
             userQuery: query(collection(db, 'data'), where('userId', '==', userId)),
             currendUserQuery: query(collection(db, 'data'), where('userId', '==', currentUserId)),
-            blockedQuery: query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', userId), where('user', '==', currentUserId))
+            blockedQuery: query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', userId), where('user', '==', currentUserId)),
+            designQuery: query(collectionGroup(db, 'designs'), where('user', '==', currentUserId))
         }
 
         const getFriendData = onSnapshot(querys.friendQuery, (querySnapshot) => {
@@ -66,14 +78,23 @@ function useUserData(userId: string, currentUserId: string) {
         const getCurrentUserData = onSnapshot(querys.currendUserQuery, (querySnapshot) => {
             let messagingId: string = ''
             let userName: string = ''
+            let email: string = ''
+            let method: string = ''
 
             querySnapshot.forEach((currentUser) => {
                 messagingId = currentUser.data().messagingId
                 userName = currentUser.data().username
+                email = currentUser.data().email
+                method = currentUser.data().method
+
             })
 
             setCurrentUserMessagingId(messagingId)
             setCurrentUserName(userName)
+            setCurrentUserEmail(email)
+            setCurrentUserMethod(method)
+
+            // setCurrentUserData({ messagingId: messagingId, name: userName, email: email, method: method })
         })
 
         const getBlockedData = onSnapshot(querys.blockedQuery, (querySnapshot) => {
@@ -86,9 +107,20 @@ function useUserData(userId: string, currentUserId: string) {
             blockedData.length > 0 ? setBlocked(true) : setBlocked(false)
         })
 
+        const getDesigns = onSnapshot(querys.designQuery, (querySnapshot) => {
+            let desingns: SetStateAction<any> = []
+
+            querySnapshot.forEach((design) => {
+                desingns.push(design.data().designData)
+            })
+
+            setDesignData(desingns)
+        })
+
         return () => {
             getFriendData()
             getCurrentUserFriends()
+            getDesigns()
             getUserData()
             getCurrentUserData()
             getBlockedData()
@@ -98,6 +130,7 @@ function useUserData(userId: string, currentUserId: string) {
     return {
         friendData: friendData,
         currentUserFriendData: currentUserFriendData,
+        designData: designData,
 
         userLocked: userLocked,
         blocked: blocked,
@@ -105,7 +138,9 @@ function useUserData(userId: string, currentUserId: string) {
         profileUrl: profileUrl,
 
         currentUserMessagingId: currentUserMessagingId,
-        currentUserName: currentUserName
+        currentUserName: currentUserName,
+        currentUserEmail: currentUserEmail,
+        currentUserMethod: currentUserMethod
     }
 }
 

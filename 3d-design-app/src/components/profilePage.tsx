@@ -16,6 +16,8 @@ import UserCard from "./userCard";
 import userActions from "../functions/actions";
 import images from "../functions/importImages";
 
+import { auth } from "../datalayer/config";
+
 interface alertType {
     message: string,
     image: StaticImageData,
@@ -48,6 +50,8 @@ function ProfilePage({ user }: any) {
     }, [alert])
 
     console.log(userData.currentUserFriendData)
+    const usertest = auth.currentUser
+    console.log(usertest?.uid)
 
     return (
         <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
