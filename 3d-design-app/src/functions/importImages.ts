@@ -16,9 +16,10 @@ const images = {
     addDoc: importAll['addDoc.png'],
     addFriend: importAll['addFriend.png'],
     addProfileImage: importAll['addProfileImage.png'],
+    appLogo: importAll['appLogo.png'],
     arrow1: importAll['arrow1.svg'],
     arrow2: importAll['arrow2.svg'], 
-    arrow3: importAll['arrow3.png'],
+    arrow3: importAll['arrow3.svg'],
     arrowDown: importAll['arrowDown.png'],
 
     back: importAll['back.png'],
