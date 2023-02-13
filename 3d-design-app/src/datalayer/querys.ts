@@ -15,14 +15,6 @@ function generateId(length: number) {
     return id
 }
 
-async function getUserData(data: any) {
-    const que = query(collection(db, 'data'), where('userId', '==', data.userId))
-    const querySnapshot = await getDocs(que)
-
-    const userData = querySnapshot.docs.map((doc) => doc.data())
-    return userData
-}
-
 async function checkUser(userId: string, userName: string, userEmail: string, method: string) {
     const messagingId = generateId(5)
 
@@ -300,7 +292,6 @@ async function updateFriendOrUser(friendOrUserData: types) {
 
 
 export {
-    getUserData,
     checkUser,
     cookieSetter,
     updateDesign,

@@ -6,7 +6,7 @@ import Link from "next/link";
 import images from "../functions/importImages";
 
 import useUserData from "../hooks/userDataHook";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { signOut } from "firebase/auth";
@@ -45,10 +45,26 @@ function UserDashboard({ currentUser }: any) {
 
     const router = useRouter()
 
-    const [alert, setAlert] = useState<errorScreenTypes>({ display: 'none', message: '', url: '', state: false })
+    const [errorScreen, setErrorScreen] = useState<errorScreenTypes>({ display: 'none', message: '', url: '', state: false })
+    const [alert, setAlert] = useState<alertTypes>({ message: 'ok', image: images.success, top: '-2.5rem' })
     const [manualSignOut, setManualSignOut] = useState(false)
+    
+    const designAndUserData = useUserData(currentUserId, currentUserId)
+    
+    const backgroundSvgs =  [
+        { image: images.arrow1, flexPos: 'flex-end', padLeft: '6rem', padTop: '0', padBottom: '5rem', key: 'arrrow1' } as backgroundTypes,
+        { image: images.cross, flexPos: 'flex-start', padLeft: '18rem', padTop: '4rem', padBottom: '0', key: 'cross' } as backgroundTypes,
+        { image: images.arrow2, flexPos: 'center', padLeft: '30rem', padTop: '0', padBottom: '0', key: 'arrow2' } as backgroundTypes,
+        { image: images.arrow3, flexPos: 'flex-end', padLeft: '24rem', padTop: '0', padBottom: '2.5rem', key: 'arrow3' } as backgroundTypes
+    ]
 
-    const [method, setMethod] = useState(String)
+    useEffect(() => {
+        if (alert.top !== '-2.5rem') {
+            setTimeout(() => {
+                setAlert({ message: alert.message, image: alert.image, top: '-2.5rem' })
+            }, 2000)
+        }
+    }, [alert])
 
     auth.onAuthStateChanged(async (user) => {
         if (user) {
@@ -59,12 +75,11 @@ function UserDashboard({ currentUser }: any) {
             if (deleteCookie === 'cookie set' && manualSignOut) {
                 router.push('/logIn')
             } else {
-                setAlert({ display: 'flex', message: 'Signed out', url: '/logIn', state: true })
+                setErrorScreen({ display: 'flex', message: 'Signed out', url: '/logIn', state: true })
             }
         }
     })
 
-    const designAndUserData = useUserData(currentUserId, currentUserId)
 
     async function userSignOut() {
         if (designAndUserData.currentUserMethod !== 'email') {
@@ -90,23 +105,25 @@ function UserDashboard({ currentUser }: any) {
         }    
     }
 
-    const backgroundSvgs =  [
-        { image: images.arrow1, flexPos: 'flex-end', padLeft: '6rem', padTop: '0', padBottom: '5rem', key: 'arrrow1' } as backgroundTypes,
-        { image: images.cross, flexPos: 'flex-start', padLeft: '18rem', padTop: '4rem', padBottom: '0', key: 'cross' } as backgroundTypes,
-        { image: images.arrow2, flexPos: 'center', padLeft: '30rem', padTop: '0', padBottom: '0', key: 'arrow2' } as backgroundTypes,
-        { image: images.arrow3, flexPos: 'flex-end', padLeft: '24rem', padTop: '0', padBottom: '2.5rem', key: 'arrow3' } as backgroundTypes
-    ]
+    useEffect
 
     return (
         <>
-            <section className="bg-[#F6F7F9] w-full h-[150vh]" style={{ position: alert.state ? 'fixed' : 'static' }}>
-                <div className="absolute w-full h-[100vh] backdrop-blur-md justify-center items-center" style={{ display: alert.display }}>
+            <section className="bg-[#F6F7F9] w-full h-[150vh]" style={{ position: errorScreen.state ? 'fixed' : 'static' }}>
+                <div className="absolute w-full h-[100vh] backdrop-blur-md justify-center items-center" style={{ display: errorScreen.display }}>
                     <div className="w-[12rem] h-[17.5rem] text-black items-center flex gap-y-1 flex-col">
                         <Image src={images.appLogo} alt="logo" width={150} height={150} />
-                        <h1 className="text-xl">{alert.message}</h1>
+                        <h1 className="text-xl">{errorScreen.message}</h1>
 
-                        <Link href={alert.url} className="bg-[#40C057] w-[65%] h-[2rem] flex justify-center items-center mt-8 rounded-lg hover:brightness-90 active:scale-90">Log In</Link>
+                        <Link href={errorScreen.url} className="bg-[#40C057] w-[65%] h-[2rem] flex justify-center items-center mt-8 rounded-lg hover:brightness-90 active:scale-90">Log In</Link>
                     </div>
+                </div>
+
+                <div className="absolute left-[43.5%] w-[15rem] h-[2rem] bg-[#3D3D3D] rounded-lg pl-2 flex items-center text-white transition-all duration-200"
+                    style={{ top: alert.top }}>
+                    <Image src={alert?.image} alt="image" />
+                    <h1 className="px-2">|</h1>
+                    <h1>{alert.message}</h1>
                 </div>
 
                 <div className="bg-[#1A73E8] h-[30%] flex">
@@ -122,7 +139,11 @@ function UserDashboard({ currentUser }: any) {
 
                     <div className="max-w-[66rem] my-[6rem] flex gap-y-12 gap-x-12 flex-wrap ">
                         <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc"
-                            onClick={() => updateDesign(currentUserId, 'add', '', '')}>
+                            onClick={async () => {
+                                const addResult = await updateDesign(currentUserId, 'add', '', '')
+                                setAlert({ message: addResult?.message, image: addResult?.image, top: '1.25rem' })
+                            }}>
+
                             <div className="flex flex-col items-center text-[#1A73E8] gap-y-8 mt-8">
                                 <Image src={images.addDoc} alt="addDoc" />
                                 <h1>Add New Design</h1>
@@ -131,7 +152,7 @@ function UserDashboard({ currentUser }: any) {
 
                         {
                             designAndUserData.designData.map((docCard: any) => {
-                                return <DocumentCard key={docCard.docId} userId={currentUserId} docId={docCard.docId} docName={docCard.docName} />
+                                return <DocumentCard key={docCard.docId} userId={currentUserId} docId={docCard.docId} docName={docCard.docName} alert={(alert: alertTypes) => {setAlert(alert)}} />
                             })
                         }
                     </div>
@@ -178,7 +199,10 @@ function DocumentCard(props: any) {
                 
                 <div className="flex justify-evenly w-[6rem]">
                     <Image src={images.docShare} alt="docShare" />
-                    <Image src={images.docRemove} alt="docRemove" onClick={() => updateDesign(props.userId, 'remove', props.docId, '')} />
+                    <Image src={images.docRemove} alt="docRemove" onClick={async () => {
+                        const deleteResult = await updateDesign(props.userId, 'remove', props.docId, '')
+                        props.alert({ message: deleteResult?.message, image: deleteResult?.image, top: '1.25rem' })
+                    }} />
                 </div>
             </div>
         </div>
