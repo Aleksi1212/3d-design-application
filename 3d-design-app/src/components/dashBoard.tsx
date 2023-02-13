@@ -14,11 +14,17 @@ import { auth } from "../datalayer/config";
 
 import { cookieSetter, updateDesign } from "../datalayer/querys";
 
-interface alertType {
+interface errorScreenTypes {
     display: string
     message: string
     url: string
     state: boolean
+}
+
+interface alertTypes {
+    message: string
+    image: StaticImageData
+    top: string
 }
 
 interface backgroundTypes {
@@ -39,8 +45,10 @@ function UserDashboard({ currentUser }: any) {
 
     const router = useRouter()
 
-    const [alert, setAlert] = useState<alertType>({ display: 'none', message: '', url: '', state: false })
+    const [alert, setAlert] = useState<errorScreenTypes>({ display: 'none', message: '', url: '', state: false })
     const [manualSignOut, setManualSignOut] = useState(false)
+
+    const [method, setMethod] = useState(String)
 
     auth.onAuthStateChanged(async (user) => {
         if (user) {
@@ -100,6 +108,7 @@ function UserDashboard({ currentUser }: any) {
                         <Link href={alert.url} className="bg-[#40C057] w-[65%] h-[2rem] flex justify-center items-center mt-8 rounded-lg hover:brightness-90 active:scale-90">Log In</Link>
                     </div>
                 </div>
+
                 <div className="bg-[#1A73E8] h-[30%] flex">
                     {
                         backgroundSvgs.map((svg: backgroundTypes) => {

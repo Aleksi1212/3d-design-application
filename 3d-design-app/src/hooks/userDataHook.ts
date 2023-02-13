@@ -6,10 +6,11 @@ import { db } from "../datalayer/config";
 import { collection, collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 
 interface currentUserTypes {
-    messagingId: string,
-    name: string,
-    email: string,
+    userId: string
+    name: string
+    email: string
     method: string
+    profileUrl: string
 }
 
 function useUserData(userId: string, currentUserId: string) {
@@ -27,16 +28,16 @@ function useUserData(userId: string, currentUserId: string) {
     const [currentUserEmail, setCurrentUserEmail] = useState(String)
     const [currentUserMethod, setCurrentUserMethod] = useState(String)
 
-    // const [currentUserData, setCurrentUserData] = useState<currentUserTypes>({ messagingId: '', name: '', email: '', method: '' })
+    // const [currentUserData, setCurrentUserData] = useState<currentUserTypes>({ userId: '', name: '', email: '', method: '', profileUrl: '' })
     
     useEffect(() => {
         const querys = {
             friendQuery: query(collectionGroup(db, 'friends'), where('user', '==', userId), where('state', '==', 'accepted')),
             currentUserFriendQuery: query(collectionGroup(db, 'friends'), where('user', '==', currentUserId), where('state', '==', 'accepted')),
             userQuery: query(collection(db, 'data'), where('userId', '==', userId)),
-            currendUserQuery: query(collection(db, 'data'), where('userId', '==', currentUserId)),
+            currendUserQuery: query(collection(db, 'dataDesigns'), where('userId', '==', currentUserId)),
             blockedQuery: query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', userId), where('user', '==', currentUserId)),
-            designQuery: query(collectionGroup(db, 'designs'), where('user', '==', currentUserId))
+            designQuery: query(collectionGroup(db, 'designs'), where('user', '==', currentUserId)),
         }
 
         const getFriendData = onSnapshot(querys.friendQuery, (querySnapshot) => {
@@ -140,7 +141,7 @@ function useUserData(userId: string, currentUserId: string) {
         currentUserMessagingId: currentUserMessagingId,
         currentUserName: currentUserName,
         currentUserEmail: currentUserEmail,
-        currentUserMethod: currentUserMethod
+        currentUserMethod: currentUserMethod,
     }
 }
 

@@ -16,7 +16,8 @@ import UserCard from "./userCard";
 import userActions from "../functions/actions";
 import images from "../functions/importImages";
 
-import { auth } from "../datalayer/config";
+import { auth, db } from "../datalayer/config";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 
 interface alertType {
     message: string,
@@ -26,21 +27,30 @@ interface alertType {
 
 function ProfilePage({ user }: any) {
     const { userId, userName, currentUser, pendingCount } = user || {}
+    
+    const router = useRouter()
+
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            console.log(user.uid)
+        } else {
+            router.push('/logIn')
+        }
+    })
 
     const userData = useUserData(userId, currentUser.userId)
     const profileImage = useProfileImage(userData.profileUrl)
     
     const [alert, setAlert] = useState<alertType>({ message: 'ok', image: images.success, top: '-2.5rem' })
     const [hovered, setHovered] = useState(false)
-    const router = useRouter()
-
+    
     let currentUserFriends: any = []
     userData.currentUserFriendData.map((friend: any) => {
         currentUserFriends.push(friend.friendId)
     })
 
     const actions = userActions(userId, userData.currentUserName, userData.currentUserMessagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
-
+    
     useEffect(() => {
         if (alert.top !== '-2.5rem') {
             setTimeout(() => {
@@ -48,10 +58,6 @@ function ProfilePage({ user }: any) {
             }, 2000)
         }
     }, [alert])
-
-    console.log(userData.currentUserFriendData)
-    const usertest = auth.currentUser
-    console.log(usertest?.uid)
 
     return (
         <section className="bg-[#F6F7F9] w-full h-[100vh] flex justify-center items-center gap-x-6">
@@ -61,6 +67,7 @@ function ProfilePage({ user }: any) {
                 <h1 className="px-2">|</h1>
                 <h1>{alert.message}</h1>
             </div>
+
 
             <div className='absolute left-20 top-20  flex justify-between w-[10rem]'>
                 <div className="flex flex-col items-center gap-y-1">

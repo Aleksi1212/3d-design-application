@@ -68,31 +68,77 @@ async function cookieSetter(userState: boolean, userId: string | null) {
 async function updateDesign(userId: string, action: string, oldDesignId: string, newName: string) {
     const newDesignId = generateId(8)
 
-    const que = query(collection(db, 'data'), where('userId', '==', userId))
-    const querySnapshot = await getDocs(que)
-    const docId = querySnapshot.docs.map((doc) => doc.id)
+    const designQue = query(collection(db, 'dataDesigns'), where('userId', '==', userId))
+    const profileQue = query(collection(db, 'data'), where('userId', '==', userId))
+
+    const designQuerySnapshot = await getDocs(designQue)
+    const profileQuerySnapshot = await getDocs(profileQue)
+
+    const designDocId = designQuerySnapshot.docs.map((doc) => doc.id)
+    const profileDocId = profileQuerySnapshot.docs.map((doc) => doc.id)
 
     if (action === 'add') {
-        const docRef = doc(db, 'data', docId[0], 'designs', newDesignId)
+        const designDocRef = doc(db, 'dataDesigns', designDocId[0], 'designs', newDesignId)
+        const profileDocRef = doc(db, 'data', profileDocId[0], 'usersDesigns', newDesignId)
     
-        await setDoc(docRef, {
-            designData: {
-                docId: newDesignId,
-                docName: 'Untitled'
-            },
-            user: userId
-        })
+        const designPromises = await Promise.allSettled([
+            setDoc(designDocRef, {
+                designData: {
+                    docId: newDesignId,
+                    docName: 'Untitled'
+                },
+                user: userId
+            }),
+
+            setDoc(profileDocRef, {
+                designData: {
+                    docId: newDesignId,
+                    docName: 'Untitled'
+                },
+                user: userId
+            })
+        ])
+
+        if (designPromises[0].status === 'fulfilled') {
+            return { message: 'New Design Created', image: images.success }
+        }
+
+        return { message: designPromises[0].reason, image: images.error }
 
     } else if (action === 'remove') {
-        const docRef = doc(db, 'data', docId[0], 'designs', oldDesignId)
-        await deleteDoc(docRef)
+        const designDocRef = doc(db, 'dataDesigns', designDocId[0], 'designs', oldDesignId)
+        const profileDocRef = doc(db, 'data', profileDocId[0], 'usersDesigns', oldDesignId)
+
+        const deleteDesignPromise = await Promise.allSettled([
+            deleteDoc(designDocRef),
+            deleteDoc(profileDocRef)
+        ])
+
+        if (deleteDesignPromise[0].status === 'fulfilled') {
+            return { message: 'Design Deleted', image: images.success }
+        }
+
+        return { message: deleteDesignPromise[0].reason, image: images.error }
 
     } else if (action === 'update') {
-        const docRef = doc(db, 'data', docId[0], 'designs', oldDesignId)
+        const designDocRef = doc(db, 'dataDesigns', designDocId[0], 'designs', oldDesignId)
+        const profileDocRef = doc(db, 'data', profileDocId[0], 'usersDesigns', oldDesignId)
 
-        await updateDoc(docRef, {
-            'designData.docName': newName
-        })
+        const updateDesignPromise = await Promise.allSettled([
+            updateDoc(designDocRef, {
+                'designData.docName': newName
+            }),
+
+            updateDoc(profileDocRef, {
+                'designData.docName': newName
+            })
+        ])
+
+        if (updateDesignPromise[0].status === 'fulfilled') {
+            return { message: `Name Updated To: ${newName}`, image: images.success }
+        }
+
+        return { message: updateDesignPromise[0].reason, image: images.error }
     }
 }
 
