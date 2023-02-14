@@ -134,22 +134,7 @@ async function updateDesign(userId: string, action: string, oldDesignId: string,
     }
 }
 
-interface types {
-    userId: string,
-    userName: any,
-    action: string,
-    friendId: any,
-    friendName: any,
-    friendMessagingId: any,
-    userMessagingId: any,
-    friendOrUser: string,
-    state: any,
-    blockedUser: any,
-    image: any,
-    // alertMessage: any
-}
-
-async function updateFriendOrUser(friendOrUserData: types) {
+async function updateFriendOrUser(friendOrUserData: any) {
     const que = query(collection(db, 'data'), where('userId', '==', friendOrUserData.userId))
     const querySnapshot = await getDocs(que)
     const docId = querySnapshot.docs.map((doc) => doc.id)
@@ -202,12 +187,14 @@ async function updateFriendOrUser(friendOrUserData: types) {
                     sentTo: friendOrUserData.friendId
                 })
             ])
+
+            console.log(friendRequestPromise[0].status)
     
             return friendRequestPromise[0].status === 'fulfilled' ? { message: 'Friend Request Sent', image: images.success } : { message: friendRequestPromise[0].reason, image: images.error }
         }
     
         return { message: addFriendPromise[0].reason, image: images.error }
-
+        
     // lock profile so that only friends can view it
     } else if (friendOrUserData.action === 'update' && friendOrUserData.friendOrUser === 'user') {
         const docRef = doc(db, 'data', docId[0])
@@ -274,18 +261,59 @@ async function updateFriendOrUser(friendOrUserData: types) {
     // update profile picture
     } else if (friendOrUserData.action === 'updateProfile' && friendOrUserData.friendOrUser === 'user') {
         const imageId = generateId(5)
-        const testRef = ref(storage, `profileImages/${imageId+friendOrUserData.image.name}`)
+        const storageRef = ref(storage, `profileImages/${imageId+friendOrUserData.image.name}`)
 
-        uploadBytes(testRef, friendOrUserData.image)
-        .then(async (snapshot) => {
+        const profilePicturePromise = await Promise.allSettled([
+            uploadBytes(storageRef, friendOrUserData.image)
+        ])
+
+        if (profilePicturePromise[0].status === 'fulfilled') {
             const docRef = doc(db, 'data', docId[0])
-            await updateDoc(docRef, {
-                'profileUrl': `profileImages/${imageId+friendOrUserData.image.name}`
-            })
+
+            const profilePathPromise = await Promise.allSettled([
+                updateDoc(docRef, {
+                    'profileUrl': `profileImages/${imageId+friendOrUserData.image.name}`
+                })
+            ])
+
+            return profilePathPromise[0].status === 'fulfilled' ? { message: 'Profile Image Updated', image: images.success } : { message: profilePathPromise[0].reason, image: images.error }
+        }
+
+        return { message: profilePicturePromise[0].reason, image: images.error }
+    }
+}
+
+async function acceptFriendRequest(sentToId: string, sentFromId: string) {
+    const querys = {
+        sentToQuery: query(collection(db, 'data'), where('userId', '==', sentToId)),
+        sentFromQuery: query(collection(db, 'data'), where('userId', '==', sentFromId))
+    }
+
+    const sentToSnapShot = await getDocs(querys.sentToQuery)
+    const sentFromSnapShot = await getDocs(querys.sentFromQuery)
+
+    const docIds = {
+        sentToDocId: sentToSnapShot.docs.map((doc) => doc.id),
+        sentFromDocId: sentFromSnapShot.docs.map((doc) => doc.id)
+    }
+
+    const docRefs = {
+        sentToDocRef: doc(db, 'data', docIds.sentToDocId[0], 'friendRequests', sentFromId), 
+        sentFromDocRef: doc(db, 'data', docIds.sentFromDocId[0], 'friends', sentToId),
+        addFriendRef: doc(db, 'data', )
+    }
+
+    const acceptRequestPromise = await Promise.allSettled([
+        deleteDoc(docRefs.sentToDocRef),
+        updateDoc(docRefs.sentFromDocRef, {
+            'state': 'accepted'
         })
-        .catch((err) => {
-            console.log(err);
-        })
+    ])
+
+    return acceptRequestPromise[0].status === 'fulfilled' ? {
+        message: 'Friend Added', image: images.success
+    } : {
+        message: acceptRequestPromise[0].reason, image: images.error
     }
 }
 
@@ -296,5 +324,6 @@ export {
     cookieSetter,
     updateDesign,
     updateFriendOrUser,
-    generateId
+    generateId,
+    acceptFriendRequest
 }

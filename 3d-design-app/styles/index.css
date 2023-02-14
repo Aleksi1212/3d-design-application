@@ -136,6 +136,10 @@
   .arrowLine {
     @apply w-full h-1 bg-[#4D4D4D] absolute
   }
+
+  .imageLoader {
+    @apply inline-block relative w-[80px] h-[80px]
+  }
 }
 
 html, body {
@@ -201,4 +205,87 @@ html, body {
 
 #profileIcon:hover ~ #profileSvg {
   stroke-dashoffset: 0;
+}
+
+.imageLoader div {
+  animation: roller 1.2s cubic-bezier(.5, 0, .5, 1) infinite;
+  transform-origin: 40px 40px;
+}
+
+.imageLoader div:after {
+  content: " ";
+  display: block;
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #3D3D3D;
+  margin: -4px 0 0 -4px;
+}
+
+.imageLoader div:nth-child(1) {
+  animation-delay: -0.036s;
+}
+.imageLoader div:nth-child(1):after {
+  top: 63px;
+  left: 63px;
+}
+.imageLoader div:nth-child(2) {
+  animation-delay: -0.072s;
+}
+.imageLoader div:nth-child(2):after {
+  top: 68px;
+  left: 56px;
+}
+.imageLoader div:nth-child(3) {
+  animation-delay: -0.108s;
+}
+.imageLoader div:nth-child(3):after {
+  top: 71px;
+  left: 48px;
+}
+.imageLoader div:nth-child(4) {
+  animation-delay: -0.144s;
+}
+.imageLoader div:nth-child(4):after {
+  top: 72px;
+  left: 40px;
+}
+.imageLoader div:nth-child(5) {
+  animation-delay: -0.18s;
+}
+.imageLoader div:nth-child(5):after {
+  top: 71px;
+  left: 32px;
+}
+.imageLoader div:nth-child(6) {
+  animation-delay: -0.216s;
+}
+.imageLoader div:nth-child(6):after {
+  top: 68px;
+  left: 24px;
+}
+.imageLoader div:nth-child(7) {
+  animation-delay: -0.252s;
+}
+.imageLoader div:nth-child(7):after {
+  top: 63px;
+  left: 17px;
+}
+.imageLoader div:nth-child(8) {
+  animation-delay: -0.288s;
+}
+.imageLoader div:nth-child(8):after {
+  top: 56px;
+  left: 12px;
+}
+
+@keyframes roller {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }

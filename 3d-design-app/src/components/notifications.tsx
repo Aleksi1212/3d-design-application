@@ -11,6 +11,7 @@ import { db } from '../datalayer/config';
 import { collectionGroup, query, where, onSnapshot } from 'firebase/firestore';
 
 import images from '../functions/importImages';
+import { updateFriendOrUser, acceptFriendRequest } from '../datalayer/querys';
 
 function Notifications({ user }: any) {
     const { currentUserId, userName } = user || {}
@@ -91,7 +92,13 @@ function Notifications({ user }: any) {
                                 usersId: pendingFriend.requestFromId,
                                 usersName: pendingFriend.requestFromName,
                                 messagingId: pendingFriend.messagingId,
-                                initialAction: { message: 'Accept', action: '', image: images.acceptRequest },
+
+                                initialAction: {
+                                    message: 'Accept',
+                                    image: images.acceptRequest,
+                                    action: acceptFriendRequest,
+                                },
+
                                 secondaryAction: { message: 'Decline Request', color: '#FA5252', action: '' }
                             }} />
                         })

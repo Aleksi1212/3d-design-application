@@ -51,11 +51,11 @@ function UserDashboard({ currentUser }: any) {
     
     const designAndUserData = useUserData(currentUserId, currentUserId)
     
-    const backgroundSvgs =  [
-        { image: images.arrow1, flexPos: 'flex-end', padLeft: '6rem', padTop: '0', padBottom: '5rem', key: 'arrrow1' } as backgroundTypes,
-        { image: images.cross, flexPos: 'flex-start', padLeft: '18rem', padTop: '4rem', padBottom: '0', key: 'cross' } as backgroundTypes,
-        { image: images.arrow2, flexPos: 'center', padLeft: '30rem', padTop: '0', padBottom: '0', key: 'arrow2' } as backgroundTypes,
-        { image: images.arrow3, flexPos: 'flex-end', padLeft: '24rem', padTop: '0', padBottom: '2.5rem', key: 'arrow3' } as backgroundTypes
+    const backgroundSvgs: Array<backgroundTypes> =  [
+        { image: images.arrow1, flexPos: 'flex-end', padLeft: '6rem', padTop: '0', padBottom: '5rem', key: 'arrrow1' },
+        { image: images.cross, flexPos: 'flex-start', padLeft: '18rem', padTop: '4rem', padBottom: '0', key: 'cross' },
+        { image: images.arrow2, flexPos: 'center', padLeft: '30rem', padTop: '0', padBottom: '0', key: 'arrow2' },
+        { image: images.arrow3, flexPos: 'flex-end', padLeft: '24rem', padTop: '0', padBottom: '2.5rem', key: 'arrow3' }
     ]
 
     useEffect(() => {

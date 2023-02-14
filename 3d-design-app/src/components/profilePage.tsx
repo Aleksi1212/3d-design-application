@@ -16,8 +16,7 @@ import UserCard from "./userCard";
 import userActions from "../functions/actions";
 import images from "../functions/importImages";
 
-import { auth, db } from "../datalayer/config";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { auth } from "../datalayer/config";
 
 interface alertType {
     message: string,
@@ -32,7 +31,7 @@ function ProfilePage({ user }: any) {
 
     auth.onAuthStateChanged((user) => {
         if (user) {
-            console.log(user.uid)
+            // console.log(user.uid)
         } else {
             router.push('/logIn')
         }
@@ -40,16 +39,16 @@ function ProfilePage({ user }: any) {
 
     const userData = useUserData(userId, currentUser.userId)
     const profileImage = useProfileImage(userData.profileUrl)
+    const actions = userActions(userId, userData.currentUserName, userData.currentUserMessagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
     
     const [alert, setAlert] = useState<alertType>({ message: 'ok', image: images.success, top: '-2.5rem' })
+    const [loading, setLoading] = useState(false)
     const [hovered, setHovered] = useState(false)
-    
+
     let currentUserFriends: any = []
     userData.currentUserFriendData.map((friend: any) => {
         currentUserFriends.push(friend.friendId)
     })
-
-    const actions = userActions(userId, userData.currentUserName, userData.currentUserMessagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
     
     useEffect(() => {
         if (alert.top !== '-2.5rem') {
@@ -67,7 +66,6 @@ function ProfilePage({ user }: any) {
                 <h1 className="px-2">|</h1>
                 <h1>{alert.message}</h1>
             </div>
-
 
             <div className='absolute left-20 top-20  flex justify-between w-[10rem]'>
                 <div className="flex flex-col items-center gap-y-1">
@@ -107,7 +105,7 @@ function ProfilePage({ user }: any) {
                         {
                             profileImage.errors.includes(profileImage.profileImage) || profileImage.profileImage.length <= 0 ? (
                                 <h1>{profileImage.profileImage}</h1>
-                            ) : (
+                            ) : !loading ? (
                                 <Image src={profileImage.profileImage} alt="profileImage" width={500} height={500}
                                 style={{
                                     objectFit: 'cover',
@@ -115,19 +113,30 @@ function ProfilePage({ user }: any) {
                                     height: userData.profileUrl === 'profileImages/defaultProfile.png' || userData.profileUrl === '' ? '25%' : '100%',
                                     opacity: hovered ? '20%' : '100%'
                                 }} />
+                            ) : loading || profileImage.profileImage == '' ? (
+                                <Loader />
+                            ) : (
+                                null
                             )
                         }
 
                         {
                             currentUser.userId === userId ? (
                                 <label className="w-full h-full rounded-full absolute cursor-pointer">
-                                    <input type="file" className="hidden" accept="image/png, image/jpeg" onChange={(e: any) => 
-                                        updateFriendOrUser({ 
-                                            userId: currentUser.userId, userName: null, action: 'updateProfile', friendId: null, friendName: null,
-                                            friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null, blockedUser: null,
-                                            image: e.target.files[0]
-                                        })
-                                    } />
+                                    <input type="file" className="hidden" accept="image/png, image/jpeg" onChange={async (e: any) => {
+                                        if (e.target.files.length > 0) {
+                                            setLoading(true)
+
+                                            const changeImageResult = await updateFriendOrUser({ 
+                                                userId: currentUser.userId, userName: null, action: 'updateProfile', friendId: null, friendName: null,
+                                                friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null, blockedUser: null,
+                                                image: e.target.files[0]
+                                            })
+    
+                                            setLoading(false)
+                                            setAlert({ message: changeImageResult?.message, image: changeImageResult?.image, top: '1.25rem' })
+                                        }
+                                    }} />
                                 </label>
                             ) : (
                                 null
@@ -225,6 +234,17 @@ function ProfilePage({ user }: any) {
 
             <SearchUsers viewer={{ userId: currentUser.userId }} />
         </section>
+    )
+}
+
+export function Loader() {
+    return (
+        <div className="imageLoader">
+            <div></div>  <div></div>
+            <div></div>  <div></div>
+            <div></div>  <div></div>
+            <div></div>  <div></div>
+        </div>
     )
 }
 

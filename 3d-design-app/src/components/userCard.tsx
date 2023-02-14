@@ -15,6 +15,8 @@ import { query, collectionGroup, where, onSnapshot, collection } from "firebase/
 import useProfileImage from "../hooks/profileImagehook";
 import useUserData from "../hooks/userDataHook";
 
+import { Loader } from "./profilePage";
+
 interface reducerType {
     overUser: boolean,
     overMenu: boolean,
@@ -111,7 +113,7 @@ function UserCard({ user }: any) {
 
 
             <div className="flex w-[7rem] justify-between relative">
-                <button className="friendButton" id="message">
+                <button className="friendButton" id="message" onClick={() => initialAction.action(viewingUser, usersId)}>
                     <Image src={initialAction.image} alt="initialAction" />
                 </button>
 
