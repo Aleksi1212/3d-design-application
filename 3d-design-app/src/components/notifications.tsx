@@ -11,7 +11,7 @@ import { db } from '../datalayer/config';
 import { collectionGroup, query, where, onSnapshot } from 'firebase/firestore';
 
 import images from '../functions/importImages';
-import { updateFriendOrUser, acceptFriendRequest } from '../datalayer/querys';
+import { acceptFriendRequest } from '../datalayer/querys';
 
 function Notifications({ user }: any) {
     const { currentUserId, userName } = user || {}

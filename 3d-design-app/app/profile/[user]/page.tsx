@@ -1,9 +1,6 @@
 import ProfilePage from "../../../src/components/profilePage";
 import { cookies } from 'next/headers'
 
-import { db, auth } from "../../../src/datalayer/config";
-import { collectionGroup, query, where, getCountFromServer } from "firebase/firestore";
-
 export default async function Profile({ params }: any) {
     const userData = params.user.split('%3D')
 
@@ -12,14 +9,7 @@ export default async function Profile({ params }: any) {
     
     const currentUser = JSON.parse(authCookie?.value)
 
-    const que = query(collectionGroup(db, 'friendRequests'), where('sentTo', '==', currentUser.userId))
-    const snapshot = await getCountFromServer(que)
-    const count = snapshot.data().count
-
-    // const test = auth.currentUser
-    // console.log(test?.email)
-
     return (
-        <ProfilePage user={{ userId: userData[0], userName: userData[1], currentUser: currentUser, pendingCount: count }} />
+        <ProfilePage user={{ userId: userData[0], userName: userData[1], currentUser: currentUser }} />
     )
 }

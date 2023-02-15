@@ -48,9 +48,11 @@ function UserDashboard({ currentUser }: any) {
     const [errorScreen, setErrorScreen] = useState<errorScreenTypes>({ display: 'none', message: '', url: '', state: false })
     const [alert, setAlert] = useState<alertTypes>({ message: 'ok', image: images.success, top: '-2.5rem' })
     const [manualSignOut, setManualSignOut] = useState(false)
+
+    console.log(manualSignOut)
     
     const designAndUserData = useUserData(currentUserId, currentUserId)
-    
+
     const backgroundSvgs: Array<backgroundTypes> =  [
         { image: images.arrow1, flexPos: 'flex-end', padLeft: '6rem', padTop: '0', padBottom: '5rem', key: 'arrrow1' },
         { image: images.cross, flexPos: 'flex-start', padLeft: '18rem', padTop: '4rem', padBottom: '0', key: 'cross' },
@@ -74,15 +76,13 @@ function UserDashboard({ currentUser }: any) {
             
             if (deleteCookie === 'cookie set' && manualSignOut) {
                 router.push('/logIn')
-            } else {
-                setErrorScreen({ display: 'flex', message: 'Signed out', url: '/logIn', state: true })
             }
         }
     })
 
 
     async function userSignOut() {
-        if (designAndUserData.currentUserMethod !== 'email') {
+        if (designAndUserData.currentUserData.method !== 'email') {
             const signOutPromise = await Promise.allSettled([
                 signOut(auth)
             ])
@@ -100,12 +100,10 @@ function UserDashboard({ currentUser }: any) {
 
             if (responseMessage.message === 'ok') {
                 await cookieSetter(false, null)
-                // window.location.reload()
+                window.location.reload()
             }
         }    
     }
-
-    useEffect
 
     return (
         <>
@@ -135,12 +133,13 @@ function UserDashboard({ currentUser }: any) {
                 </div>
 
                 <div className="w-full flex items-center flex-col -mt-[26rem]">
-                    <h1 className="text-white text-5xl mt-24">Welcome Back {designAndUserData.currentUserName}</h1>
+                    <h1 className="text-white text-5xl mt-24">Welcome Back {designAndUserData.currentUserData.username}</h1>
 
                     <div className="max-w-[66rem] my-[6rem] flex gap-y-12 gap-x-12 flex-wrap ">
                         <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc"
                             onClick={async () => {
                                 const addResult = await updateDesign(currentUserId, 'add', '', '')
+                                console.log(addResult?.test)
                                 setAlert({ message: addResult?.message, image: addResult?.image, top: '1.25rem' })
                             }}>
 
@@ -166,8 +165,8 @@ function UserDashboard({ currentUser }: any) {
                             </div>
                         
                             <div className="pl-2 text-[#737373] flex flex-col text-xl">
-                                <h1>{designAndUserData.currentUserName}</h1>
-                                <h1>{designAndUserData.currentUserEmail}</h1>
+                                <h1>{designAndUserData.currentUserData.username}</h1>
+                                <h1>{designAndUserData.currentUserData.email}</h1>
                             </div>
                         </div>
 
@@ -175,7 +174,7 @@ function UserDashboard({ currentUser }: any) {
 
                         <div className="h-full flex items-center">
                             <div className="flex flex-col h-[11rem] justify-evenly">
-                                <Link href={`/profile/${currentUserId}=${designAndUserData.currentUserName}`} className="userButton bg-white flex justify-center items-center">Show Profile</Link>
+                                <Link href={`/profile/${currentUserId}=${designAndUserData.currentUserData.username}`} className="userButton bg-white flex justify-center items-center">Show Profile</Link>
                                 <button className="userButton bg-white" onClick={userSignOut}>Sign Out</button>
                                 <Link className="userButton bg-[#FA5252] flex justify-center items-center" href="/logIn/delete">Delete</Link>
                             </div>

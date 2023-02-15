@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { updateFriendOrUser } from "../datalayer/querys";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'
 import useProfileImage from "../hooks/profileImagehook";
 import useUserData from "../hooks/userDataHook";
@@ -31,15 +31,13 @@ function ProfilePage({ user }: any) {
 
     auth.onAuthStateChanged((user) => {
         if (user) {
-            // console.log(user.uid)
-        } else {
-            router.push('/logIn')
+            console.log(user.uid)
         }
     })
 
     const userData = useUserData(userId, currentUser.userId)
     const profileImage = useProfileImage(userData.profileUrl)
-    const actions = userActions(userId, userData.currentUserName, userData.currentUserMessagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
+    const actions = userActions(userId, userData.currentUserData.username, userData.currentUserData.messagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
     
     const [alert, setAlert] = useState<alertType>({ message: 'ok', image: images.success, top: '-2.5rem' })
     const [loading, setLoading] = useState(false)
@@ -85,7 +83,7 @@ function ProfilePage({ user }: any) {
 
                 <div className='relative flex flex-col justify-end'>
                     <div className='rounded-full w-[3rem] h-[3rem] absolute -top-[.4rem] left-[.4rem]' id='profileIcon'>
-                        <Link href={`/profile/${currentUser.userId}=${userData.currentUserName}`} className="w-full h-full flex justify-center items-center">
+                        <Link href={`/profile/${currentUser.userId}=${userData.currentUserData.username}`} className="w-full h-full flex justify-center items-center">
                             <Image src={images.userProfile} alt="profile" width={30}height={30} />
                         </Link>
                     </div>
@@ -156,6 +154,8 @@ function ProfilePage({ user }: any) {
                                         onClick={async () => {
                                             if (action.type === 'func') {
                                                 const alert = await action.action(action.params)
+
+                                                console.log(alert.test)
                                                 setAlert({ message: alert.message, image: alert.image, top: '1.25rem' })
                                             } else {
                                                 router.push(action.params)
@@ -232,7 +232,7 @@ function ProfilePage({ user }: any) {
                 </div>
             </div>
 
-            <SearchUsers viewer={{ userId: currentUser.userId }} />
+            <SearchUsers viewer={{ userId: currentUser.userId, alert: (alertData: alertType) => setAlert(alertData)}} />
         </section>
     )
 }

@@ -29,7 +29,7 @@ interface payloadType {
 }
 
 function UserCard({ user }: any) {
-    const { viewingUser, usersId, usersName, messagingId, initialAction, secondaryAction } = user || {}
+    const { viewingUser, usersId, usersName, messagingId, initialAction, secondaryAction, alert } = user || {}
 
     const [blockable, setBlockable] = useState(true)
     const [profileUrl, setProfileUrl] = useState([''])
@@ -113,7 +113,11 @@ function UserCard({ user }: any) {
 
 
             <div className="flex w-[7rem] justify-between relative">
-                <button className="friendButton" id="message" onClick={() => initialAction.action(viewingUser, usersId)}>
+                <button className="friendButton" id="message" onClick={async () => {
+                    const actionResult = await initialAction.action(viewingUser, usersId, usersName, messagingId)
+
+                    alert({ message: actionResult.message, image: actionResult.image })
+                    }}>
                     <Image src={initialAction.image} alt="initialAction" />
                 </button>
 
@@ -142,8 +146,8 @@ function UserCard({ user }: any) {
                             onClick={() => {
                                 if (secondaryAction.action === 'add' || secondaryAction.action === 'remove') {
                                     updateFriendOrUser({
-                                        userId: viewingUser, userName: userData.currentUserName, action: secondaryAction.action, friendId: usersId, friendName: usersName,
-                                        friendMessagingId: messagingId, userMessagingId: userData.currentUserMessagingId, friendOrUser: 'friend', state: null,
+                                        userId: viewingUser, userName: userData.currentUserData.username, action: secondaryAction.action, friendId: usersId, friendName: usersName,
+                                        friendMessagingId: messagingId, userMessagingId: userData.currentUserData.messagingId, friendOrUser: 'friend', state: null,
                                         blockedUser: null, image: null
                                     })
                                 }
