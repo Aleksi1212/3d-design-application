@@ -125,7 +125,7 @@ function UserCard({ user }: any) {
                     onClick={() => dispatch({ payload: { overUser: state.overUser, overMenu: state.overMenu, clicked: true, children: state.children } })}>
                     <Image src={images.userMenu} alt="userMenu" />
                 </button>
-
+                
                 <div className="messageFriend right-12 w-[5rem]">{initialAction.message}</div>
                 <div className="friendActions">More</div>
 

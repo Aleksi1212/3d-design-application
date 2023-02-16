@@ -14,10 +14,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const querySnapshots = await getDocs(que)
     const data = querySnapshots.docs.map((doc) => doc.data())
-
-    console.log(`data found with id: ${userId}`);
-
-    const user = auth.currentUser
     
-    res.status(200).json({ userData: data, userState: user})
+    res.status(200).json({ userData: data})
 }

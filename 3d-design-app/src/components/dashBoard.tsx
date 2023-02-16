@@ -14,6 +14,8 @@ import { auth } from "../datalayer/config";
 
 import { cookieSetter, updateDesign } from "../datalayer/querys";
 
+import { Loader } from "./profilePage";
+
 interface errorScreenTypes {
     display: string
     message: string
@@ -41,17 +43,16 @@ interface svgPropType {
 }
 
 function UserDashboard({ currentUser }: any) {
-    const { currentUserId } = currentUser || {}
+    const { currentUserId, test } = currentUser || {}
 
     const router = useRouter()
 
     const [errorScreen, setErrorScreen] = useState<errorScreenTypes>({ display: 'none', message: '', url: '', state: false })
     const [alert, setAlert] = useState<alertTypes>({ message: 'ok', image: images.success, top: '-2.5rem' })
     const [manualSignOut, setManualSignOut] = useState(false)
-
-    console.log(manualSignOut)
     
     const designAndUserData = useUserData(currentUserId, currentUserId)
+    console.log(designAndUserData.currentUserData)
 
     const backgroundSvgs: Array<backgroundTypes> =  [
         { image: images.arrow1, flexPos: 'flex-end', padLeft: '6rem', padTop: '0', padBottom: '5rem', key: 'arrrow1' },
@@ -139,8 +140,12 @@ function UserDashboard({ currentUser }: any) {
                         <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc"
                             onClick={async () => {
                                 const addResult = await updateDesign(currentUserId, 'add', '', '')
-                                console.log(addResult?.test)
-                                setAlert({ message: addResult?.message, image: addResult?.image, top: '1.25rem' })
+
+                                if (addResult?.type === 'FirebaseError') {
+                                    setErrorScreen({ display: 'flex', message: 'Log In To Make Changes', url: '/logIn', state: true })
+                                } else {
+                                    setAlert({ message: addResult?.message, image: addResult?.image, top: '1.25rem' })
+                                }
                             }}>
 
                             <div className="flex flex-col items-center text-[#1A73E8] gap-y-8 mt-8">
@@ -159,26 +164,36 @@ function UserDashboard({ currentUser }: any) {
                     <hr className="bg-[#969393] w-[50rem] h-[2px]" />
 
                     <div className="h-[20rem] w-[40rem] flex mt-[6rem] ">
-                        <div className="pl-10 pr-14 flex flex-col justify-evenly items-center">
-                            <div className="w-[10rem] h-[10rem] rounded-full bg-white flex justify-center items-center shadow-lg">
-                                <Image src={images.userProfile} alt="userProfile" />
-                            </div>
-                        
-                            <div className="pl-2 text-[#737373] flex flex-col text-xl">
-                                <h1>{designAndUserData.currentUserData.username}</h1>
-                                <h1>{designAndUserData.currentUserData.email}</h1>
-                            </div>
-                        </div>
+                        {
+                            designAndUserData.currentUserData.username.length <= 0 ? (
+                                <div className="w-full h-full flex justify-center items-center">
+                                    <Loader />
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="pl-10 pr-14 flex flex-col justify-evenly items-center">
+                                        <div className="w-[10rem] h-[10rem] rounded-full bg-white flex justify-center items-center shadow-lg">
+                                            <Image src={images.userProfile} alt="userProfile" />
+                                        </div>
+                                    
+                                        <div className="pl-2 text-[#737373] flex flex-col text-xl">
+                                            <h1>{designAndUserData.currentUserData.username}</h1>
+                                            <h1>{designAndUserData.currentUserData.email}</h1>
+                                        </div>
+                                    </div>
 
-                        <hr className="bg-[#969393] w-[2px] h-[20rem] mr-14" />
+                                    <hr className="bg-[#969393] w-[2px] h-[20rem] mr-14" />
 
-                        <div className="h-full flex items-center">
-                            <div className="flex flex-col h-[11rem] justify-evenly">
-                                <Link href={`/profile/${currentUserId}=${designAndUserData.currentUserData.username}`} className="userButton bg-white flex justify-center items-center">Show Profile</Link>
-                                <button className="userButton bg-white" onClick={userSignOut}>Sign Out</button>
-                                <Link className="userButton bg-[#FA5252] flex justify-center items-center" href="/logIn/delete">Delete</Link>
-                            </div>
-                        </div>
+                                    <div className="h-full flex items-center">
+                                        <div className="flex flex-col h-[11rem] justify-evenly">
+                                            <Link href={`/profile/${currentUserId}=${designAndUserData.currentUserData.username}`} className="userButton bg-white flex justify-center items-center">Show Profile</Link>
+                                            <button className="userButton bg-white" onClick={userSignOut}>Sign Out</button>
+                                            <Link className="userButton bg-[#FA5252] flex justify-center items-center" href="/logIn/delete">Delete</Link>
+                                        </div>
+                                    </div>
+                                </>
+                            )
+                        }
                     </div>
                 </div>
             </section>

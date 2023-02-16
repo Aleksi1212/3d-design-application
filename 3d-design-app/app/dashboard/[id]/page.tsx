@@ -1,21 +1,19 @@
 
 import UserDashboard from "../../../src/components/dashBoard"
 
-function Dashboard({ params }: any) {
-    // const test = cookies()
-    // const userCookie = test.get('auth') as any
-    // console.log(JSON.parse(userCookie?.value))
+async function Dashboard({ params }: any) {
+    const res = await fetch('http://localhost:3000/api/getUserInfo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId: params.id })
+    })
 
-    // auth.onAuthStateChanged((user) => {
-    //     if (user) {
-    //         console.log('user')
-    //     } else {
-    //         console.log('no user')
-    //     }
-    // })
+    const test = await res.json()
 
     return (
-        <UserDashboard currentUser={{ currentUserId: params.id }} />
+        <UserDashboard currentUser={{ currentUserId: params.id, test: test.userData }} />
     )
 }
 

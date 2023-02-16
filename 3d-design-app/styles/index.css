@@ -8,7 +8,7 @@
   }
 
   .formHeader {
-    @apply text-white w-full text-center text-4xl mt-14
+    @apply text-[#4D4D4D] w-full text-center text-4xl mt-14 font-bold
   }
 
   .formContainer {
@@ -28,11 +28,11 @@
   }
 
   .logInButton {
-    @apply w-[20rem] h-[3rem] rounded-lg border-[1px] border-[cyan] bg-[#2d2d2d] overflow-hidden relative flex justify-center items-center
+    @apply w-[20rem] h-[3rem] rounded-lg border-[1.5px] border-[#4D4D4D] overflow-hidden relative flex justify-center items-center
   }
 
   .buttonText {
-    @apply absolute top-14 left-0 w-full h-full 
+    @apply absolute top-14 left-0 w-full h-full text-lg font-semibold
   }
 
   .button {
@@ -94,18 +94,13 @@
   .friendButton:active, #profileAction:active {
     @apply scale-95
   }
-
   
   .friendActions, .messageFriend {
     @apply absolute -right-[.475rem] -top-10 w-[4rem] h-[2rem] bg-[#5D5D5D] rounded-md flex justify-center items-center
     transition-all duration-200 scale-0 origin-bottom text-white
   }
 
-  #menu:hover ~ .friendActions, #backHome:hover ~ #homeMessage {
-    @apply scale-100
-  }
-
-  #message:hover ~ .messageFriend {
+  #menu:hover ~ .friendActions, #backHome:hover ~ #homeMessage, #message:hover ~ .messageFriend, #closeImage:hover ~ #closeBox {
     @apply scale-100
   }
 
@@ -135,10 +130,6 @@
 
   .arrowLine {
     @apply w-full h-1 bg-[#4D4D4D] absolute
-  }
-
-  .imageLoader {
-    @apply inline-block relative w-[80px] h-[80px]
   }
 }
 
@@ -195,7 +186,7 @@ html, body {
 }
 
 .logInButton:hover .buttonText {
-  top: .75rem;
+  top: .65rem;
 }
 
 #profileSvg {
@@ -207,84 +198,38 @@ html, body {
   stroke-dashoffset: 0;
 }
 
-.imageLoader div {
-  animation: roller 1.2s cubic-bezier(.5, 0, .5, 1) infinite;
-  transform-origin: 40px 40px;
+.lds-ring {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
 }
 
-.imageLoader div:after {
-  content: " ";
+.lds-ring div {
+  box-sizing: border-box;
   display: block;
   position: absolute;
-  width: 5px;
-  height: 5px;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border: 8px solid #3D3D3D;
   border-radius: 50%;
-  background: #3D3D3D;
-  margin: -4px 0 0 -4px;
+  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #3D3D3D transparent transparent transparent;
 }
-
-.imageLoader div:nth-child(1) {
-  animation-delay: -0.036s;
+.lds-ring div:nth-child(1) {
+  animation-delay: -0.45s;
 }
-.imageLoader div:nth-child(1):after {
-  top: 63px;
-  left: 63px;
+.lds-ring div:nth-child(2) {
+  animation-delay: -0.3s;
 }
-.imageLoader div:nth-child(2) {
-  animation-delay: -0.072s;
+.lds-ring div:nth-child(3) {
+  animation-delay: -0.15s;
 }
-.imageLoader div:nth-child(2):after {
-  top: 68px;
-  left: 56px;
-}
-.imageLoader div:nth-child(3) {
-  animation-delay: -0.108s;
-}
-.imageLoader div:nth-child(3):after {
-  top: 71px;
-  left: 48px;
-}
-.imageLoader div:nth-child(4) {
-  animation-delay: -0.144s;
-}
-.imageLoader div:nth-child(4):after {
-  top: 72px;
-  left: 40px;
-}
-.imageLoader div:nth-child(5) {
-  animation-delay: -0.18s;
-}
-.imageLoader div:nth-child(5):after {
-  top: 71px;
-  left: 32px;
-}
-.imageLoader div:nth-child(6) {
-  animation-delay: -0.216s;
-}
-.imageLoader div:nth-child(6):after {
-  top: 68px;
-  left: 24px;
-}
-.imageLoader div:nth-child(7) {
-  animation-delay: -0.252s;
-}
-.imageLoader div:nth-child(7):after {
-  top: 63px;
-  left: 17px;
-}
-.imageLoader div:nth-child(8) {
-  animation-delay: -0.288s;
-}
-.imageLoader div:nth-child(8):after {
-  top: 56px;
-  left: 12px;
-}
-
-@keyframes roller {
+@keyframes lds-ring {
   0% {
     transform: rotate(0deg);
   }
-
   100% {
     transform: rotate(360deg);
   }

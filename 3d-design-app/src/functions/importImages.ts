@@ -27,6 +27,7 @@ const images = {
 
     check: importAll['check.png'],
     close: importAll['close.png'],
+    closeError: importAll['closeError.png'],
     cross: importAll['cross.svg'],
 
     docMenu: importAll['docMenu.png'],
