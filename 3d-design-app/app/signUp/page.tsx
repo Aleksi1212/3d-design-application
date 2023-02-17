@@ -15,7 +15,7 @@ export default function SignUpButtons() {
                 </Link>
             </div>
 
-            <AuthBox method={'signUp'} header={'Sign Up'} marginTop={'13rem'} buttons={{
+            <AuthBox method={'signUp'} header={'Sign Up'} styles={{ marginTop: '13rem', color: 'white' }} buttons={{
                 email: 'Sign Up With Email',
                 google: 'Sign Up With Google',
                 github: 'Sign Up With GitHub',

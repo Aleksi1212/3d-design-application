@@ -49,6 +49,7 @@ const images = {
 
     lockProfile: importAll['lockProfile.png'],
     logo: importAll['logo.png'],
+    logIn: importAll['logIn.png'],
 
     message: importAll['message.png'],
     search: importAll['search.png'],

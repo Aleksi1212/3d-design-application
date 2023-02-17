@@ -3,11 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 
-import email from '../images/email.png'
-import google from '../images/google.png'
-import github from '../images/github.png'
-import facebook from '../images/facebook.png'
-import back from '../images/back.png'
+import images from "../functions/importImages";
 
 import { useRouter } from "next/navigation"
 
@@ -66,22 +62,22 @@ function AuthBox(props: any) {
 
             <div className="w-[25rem] h-[20rem] absolute bottom-12 flex flex-col justify-evenly items-center">
                 <Link href={`/${props.method}/email`} className="logInButton flex justify-center items-center">
-                    <Image src={email} alt="email" className="buttonImage" width={25} height={25} />
+                    <Image src={images.email} alt="email" className="buttonImage" width={25} height={25} />
                     <span className="buttonText text-center">{props.buttons.email}</span>
                 </Link>
 
                 <button className="logInButton" onClick={() => Auth(googleProvider, 'google')}>
-                    <Image src={google} alt="google" className="buttonImage"/>
+                    <Image src={images.google} alt="google" className="buttonImage"/>
                     <span className="buttonText">{props.buttons.google}</span>
                 </button>
 
                 <button className="logInButton" onClick={() => Auth(githubprovider, 'github')}>
-                    <Image src={github} alt="github" className="buttonImage" />
+                    <Image src={images.github} alt="github" className="buttonImage" />
                     <span className="buttonText">{props.buttons.github}</span>
                 </button>
 
                 <button className="logInButton" onClick={() => Auth(facebookProvider, 'facebook')}>
-                    <Image src={facebook} alt="facebook" className="buttonImage" />
+                    <Image src={images.facebook} alt="facebook" className="buttonImage" />
                     <span className="buttonText">{props.buttons.facebook}</span>
                 </button>
             </div>

@@ -5,7 +5,7 @@ import Image from 'next/image'
 
 import back from '../images/back.png'
 
-import useInputType from '../hooks/inputTypehook';
+import useInputType from '../hooks/inputStylehook';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 

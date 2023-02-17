@@ -8,7 +8,7 @@
   }
 
   .formHeader {
-    @apply text-[#4D4D4D] w-full text-center text-4xl mt-14 font-bold
+    @apply text-[#4D4D4D] w-full text-center text-4xl mt-14
   }
 
   .formContainer {
@@ -17,6 +17,14 @@
 
   .form {
     @apply flex flex-col justify-evenly h-full
+  }
+
+  .input {
+    @apply h-12 w-full pl-[10px] pt-2 text-[#2D2D2D] border-b-2 border-[#4D4D4D] outline-none
+  }
+
+  .placeholder {
+    @apply absolute left-2 bottom-2 text-lg opacity-75 pointer-events-none transition-all duration-200
   }
 
   #link:hover {
@@ -32,7 +40,7 @@
   }
 
   .buttonText {
-    @apply absolute top-14 left-0 w-full h-full text-lg font-semibold
+    @apply absolute top-14 left-0 w-full h-full text-lg font-[550]
   }
 
   .button {
@@ -100,7 +108,7 @@
     transition-all duration-200 scale-0 origin-bottom text-white
   }
 
-  #menu:hover ~ .friendActions, #backHome:hover ~ #homeMessage, #message:hover ~ .messageFriend, #closeImage:hover ~ #closeBox {
+  #menu:hover ~ .friendActions, #backHome:hover ~ #homeMessage, #message:hover ~ .messageFriend, #closeImage:hover ~ #closeBox, #showHide:hover ~ #showHideBox {
     @apply scale-100
   }
 
@@ -148,7 +156,7 @@ html, body {
   background: linear-gradient(360deg, rgba(45,45,45,1) 43%, rgba(52,52,52,1) 49%, rgba(61,61,61,1) 54%);
 }
 
-.input {
+/* .input {
   background-color: #2d2d2d;
   border-radius: .5rem;
   height: 3rem;
@@ -156,7 +164,7 @@ html, body {
   border: 1px solid cyan;
   padding-left: 10px;
   color: white;
-}
+} */
 
 .inputButton {
   background: rgb(0,255,255);
@@ -186,7 +194,7 @@ html, body {
 }
 
 .logInButton:hover .buttonText {
-  top: .65rem;
+  top: .60rem;
 }
 
 #profileSvg {
