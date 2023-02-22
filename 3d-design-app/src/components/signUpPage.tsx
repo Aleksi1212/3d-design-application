@@ -8,12 +8,38 @@ import Link from "next/link";
 
 import images from "../functions/importImages";
 
+import { auth, db } from "../datalayer/config";
+// import { collection, addDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword,  } from "firebase/auth";
+
+import { checkUser } from "../datalayer/querys";
+
 function SignUp() {
     const [inputType, setInputType] = useState<boolean>(false)
 
     const [emailFieldStyles, setEmailFieldStyles] = useInputStyles({ inputVal: '', placeholder: false, isUp: false }) as any
     const [usernameFieldStyles, setUsernameFieldStyles] = useInputStyles({ inputVal: '', placeholder: false, isUp: false }) as any
     const [passwordFieldStyles, setPasswordFieldStyles] = useInputStyles({ inputVal: '', placeholder: false, isUp: false }) as any
+
+    async function signUp(event: any) {
+        event.preventDefault()
+
+        const userData = {
+            email: event.target.email.value,
+            username: event.target.username.value,
+            password: event.target.password.value,
+        }
+
+        createUserWithEmailAndPassword(auth, userData.email, userData.password)
+            .then(async (userCredentials) => {
+                const user = userCredentials.user
+
+                checkUser(user.uid, userData.username, userData.email, 'email')
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+    }
 
     return (
         <>
@@ -29,7 +55,7 @@ function SignUp() {
                     <h1 className="formHeader">Sign Up</h1>
 
                     <div className="formContainer h-96">
-                        <form className="form" action="http://localhost:3000/api/signUp" method="POST">
+                        <form className="form" onSubmit={signUp}>
                             <div className="flex relative">
                                 <input type="text" className="input" name="email" required
                                 onClick={() => setEmailFieldStyles({ payload: { inputVal: emailFieldStyles.inputVal, placeholder: true, isUp: true } })}

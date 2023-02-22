@@ -13,21 +13,18 @@ import UserCard from "./userCard";
 interface searchBoxTypes {
     message: string
     hidden: boolean
-    userData: Array<any>
 }
 
 function reducer(state: any, action: any) {
     if (action.payload.hidden) {
         return {
             message: 'Show Searchbox',
-            hidden: true,
-            userData: []
+            hidden: true
         }
     } else {
         return {
             message: 'Hide Searchbox',
-            hidden: false,
-            userData: action.payload.userData
+            hidden: false
         }
     }
 }
@@ -35,8 +32,8 @@ function reducer(state: any, action: any) {
 function SearchUsers({ viewer }: any) {
     const { userId, alert } = viewer || {}
 
-    const [state, dispatch] = useReducer(reducer, { message: 'Hide Searchbox', hidden: false, userData: userData } as searchBoxTypes)
-    const [userData, setUserData] = useState(state.userData) as any
+    const [state, dispatch] = useReducer(reducer, { message: 'Hide Searchbox', hidden: false } as searchBoxTypes)
+    const [userData, setUserData] = useState([]) as any
 
     const inputRef = useRef<HTMLInputElement | any>(null)
     
@@ -52,22 +49,22 @@ function SearchUsers({ viewer }: any) {
         }
     }
 
-    // useEffect(() => {
-    //     if (state.hidden) {
-    //         inputRef.current.value = ''
-    //         setUserData([])
-    //     } else {
-    //         inputRef.current.value = inputRef.current.value
-    //         setUserData(userData)
-    //     }
-    // }, [state])
+    useEffect(() => {
+        if (state.hidden) {
+            inputRef.current.value = ''
+            setUserData([])
+        } else {
+            inputRef.current.value = inputRef.current.value
+            setUserData(userData)
+        }
+    }, [state])
 
 
     return (
         <div className="h-[50rem] shadow-lg bg-white rounded-xl p-6 transition-all" style={{ width: state.hidden ? '5rem' : '30rem' }}>
             <div className="absolute transition-all flex items-center gap-x-2 w-[12rem] h-[2.5rem]" style={{ right: state.hidden ? '23.5rem' : '11rem' }}>
 
-                <button className="h-full w-[35%]" id="showSearch" onClick={() => dispatch({ payload: { message: '', hidden: !state.hidden, userData: state.userData } })}>
+                <button className="h-full w-[35%]" id="showSearch" onClick={() => dispatch({ payload: { message: '', hidden: !state.hidden } })}>
                     <Image src={images.showSearch} alt="showSearch" className="transitiom-all duration-200" width={40} height={40} style={{ WebkitTransform: state.hidden ? 'rotate(180deg)' : 'rotate(0deg)' }} />
                 </button>
                 <div className="bg-[#5D5D5D] rounded-md text-white text-sm h-[1.5rem] flex items-center justify-center transition-all duration-200 origin-left scale-0" id="messageBox" style={{ width: 'calc(100% + 20px)' }}>{state.message}</div>

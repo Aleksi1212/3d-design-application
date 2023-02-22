@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import { updateFriendOrUser } from "../datalayer/querys";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'
 import useProfileImage from "../hooks/profileImagehook";
 import useUserData from "../hooks/userDataHook";
@@ -16,8 +16,6 @@ import AuthBox from "./authenticationBox";
 
 import userActions from "../functions/actions";
 import images from "../functions/importImages";
-
-import { auth } from "../datalayer/config";
 
 interface alertType {
     message: string,

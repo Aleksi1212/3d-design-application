@@ -83,27 +83,27 @@ function UserDashboard({ currentUser }: any) {
 
 
     async function userSignOut() {
-        if (designAndUserData.currentUserData.method !== 'email') {
-            const signOutPromise = await Promise.allSettled([
-                signOut(auth)
-            ])
+        // if (designAndUserData.currentUserData.method !== 'email') {
+        const signOutPromise = await Promise.allSettled([
+            signOut(auth)
+        ])
 
-            if (signOutPromise[0].status === 'fulfilled') {
-                setManualSignOut(true)
-            }
+        if (signOutPromise[0].status === 'fulfilled') {
+            setManualSignOut(true)
+        }
 
-        } else {
-            const res = await fetch('http://localhost:3000/api/signOut', {
-                method: 'GET'
-            })
+        // } else {
+        //     const res = await fetch('http://localhost:3000/api/signOut', {
+        //         method: 'GET'
+        //     })
 
-            const responseMessage = await res.json()
+        //     const responseMessage = await res.json()
 
-            if (responseMessage.message === 'ok') {
-                await cookieSetter(false, null)
-                window.location.reload()
-            }
-        }    
+        //     if (responseMessage.message === 'ok') {
+        //         await cookieSetter(false, null)
+        //         window.location.reload()
+        //     }
+        // }    
     }
 
     return (

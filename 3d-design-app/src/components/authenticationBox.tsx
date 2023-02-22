@@ -26,7 +26,6 @@ function AuthBox(props: any) {
             ])
 
             if (setCookiePromise[0].status === 'fulfilled') {
-                console.log('signed in')
                 router.push(`/dashboard/${user.uid}`)
             }
         }

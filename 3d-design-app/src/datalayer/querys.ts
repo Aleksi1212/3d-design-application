@@ -1,9 +1,10 @@
 import { db, storage } from "./config"
 import { addDoc, collection, getDocs, getDoc, query, where, doc, setDoc, deleteDoc, updateDoc, arrayUnion, arrayRemove, collectionGroup, deleteField } from "firebase/firestore"
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage"
+import { ref, uploadBytes, deleteObject } from "firebase/storage"
 
 import images from "../functions/importImages"
 
+// function to generate a random id with the length of given number
 function generateId(length: number) {
     let id = ''
     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -15,6 +16,11 @@ function generateId(length: number) {
     return id
 }
 
+
+/*
+function that checks if users data exists, if so, then does nothing,
+but if not, then adds a new user to the database
+ */
 async function checkUser(userId: string, userName: string, userEmail: string, method: string) {
     const messagingId = generateId(5)
 
@@ -22,8 +28,8 @@ async function checkUser(userId: string, userName: string, userEmail: string, me
     const querySnapshot = await getDocs(que)
 
     if (querySnapshot.empty) {
-        try {
-            const docRef = await addDoc(collection(db, 'data'), {
+        const createNewUserPromise = await Promise.allSettled([
+            addDoc(collection(db, 'data'), {
                 userId: userId,
                 username: userName,
                 email: userEmail,
@@ -31,18 +37,32 @@ async function checkUser(userId: string, userName: string, userEmail: string, me
                 locked: false,
                 messagingId: messagingId,
                 profileUrl: 'profileImages/defaultProfile.png'
-            })
+            }),
 
-            console.log(`Data added with id: ${docRef.id}`);
-            
-        } catch (err) {
-            console.log(err);
+            addDoc(collection(db, 'dataDesigns'), {
+                userId: userId,
+                username: userName,
+                email: userEmail,
+                method: method,
+                profileUrl: 'profileImages/defaultProfile.png'
+            })
+        ])
+
+        if (createNewUserPromise[0].status === 'fulfilled') {
+            console.log(`new user created with id: ${userId}`)
+        } else {
+            console.error(createNewUserPromise[0].reason)
         }
     } else {
         console.log('data exists');
     }
 }
 
+
+/* 
+Function that creates a new cookie with values userState and userId.
+If user is signed in, then userState is true, and userId is the current users userId, else userState is false and userId is null
+*/
 async function cookieSetter(userState: boolean, userId: string | null) {
     const res = await fetch('http://localhost:3000/api/cookieSetter', {
         method: 'POST',
@@ -57,6 +77,7 @@ async function cookieSetter(userState: boolean, userId: string | null) {
 }
 
 
+// function to update designs data. Add new design, remove existing design or update existing design
 async function updateDesign(userId: string, action: string, oldDesignId: string, newName: string) {
     const newDesignId = generateId(8)
 
@@ -134,6 +155,8 @@ async function updateDesign(userId: string, action: string, oldDesignId: string,
     }
 }
 
+
+// function to update users data
 async function updateFriendOrUser(friendOrUserData: any) {
     const que = query(collection(db, 'data'), where('userId', '==', friendOrUserData.userId !== null ? friendOrUserData.userId : 'errorid'))
     const querySnapshot = await getDocs(que)
@@ -272,9 +295,11 @@ async function updateFriendOrUser(friendOrUserData: any) {
 
         const storageRef = ref(storage, `profileImages/${imageId+friendOrUserData.image.name}`)
         const docRef = doc(db, 'data', docId[0])
+        const oldprofileUrl = await getDoc(docRef)
 
         const profilePicturePromise = await Promise.allSettled([
             uploadBytes(storageRef, friendOrUserData.image),
+            deleteObject(ref(storage, oldprofileUrl?.data()?.profileUrl)),
             updateDoc(docRef, {
                 'profileUrl': `profileImages/${imageId+friendOrUserData.image.name}`
             })
@@ -288,7 +313,7 @@ async function updateFriendOrUser(friendOrUserData: any) {
     }
 }
 
-
+// function that accepts pending friend requests
 async function acceptFriendRequest(sentToId: string, sentFromId: string, sentFromName: string, sentFromMessagingId: string) {
     const querys = {
         sentToQuery: query(collection(db, 'data'), where('userId', '==', sentToId)),
