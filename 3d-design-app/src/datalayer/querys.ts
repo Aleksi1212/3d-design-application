@@ -16,7 +16,6 @@ function generateId(length: number) {
     return id
 }
 
-
 /*
 function that checks if users data exists, if so, then does nothing,
 but if not, then adds a new user to the database
@@ -297,9 +296,20 @@ async function updateFriendOrUser(friendOrUserData: any) {
         const docRef = doc(db, 'data', docId[0])
         const oldprofileUrl = await getDoc(docRef)
 
-        const profilePicturePromise = await Promise.allSettled([
+        const profilePicturePromise = oldprofileUrl?.data()?.profileUrl !== 'profileImages/defaultProfile.png' ? 
+
+        await Promise.allSettled([
             uploadBytes(storageRef, friendOrUserData.image),
             deleteObject(ref(storage, oldprofileUrl?.data()?.profileUrl)),
+            updateDoc(docRef, {
+                'profileUrl': `profileImages/${imageId+friendOrUserData.image.name}`
+            })
+        ])
+        
+        :
+
+        await Promise.allSettled([
+            uploadBytes(storageRef, friendOrUserData.image),
             updateDoc(docRef, {
                 'profileUrl': `profileImages/${imageId+friendOrUserData.image.name}`
             })
