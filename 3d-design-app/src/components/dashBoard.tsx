@@ -93,7 +93,7 @@ function UserDashboard({ currentUser }: any) {
 
     return (
         <>
-            <section className="bg-[#F6F7F9] w-full h-[150vh]" style={{ position: errorScreen.state ? 'fixed' : 'static' }}>
+            <section className="bg-[#F6F7F9] w-full xxxl:h-[150vh] h-[100vh]" style={{ position: errorScreen.state ? 'fixed' : 'static' }}>
 
                 <div className="absolute w-full h-[100vh] backdrop-blur-md justify-center items-center" style={{ display: errorScreen.display }}>
                     <div className="w-[12rem] h-[17.5rem] text-black items-center flex gap-y-1 flex-col">
@@ -120,10 +120,10 @@ function UserDashboard({ currentUser }: any) {
                 </div>
 
                 <div className="w-full flex items-center flex-col -mt-[26rem]">
-                    <h1 className="text-white text-5xl mt-24">Welcome Back {designAndUserData.currentUserData.username}</h1>
+                    <h1 className="text-white xxl:text-5xl xxl:mt-24 text-3xl mt-52">Welcome Back {designAndUserData.currentUserData.username}</h1>
 
-                    <div className="max-w-[66rem] my-[6rem] flex gap-y-12 gap-x-12 flex-wrap ">
-                        <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-center items-center cursor-pointer" id="doc"
+                    <div className="xxl:max-w-[66rem] max-w-[25rem] bg-red-500 xxl:my-[6rem] my-[5rem] flex xxl:gap-12 gap-4 flex-wrap ">
+                        <div className="bg-white rounded-lg shadow-xl xxl:h-[15rem] xxl:w-[20rem] h-[9rem] w-[12rem] flex justify-center items-center cursor-pointer" id="doc"
                             onClick={async () => {
                                 const addResult = await updateDesign(currentUserId, 'add', '', '')
 
@@ -134,7 +134,7 @@ function UserDashboard({ currentUser }: any) {
                                 }
                             }}>
 
-                            <div className="flex flex-col items-center text-[#1A73E8] gap-y-8 mt-8">
+                            <div className="flex flex-col items-center text-[#1A73E8] xxl:gap-y-8 gap-y-2 mt-8">
                                 <Image src={images.addDoc} alt="addDoc" />
                                 <h1>Add New Design</h1>
                             </div>
@@ -189,7 +189,7 @@ function UserDashboard({ currentUser }: any) {
 
 function DocumentCard(props: any) {
     return (
-        <div className="bg-white rounded-lg shadow-xl h-[15rem] w-[20rem] flex justify-between flex-col cursor-pointer" id="doc">
+        <div className="bg-white rounded-lg shadow-xl xxl:h-[15rem] xxl:w-[20rem] h-[9rem] w-[12rem] flex justify-between flex-col cursor-pointer" id="doc">
             <Link href={`document/${props.userId}/${props.docId}=${props.docName}`} className="h-[85%]">
                 <h1 className="pt-3 pl-4 text-xl">{props.docName}</h1>
             </Link>

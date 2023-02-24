@@ -2,9 +2,9 @@ import { ReactNode } from "react";
 
 import '../styles/index.css'
 import '../styles/loadingEffect.css'
-import { Raleway } from '@next/font/google'
+import { Nunito_Sans } from '@next/font/google'
 
-const raleway = Raleway({
+const nunito = Nunito_Sans({
     subsets: ['latin'],
     weight: ['400']
 })
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: {
                 <title>Arcus Design</title>
             </head>
 
-            <body className={raleway.className}>
+            <body className={nunito.className}>
                 {children}
             </body>
         </html>
