@@ -60,8 +60,6 @@ function ProfilePage({ user }: any) {
                     <h1>{alert.message}</h1>
                 </div>
 
-
-
                 <div className='absolute left-20 top-20  flex justify-between w-[10rem]'>
                     <div className="flex flex-col items-center gap-y-1">
                         <Link href={`/dashboard/${currentUser.userId}`} className="flex w-[2.5rem] h-[2.5rem]" id="dashLink">
@@ -164,9 +162,9 @@ function ProfilePage({ user }: any) {
                                                 }
                                             }}>
                                                 {
-                                                    action.key === 'notifications' && pendingCount > 0 ? (
+                                                    action.key === 'notifications' && userData.pendingFriends.length > 0 ? (
                                                         <div className="bg-[#FA5252] w-[1rem] h-[1rem] rounded-full absolute -right-1 flex justify-center items-center text-white text-xs">
-                                                            {pendingCount > 9 ? '9+' : pendingCount}
+                                                            {userData.pendingFriends.length > 9 ? '9+' : userData.pendingFriends.length}
                                                         </div>
                                                     ) : (
                                                         null

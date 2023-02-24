@@ -52,7 +52,6 @@ function UserDashboard({ currentUser }: any) {
     const [manualSignOut, setManualSignOut] = useState(false)
     
     const designAndUserData = useUserData(currentUserId, currentUserId)
-    console.log(designAndUserData.currentUserData)
 
     const backgroundSvgs: Array<backgroundTypes> =  [
         { image: images.arrow1, flexPos: 'flex-end', padLeft: '6rem', padTop: '0', padBottom: '5rem', key: 'arrrow1' },
@@ -92,26 +91,9 @@ function UserDashboard({ currentUser }: any) {
         }  
     }
 
-    async function testing() {
-        const result = await fetch('http://localhost:8000/test', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-
-        const message = await result.json()
-        return { message: message.message }
-    }
-
     return (
         <>
             <section className="bg-[#F6F7F9] w-full h-[150vh]" style={{ position: errorScreen.state ? 'fixed' : 'static' }}>
-                <button className="absolute w-[5rem] h-[2rem] bg-red-500" onClick={async () => {
-                    const apiCall = await testing()
-
-                    setAlert({ message: apiCall.message, image: alert.image, top: '1.25rem' })
-                }}>test</button>
 
                 <div className="absolute w-full h-[100vh] backdrop-blur-md justify-center items-center" style={{ display: errorScreen.display }}>
                     <div className="w-[12rem] h-[17.5rem] text-black items-center flex gap-y-1 flex-col">

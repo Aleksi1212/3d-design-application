@@ -6,6 +6,7 @@ import Image from 'next/image'
 import UserCard from './userCard';
 
 import { useState, useEffect, SetStateAction } from 'react';
+import useUserData from '../hooks/userDataHook';
 
 import { db } from '../datalayer/config';
 import { collectionGroup, query, where, onSnapshot } from 'firebase/firestore';
@@ -16,23 +17,25 @@ import { acceptFriendRequest } from '../datalayer/querys';
 function Notifications({ user }: any) {
     const { currentUserId, userName } = user || {}
 
-    const [pendingFriends, setPendingFriends] = useState([])
+    const friendRequests = useUserData(currentUserId, currentUserId)
 
-    useEffect(() => {
-        const pendingFriendsQuery = query(collectionGroup(db, 'friendRequests'), where('sentTo', '==', currentUserId))
+    // const [pendingFriends, setPendingFriends] = useState([])
 
-        const getPendingFriends = onSnapshot(pendingFriendsQuery, (querySnapshot) => {
-            let pendingFriends: SetStateAction<any> = []
+    // useEffect(() => {
+    //     const pendingFriendsQuery = query(collectionGroup(db, 'friendRequests'), where('sentTo', '==', currentUserId))
 
-            querySnapshot.forEach((pendingFriend) => {
-                pendingFriends.push(pendingFriend.data().requestData)
-            })
+    //     const getPendingFriends = onSnapshot(pendingFriendsQuery, (querySnapshot) => {
+    //         let pendingFriends: SetStateAction<any> = []
 
-            setPendingFriends(pendingFriends)
-        })
+    //         querySnapshot.forEach((pendingFriend) => {
+    //             pendingFriends.push(pendingFriend.data().requestData)
+    //         })
 
-        return () => getPendingFriends()
-    }, [])
+    //         setPendingFriends(pendingFriends)
+    //     })
+
+    //     return () => getPendingFriends()
+    // }, [])
 
     return (
         <section className="w-full h-[100vh] bg-[#F6F7F9] flex justify-center items-center">
@@ -85,7 +88,7 @@ function Notifications({ user }: any) {
 
                 <div className=' w-[110%] h-full max-h-full overflow-auto flex flex-col pt-7 ml-[11.9rem]'>
                     {
-                        pendingFriends.map((pendingFriend: any) => {
+                        friendRequests.pendingFriends.map((pendingFriend: any) => {
                             return <UserCard key={pendingFriend.requestFromId} 
                             user={{
                                 viewingUser: currentUserId,

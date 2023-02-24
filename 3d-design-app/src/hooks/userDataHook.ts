@@ -18,6 +18,7 @@ function useUserData(userId: string, currentUserId: string) {
     const [friendData, setFriendData] = useState([])
     const [currentUserFriendData, setCurrentUserFriendData] = useState([])
     const [designData, setDesignData] = useState([])
+    const [pendingFriends, setPendingFriends] = useState([])
 
     const [userLocked, setUserLocked] = useState({ state: false })
     const [blocked, setBlocked] = useState(false)
@@ -34,6 +35,7 @@ function useUserData(userId: string, currentUserId: string) {
             currendUserQuery: query(collection(db, 'data'), where('userId', '==', currentUserId !== null ? currentUserId : userId)),
             blockedQuery: query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', userId), where('user', '==', currentUserId)),
             designQuery: query(collectionGroup(db, 'usersDesigns'), where('user', '==', currentUserId)),
+            pendingFriendsQuery: query(collectionGroup(db, 'friendRequests'), where('sentTo', '==', currentUserId))
         }
 
         const getFriendData = onSnapshot(querys.friendQuery, (querySnapshot) => {
@@ -104,6 +106,16 @@ function useUserData(userId: string, currentUserId: string) {
             setDesignData(desingns)
         })
 
+        const getPendingFriends = onSnapshot(querys.pendingFriendsQuery, (querySnapshot) => {
+            let pendingFriends: SetStateAction<any> = []
+
+            querySnapshot.forEach((pendingFriend) => {
+                pendingFriends.push(pendingFriend.data().requestData)
+            })
+
+            setPendingFriends(pendingFriends)
+        })
+
         return () => {
             getFriendData()
             getCurrentUserFriends()
@@ -111,6 +123,7 @@ function useUserData(userId: string, currentUserId: string) {
             getUserData()
             getCurrentUserData()
             getBlockedData()
+            getPendingFriends()
         }
     }, [])
 
@@ -118,6 +131,7 @@ function useUserData(userId: string, currentUserId: string) {
         friendData: friendData,
         currentUserFriendData: currentUserFriendData,
         designData: designData,
+        pendingFriends: pendingFriends,
 
         userLocked: userLocked,
         blocked: blocked,

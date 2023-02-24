@@ -9,6 +9,7 @@ import { useState, useReducer, useEffect, useRef } from "react";
 import images from "../functions/importImages";
 
 import UserCard from "./userCard";
+import { ErrorResponse } from "@remix-run/router";
 
 interface searchBoxTypes {
     message: string
@@ -34,6 +35,7 @@ function SearchUsers({ viewer }: any) {
 
     const [state, dispatch] = useReducer(reducer, { message: 'Hide Searchbox', hidden: false } as searchBoxTypes)
     const [userData, setUserData] = useState([]) as any
+    const [error, setError] = useState<string>('')
 
     const inputRef = useRef<HTMLInputElement | any>(null)
     
@@ -43,7 +45,13 @@ function SearchUsers({ viewer }: any) {
             const querySnapshot = await getDocs(que)
             const users = querySnapshot.docs.map((doc) => doc.data())
     
-            setUserData(users as any[])
+            if (users.length === 0) {
+                setError('No Users Found')
+                setUserData([])
+            } else {
+                setError('')
+                setUserData(users as any[])
+            }
         } else {
             setUserData([])
         }
@@ -78,6 +86,10 @@ function SearchUsers({ viewer }: any) {
             <hr className="w-full bg-[#5D5D5D] h-[2px] opacity-50 mt-6" />
 
             <div className="w-[137%] h-[90%] max-h-[90%] overflow-auto flex flex-col pt-6" id="userContainer">
+                {
+                    error !== '' ? <h1 className="w-[73.5%] flex justify-center">{error}</h1> : null
+                }
+
                 {
                     userData.map((userCard: any) => {
                         return <UserCard key={userCard.userId} 
