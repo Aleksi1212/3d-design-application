@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation'
 import useProfileImage from "../hooks/profileImagehook";
 import useUserData from "../hooks/userDataHook";
 
-import SearchUsers from "./searchUsers";
+import SearchUsers from "./searchBox";
 import UserCard from "./userCard";
 import AuthBox from "./authenticationBox";
 

@@ -139,6 +139,15 @@
   .arrowLine {
     @apply w-full h-1 bg-[#4D4D4D] absolute
   }
+
+  .hideSearchBox {
+    @apply bg-[#5D5D5D] rounded-md text-white text-sm h-[1.5rem] w-[.4rem] flex items-center transition-all duration-200 absolute 
+    before:transition-all before:duration-[50ms] before:bg-[#5D5D5D] before:w-[.4rem] before:h-[2rem] before:rounded-md
+  }
+
+  .hideSearchBox:hover {
+    @apply w-[8rem] before:h-[1rem]
+  }
 }
 
 html, body {
@@ -160,6 +169,13 @@ html, body {
   background: rgb(45,45,45);
   background: linear-gradient(360deg, rgba(45,45,45,1) 43%, rgba(52,52,52,1) 49%, rgba(61,61,61,1) 54%);
 }
+
+/* .hideSearchBox::before {
+  background-color: #5D5D5D;
+  width: .4rem;
+  height: 2rem;
+  border-radius: .357rem;
+} */
 
 /* .input {
   background-color: #2d2d2d;

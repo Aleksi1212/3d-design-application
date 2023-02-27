@@ -122,7 +122,7 @@ function UserDashboard({ currentUser }: any) {
                 <div className="w-full flex items-center flex-col -mt-[26rem]">
                     <h1 className="text-white xxl:text-5xl xxl:mt-24 text-3xl mt-52">Welcome Back {designAndUserData.currentUserData.username}</h1>
 
-                    <div className="xxl:max-w-[66rem] max-w-[25rem] bg-red-500 xxl:my-[6rem] my-[5rem] flex xxl:gap-12 gap-4 flex-wrap ">
+                    <div className="xxl:max-w-[66rem] max-w-[25rem] xxl:my-[6rem] my-[5rem] flex xxl:gap-12 gap-4 flex-wrap ">
                         <div className="bg-white rounded-lg shadow-xl xxl:h-[15rem] xxl:w-[20rem] h-[9rem] w-[12rem] flex justify-center items-center cursor-pointer" id="doc"
                             onClick={async () => {
                                 const addResult = await updateDesign(currentUserId, 'add', '', '')

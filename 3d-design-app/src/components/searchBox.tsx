@@ -9,7 +9,6 @@ import { useState, useReducer, useEffect, useRef } from "react";
 import images from "../functions/importImages";
 
 import UserCard from "./userCard";
-import { ErrorResponse } from "@remix-run/router";
 
 interface searchBoxTypes {
     message: string
@@ -70,13 +69,10 @@ function SearchUsers({ viewer }: any) {
 
     return (
         <div className="h-[50rem] shadow-lg bg-white rounded-xl p-6 transition-all" style={{ width: state.hidden ? '5rem' : '30rem' }}>
-            <div className="absolute transition-all flex items-center gap-x-2 w-[12rem] h-[2.5rem]" style={{ right: state.hidden ? '23.5rem' : '11rem' }}>
 
-                <button className="h-full w-[35%]" id="showSearch" onClick={() => dispatch({ payload: { message: '', hidden: !state.hidden } })}>
-                    <Image src={images.showSearch} alt="showSearch" className="transitiom-all duration-200" width={40} height={40} style={{ WebkitTransform: state.hidden ? 'rotate(180deg)' : 'rotate(0deg)' }} />
-                </button>
-                <div className="bg-[#5D5D5D] rounded-md text-white text-sm h-[1.5rem] flex items-center justify-center transition-all duration-200 origin-left scale-0" id="messageBox" style={{ width: 'calc(100% + 20px)' }}>{state.message}</div>
-            </div>
+            <button className="hideSearchBox" style={{ left: state.hidden ? '84rem' : '96.5rem' }} onClick={() => dispatch({ payload: { message: '', hidden: !state.hidden } })}>
+                <h1 className="absolute w-[8rem] h-[1.5rem] flex justify-center items-center pointer-events-none text-[#F6F7F9]">{state.message}</h1>
+            </button>
 
             <div className="w-full h-[3rem] rounded-lg shadow-md flex items-center relative">
                 <input ref={inputRef} type="text" className="w-full h-[3rem] rounded-lg pl-11 text-xl" onChange={(e) => searchUsers(e.target.value)} placeholder="Search Users" style={{ pointerEvents: state.hidden ? 'none' : 'auto' }} />
