@@ -1,4 +1,4 @@
-import ProfilePage from "../../../src/components/profilePage";
+import ProfilePage from "../../../src/components/social/profilePage";
 import { cookies } from 'next/headers'
 
 export default async function Profile({ params }: any) {

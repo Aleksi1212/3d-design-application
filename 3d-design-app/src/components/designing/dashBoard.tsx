@@ -3,18 +3,18 @@
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
-import images from "../functions/importImages";
+import images from "../../functions/importImages";
 
-import useUserData from "../hooks/userDataHook";
+import useUserData from "../../hooks/userDataHook";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { signOut } from "firebase/auth";
-import { auth } from "../datalayer/config";
+import { auth } from "../../datalayer/config";
 
-import { cookieSetter, updateDesign } from "../datalayer/querys";
+import { cookieSetter, updateDesign } from "../../datalayer/querys";
 
-import { Loader } from "./profilePage";
+import { Loader } from "../social/profilePage";
 
 interface errorScreenTypes {
     display: string
@@ -171,10 +171,12 @@ function UserDashboard({ currentUser }: any) {
                                     <hr className="bg-[#969393] w-[2px] h-[20rem] mr-14" />
 
                                     <div className="h-full flex items-center">
-                                        <div className="flex flex-col h-[11rem] justify-evenly">
-                                            <Link href={`/profile/${currentUserId}=${designAndUserData.currentUserData.username}`} className="userButton bg-white flex justify-center items-center">Show Profile</Link>
-                                            <button className="userButton bg-white" onClick={userSignOut}>Sign Out</button>
-                                            <Link className="userButton bg-[#FA5252] flex justify-center items-center" href="/logIn/delete">Delete</Link>
+                                        <div className="flex flex-col h-[13rem] justify-evenly">
+                                            <Link href={`/profile/${currentUserId}=${designAndUserData.currentUserData.username}`} className="userButton bg-white flex justify-center items-center">Profile</Link>
+                                            <button className="userButton bg-white">Messages</button>
+                                            <button className="userButton bg-white">Settings</button>
+                                            <button className="userButton bg-[#FA5252] text-white" onClick={userSignOut}>Sign Out</button>
+                                            {/* <Link className="userButton bg-[#FA5252] flex justify-center items-center" href="/logIn/delete">Delete</Link> */}
                                         </div>
                                     </div>
                                 </>

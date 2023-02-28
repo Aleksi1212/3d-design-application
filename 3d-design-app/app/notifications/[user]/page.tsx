@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 
-import Notifications from '../../../src/components/notifications'
+import Notifications from '../../../src/components/social/notifications'
 
 export default function NotificationPage({ params }: any) {
     const userData = params.user.split('%3D')

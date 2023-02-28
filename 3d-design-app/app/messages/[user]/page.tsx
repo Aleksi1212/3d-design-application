@@ -1,5 +1,9 @@
+import MessageStartPage from "../../../src/components/social/messageStartpage"
 
 
 export default function MessagePage({ params }: any) {
-    return <h1 className="text-white">hello</h1>
+    const userData = params.user.split('%3D')
+
+
+    return <MessageStartPage user={{ userId: userData[0] }} />
 }

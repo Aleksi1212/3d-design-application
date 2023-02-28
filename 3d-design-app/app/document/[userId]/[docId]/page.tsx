@@ -1,4 +1,4 @@
-import DocEditor from "../../../../src/components/editor"
+import DocEditor from "../../../../src/components/designing/editor"
 
 
 async function Editor({ params }: any) {

@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from "react";
-import useInputStyles from "../hooks/inputStylehook";
+import useInputStyles from "../../hooks/inputStylehook";
 
 import Link from "next/link";
 import Image from "next/image";
 
-import images from "../functions/importImages";
+import images from "../../functions/importImages";
 
 function LogIn() {
     const [inputType, setInputType] = useState<boolean>(false)

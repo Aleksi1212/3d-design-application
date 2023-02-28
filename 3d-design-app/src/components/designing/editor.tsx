@@ -8,8 +8,8 @@ import add from '../images/add.png'
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation";
 
-import { db } from "../datalayer/config";
-import { updateDesign } from "../datalayer/querys";
+import { db } from "../../datalayer/config";
+import { updateDesign } from "../../datalayer/querys";
 import { collectionGroup, onSnapshot, query, where } from "firebase/firestore";
 
 function DocEditor({ designData }: any) {

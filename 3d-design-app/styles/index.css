@@ -52,7 +52,7 @@
   }
 
   .userButton {
-    @apply w-[7rem] h-[2.5rem] rounded-lg shadow-xl
+    @apply w-[7rem] h-[2.5rem] rounded-lg shadow-md
   }
 
   .userButton:hover, #doc:hover, #friend:hover {

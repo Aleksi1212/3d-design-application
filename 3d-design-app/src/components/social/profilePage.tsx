@@ -3,19 +3,19 @@
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
-import { updateFriendOrUser } from "../datalayer/querys";
+import { updateFriendOrUser } from "../../datalayer/querys";
 
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'
-import useProfileImage from "../hooks/profileImagehook";
-import useUserData from "../hooks/userDataHook";
+import useProfileImage from "../../hooks/profileImagehook";
+import useUserData from "../../hooks/userDataHook";
 
 import SearchUsers from "./searchBox";
-import UserCard from "./userCard";
-import AuthBox from "./authenticationBox";
+import UserCard from "./userCardProfile";
+import AuthBox from "../authentication/authenticationBox";
 
-import userActions from "../functions/actions";
-import images from "../functions/importImages";
+import userActions from "../../functions/actions";
+import images from "../../functions/importImages";
 
 interface alertType {
     message: string,

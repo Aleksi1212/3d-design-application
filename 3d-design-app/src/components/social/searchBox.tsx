@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 
-import { db } from "../datalayer/config";
+import { db } from "../../datalayer/config";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
 import { useState, useReducer, useEffect, useRef } from "react";
-import images from "../functions/importImages";
+import images from "../../functions/importImages";
 
-import UserCard from "./userCard";
+import UserCard from "./userCardProfile";
 
 interface searchBoxTypes {
     message: string

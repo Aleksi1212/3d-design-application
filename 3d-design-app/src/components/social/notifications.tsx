@@ -3,16 +3,16 @@
 import Link from 'next/link'
 import Image from 'next/image'
 
-import UserCard from './userCard';
+import UserCard from './userCardProfile';
 
 import { useState, useEffect, SetStateAction } from 'react';
-import useUserData from '../hooks/userDataHook';
+import useUserData from '../../hooks/userDataHook';
 
-import { db } from '../datalayer/config';
+import { db } from '../../datalayer/config';
 import { collectionGroup, query, where, onSnapshot } from 'firebase/firestore';
 
-import images from '../functions/importImages';
-import { acceptFriendRequest } from '../datalayer/querys';
+import images from '../../functions/importImages';
+import { acceptFriendRequest } from '../../datalayer/querys';
 
 function Notifications({ user }: any) {
     const { currentUserId, userName } = user || {}

@@ -1,4 +1,4 @@
-import AuthBox from "../../src/components/authenticationBox";
+import AuthBox from "../../src/components/authentication/authenticationBox";
 
 import Link from 'next/link'
 import Image from 'next/image'

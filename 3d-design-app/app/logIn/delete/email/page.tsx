@@ -1,4 +1,4 @@
-import VerifyUser from "../../../../src/components/verifyUser"
+import VerifyUser from "../../../../src/components/authentication/verifyUser"
 
 function DeleteAccount() {
     return (

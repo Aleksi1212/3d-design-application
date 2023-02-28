@@ -6,16 +6,15 @@ import Image from "next/image";
 import { useState, useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
 
-import images from "../functions/importImages";
-import { updateFriendOrUser } from "../datalayer/querys";
+import images from "../../functions/importImages";
+import { updateFriendOrUser } from "../../datalayer/querys";
 
-import { db } from "../datalayer/config";
+import { db } from "../../datalayer/config";
 import { query, collectionGroup, where, onSnapshot, collection } from "firebase/firestore";
 
-import useProfileImage from "../hooks/profileImagehook";
-import useUserData from "../hooks/userDataHook";
+import useProfileImage from "../../hooks/profileImagehook";
+import useUserData from "../../hooks/userDataHook";
 
-import { Loader } from "./profilePage";
 
 interface reducerType {
     overUser: boolean,

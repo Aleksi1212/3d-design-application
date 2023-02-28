@@ -1,18 +1,18 @@
 'use client';
 
 import { useState } from "react";
-import useInputStyles from "../hooks/inputStylehook";
+import useInputStyles from "../../hooks/inputStylehook";
 
 import Image from "next/image";
 import Link from "next/link";
 
-import images from "../functions/importImages";
+import images from "../../functions/importImages";
 
-import { auth, db } from "../datalayer/config";
+import { auth, db } from "../../datalayer/config";
 // import { collection, addDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword,  } from "firebase/auth";
 
-import { checkUser } from "../datalayer/querys";
+import { checkUser } from "../../datalayer/querys";
 
 function SignUp() {
     const [inputType, setInputType] = useState<boolean>(false)

@@ -1,4 +1,4 @@
-import ResetPage from "../../../src/components/resetPasswordPage";
+import ResetPage from "../../../src/components/authentication/resetPasswordPage";
 
 function ResetPasswordPage() {
     return (

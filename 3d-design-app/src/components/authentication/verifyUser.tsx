@@ -5,15 +5,16 @@ import Image from 'next/image'
 
 import back from '../images/back.png'
 
-import useInputType from '../hooks/inputStylehook';
+import useInputType from '../../hooks/inputStylehook';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { cookieSetter } from '../datalayer/querys';
+import { cookieSetter } from '../../datalayer/querys';
+import images from '../../functions/importImages';
 
 function VerifyUser() {
     const [helper, setHelper] = useState(false)
-    const inputType = useInputType(helper)
+    // const inputType = useInputType(helper)
 
     const router = useRouter()
 
@@ -57,9 +58,9 @@ function VerifyUser() {
                     <input type="text" className='input' placeholder='Email Address' name='email' required />
 
                     <div className='flex relative'>
-                        <input type={inputType.type} className="input" placeholder='password' name='password' required />
+                        <input type={helper ? 'text' : 'password'} className="input" placeholder='password' name='password' required />
                         <div className='absolute h-full right-2 flex flex-col justify-center'>
-                            <Image src={inputType.image} alt="image" onClick={() => setHelper(!helper)} className="cursor-pointer" />
+                            <Image src={helper ? images.show : images.hide} alt="image" onClick={() => setHelper(!helper)} className="cursor-pointer" />
                         </div>
                     </div>
 

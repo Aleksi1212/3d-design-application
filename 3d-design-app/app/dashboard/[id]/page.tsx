@@ -1,5 +1,5 @@
 
-import UserDashboard from "../../../src/components/dashBoard"
+import UserDashboard from "../../../src/components/designing/dashBoard"
 
 async function Dashboard({ params }: any) {
     const res = await fetch('http://localhost:3000/api/getUserInfo', {
