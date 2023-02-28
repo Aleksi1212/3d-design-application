@@ -30,8 +30,8 @@ interface payloadType {
 function UserCard({ user }: any) {
     const { viewingUser, usersId, usersName, messagingId, initialAction, secondaryAction, alert } = user || {}
 
-    const [blockable, setBlockable] = useState(true)
-    const [profileUrl, setProfileUrl] = useState([''])
+    const [blockable, setBlockable] = useState<boolean>(true)
+    const [profileUrl, setProfileUrl] = useState<Array<string>>([''])
     const profileImage = useProfileImage(profileUrl[0])
 
     const userData = useUserData(usersId, viewingUser)
