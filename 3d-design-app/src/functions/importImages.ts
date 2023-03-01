@@ -30,6 +30,7 @@ const images = {
     closeError: importAll['closeError.png'],
     cross: importAll['cross.svg'],
 
+    dashboard: importAll['dashboard.png'],
     docMenu: importAll['docMenu.png'],
     docRemove: importAll['docRemove.png'],
     docShare: importAll['docShare.png'],

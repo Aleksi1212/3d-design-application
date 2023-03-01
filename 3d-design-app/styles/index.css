@@ -103,12 +103,14 @@
     @apply scale-95
   }
   
-  .friendActions, .messageFriend {
+  .friendActions, .messageFriend, .profileRoute {
     @apply absolute -right-[.475rem] -top-10 w-[4rem] h-[2rem] bg-[#5D5D5D] rounded-md flex justify-center items-center
     transition-all duration-200 scale-0 origin-bottom text-white
   }
 
-  #menu:hover ~ .friendActions, #backHome:hover ~ #homeMessage, #message:hover ~ .messageFriend, #closeImage:hover ~ #closeBox, #showHide:hover ~ #showHideBox {
+  #menu:hover ~ .friendActions, #backHome:hover ~ #homeMessage, 
+  #message:hover ~ .messageFriend, #closeImage:hover ~ #closeBox, 
+  #showHide:hover ~ #showHideBox, #dashboard:hover ~ #dashboardMessage, #settings:hover ~ #settingsMessage {
     @apply scale-100
   }
 

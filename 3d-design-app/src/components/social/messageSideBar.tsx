@@ -64,7 +64,7 @@ function MessageSideBar({ user }: any) {
             </div>
 
             <div className="absolute bottom-0 w-full h-[9%] border-t-2 border-[#D2D2D2] flex justify-between items-center px-4">
-                <div>
+                <div className="flex gap-x-4">
                     <div className="w-[4rem] h-[4rem] rounded-full shadow-md bg-[#F6F7F9] overflow-hidden">
                         {
                             profileImage.errors.includes(profileImage.profileImage) || profileImage.profileImage.length <= 0 ? (
@@ -79,6 +79,24 @@ function MessageSideBar({ user }: any) {
                             )
                         }
                     </div>
+
+                    <div className="flex flex-col justify-center">
+                        <h1 className="text-lg">{userData.userName}</h1>
+                        <p className="text-xs opacity-90">{userData.messagingId}</p>
+                    </div>
+                </div>
+
+                <div className="flex gap-x-4">
+                    <Link href={`/dashboard/${userId}`} id="dashboard">
+                        <Image src={images.dashboard} alt="dashboard" width={30} />
+                    </Link>
+
+                    <button id="settings">
+                        <Image src={images.settings} alt="settings" width={30} />
+                    </button>
+
+                    <div className="profileRoute right-[2.2rem] -top-1 text-sm h-[1.5rem] w-[5rem]" id="dashboardMessage">Dashboard</div>
+                    <div className="profileRoute right-[-1px] -top-1 text-sm h-[1.5rem]" id="settingsMessage">Settings</div>
                 </div>
             </div>
         </div>

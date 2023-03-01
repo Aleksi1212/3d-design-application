@@ -19,6 +19,7 @@ function useUserData(userId: string, currentUserId: string) {
     const [currentUserFriendData, setCurrentUserFriendData] = useState([])
     const [designData, setDesignData] = useState([])
     const [pendingFriends, setPendingFriends] = useState([])
+    const [blockedUsers, setBlockedUsers] = useState([])
 
     const [userLocked, setUserLocked] = useState({ state: false })
     const [blocked, setBlocked] = useState(false)
@@ -34,6 +35,7 @@ function useUserData(userId: string, currentUserId: string) {
             userQuery: query(collection(db, 'data'), where('userId', '==', userId)),
             currendUserQuery: query(collection(db, 'data'), where('userId', '==', currentUserId !== null ? currentUserId : userId)),
             blockedQuery: query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', userId), where('user', '==', currentUserId)),
+            blockedUsersQuery: query(collectionGroup(db, 'blockedUsers'), where('blockedBy', '==', currentUserId)),
             designQuery: query(collectionGroup(db, 'usersDesigns'), where('user', '==', currentUserId)),
             pendingFriendsQuery: query(collectionGroup(db, 'friendRequests'), where('sentTo', '==', currentUserId))
         }
@@ -116,6 +118,16 @@ function useUserData(userId: string, currentUserId: string) {
             setPendingFriends(pendingFriends)
         })
 
+        const getBLockedUsers = onSnapshot(querys.blockedUsersQuery, (querySnapshot) => {
+            let blockedUsers: SetStateAction<any> = []
+
+            querySnapshot.forEach((user) => {
+                blockedUsers.push(user.data().blockedUserData)
+            })
+
+            setBlockedUsers(blockedUsers)
+        })
+
         return () => {
             getFriendData()
             getCurrentUserFriends()
@@ -124,6 +136,7 @@ function useUserData(userId: string, currentUserId: string) {
             getCurrentUserData()
             getBlockedData()
             getPendingFriends()
+            getBLockedUsers()
         }
     }, [])
 
@@ -132,6 +145,7 @@ function useUserData(userId: string, currentUserId: string) {
         currentUserFriendData: currentUserFriendData,
         designData: designData,
         pendingFriends: pendingFriends,
+        blockedUsers: blockedUsers,
 
         userLocked: userLocked,
         blocked: blocked,

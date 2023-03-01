@@ -163,12 +163,20 @@ async function updateFriendOrUser(friendOrUserData: any) {
 
     // remove friend
     if (friendOrUserData.action === 'remove' && friendOrUserData.friendOrUser === 'friend') {
-        const docRef = doc(db, 'data', docId[0], 'friends', friendOrUserData.friendId)
-        const docExists = await getDoc(docRef)
+        const friendsDocRef = doc(db, 'data', docId[0], 'friends', friendOrUserData.friendId)
+
+        const docExists = await getDoc(friendsDocRef)
         
         if (docExists.data()) {
+            const userQuery = query(collection(db, 'data'), where('userId', '==', friendOrUserData.friendId))
+            const userQuerySnapshot = await getDocs(userQuery)
+            const userDocId = userQuerySnapshot.docs.map((doc) => doc.id)
+
+            const userDocRef = doc(db, 'data', userDocId[0], 'friends', friendOrUserData.userId)
+
             const removeFriendPromise = await Promise.allSettled([
-                deleteDoc(docRef)
+                deleteDoc(friendsDocRef),
+                deleteDoc(userDocRef)
             ])
 
             return removeFriendPromise[0].status === 'fulfilled' ? { 
@@ -234,18 +242,43 @@ async function updateFriendOrUser(friendOrUserData: any) {
 
     // block user
     } else if (friendOrUserData.action === 'block' && friendOrUserData.friendOrUser === 'user') {
-        const docRef = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
+        const blockedDocRef_1 = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
+        const blockedDocRef_2 = doc(db, 'data', docId[0], 'blockedUsers', friendOrUserData.blockedUser)
+
         const friendDoc = doc(db, 'data', docId[0], 'friends', friendOrUserData.blockedUser)
 
-        const que = query(collectionGroup(db, 'friends'), where('friendData.friendId', '==', friendOrUserData.blockedUser))
-        const querySnapshot = await getDocs(que)
-        const friendExists = querySnapshot.docs.map((doc) => doc.data())
+        const friendQuery = query(collectionGroup(db, 'friends'), where('friendData.friendId', '==', friendOrUserData.blockedUser))
+        const userQuery = query(collection(db, 'data'), where('userId', '==', friendOrUserData.blockedUser))
 
+        const friendQuerySnapshot = await getDocs(friendQuery)
+        const friendExists = friendQuerySnapshot.docs.map((doc) => doc.data())
+
+        const userQuerySnapshot = await getDocs(userQuery)
+        const userData = userQuerySnapshot.docs.map((doc) => doc.exists() ? doc.data() : {
+            messagingId: '',
+            email: '',
+            method: '',
+            userName: '',
+            locked: false,
+            profileUrl: '',
+            userId: ''
+        })
 
         const blockUserPromise = await Promise.allSettled([
-            updateDoc(docRef, {
+            updateDoc(blockedDocRef_1, {
                 'blockedusers': arrayUnion(friendOrUserData.blockedUser)
             }),
+
+            setDoc(blockedDocRef_2, {
+                blockedBy: friendOrUserData.userId,
+                blockedUserData: {
+                    messagingId: userData[0].messagingId,
+                    profileUrl: userData[0].profileUrl,
+                    userId: userData[0].userId,
+                    username: userData[0].username
+                }
+            }),
+
             friendExists.length > 0 ?
             deleteDoc(friendDoc) : null
         ])
@@ -255,10 +288,21 @@ async function updateFriendOrUser(friendOrUserData: any) {
 
         } else if (blockUserPromise[0].status === 'rejected') {
             const setBlockedUserPromise = await Promise.allSettled([
-                setDoc(docRef, {
+                setDoc(blockedDocRef_1, {
                     blockedusers: [friendOrUserData.blockedUser],
                     user: friendOrUserData.userId
                 }),
+
+                setDoc(blockedDocRef_2, {
+                    blockedBy: friendOrUserData.userId,
+                    blockedUserData: {
+                        messagingId: userData[0].messagingId,
+                        profileUrl: userData[0].profileUrl,
+                        userId: userData[0].userId,
+                        username: userData[0].username
+                    }
+                }),
+
                 friendExists.length > 0 ?
                 deleteDoc(friendDoc) : null
             ])
@@ -280,12 +324,15 @@ async function updateFriendOrUser(friendOrUserData: any) {
 
     // unblock user
     } else if (friendOrUserData.action === 'unBlock' && friendOrUserData.friendOrUser === 'user') {
-        const docRef = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
+        const blockedDocRef_1 = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
+        const blockedDocRef_2 = doc(db, 'data', docId[0], 'blockedUsers', friendOrUserData.blockedUser)
 
         const unblockUserPromise = await Promise.allSettled([
-            updateDoc(docRef, {
+            updateDoc(blockedDocRef_1, {
                 'blockedusers': arrayRemove(friendOrUserData.blockedUser)
-            })
+            }),
+
+            deleteDoc(blockedDocRef_2)
         ])
 
         return unblockUserPromise[0].status === 'fulfilled' ? { 

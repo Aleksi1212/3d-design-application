@@ -2,8 +2,7 @@
 
 import Image from "next/image"
 
-import expand from '../images/expand.png'
-import add from '../images/add.png'
+import images from "../../functions/importImages";
 
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation";
@@ -72,7 +71,7 @@ function DocEditor({ designData }: any) {
                 <div className="h-full w-[20rem] border-r-[1px] border-[#808080]">
                     <div className="w-full h-[4rem] relative top-[5rem] border-b-[1px] border-[#808080] text-lg flex items-center justify-between pr-12">
                         <h1 className="pl-5">Design - 1</h1>
-                        <Image src={expand} alt="expand" />
+                        <Image src={images.expand} alt="expand" />
                     </div>
 
                     <div className="relative top-[6rem] w-full">
@@ -154,7 +153,7 @@ function EditorBox({ data }: any) {
     return (
         <div className="editorBox mb-4">
             <p>{data}</p>
-            <Image src={add} alt="add" />
+            <Image src={images.add} alt="add" />
         </div>
     )
 }
