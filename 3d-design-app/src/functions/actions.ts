@@ -1,4 +1,4 @@
-import { updateFriendOrUser } from "../datalayer/querys";
+import updateFriendOrUser from "../datalayer/firestoreFunctions/updateFriendOrUser";
 import images from "./importImages";
 
 function userActions(userId: string, currentUserName: string, userMessagingId: string, userName: string, messagingId: string, currenUserId: string, userState: any, blocked: boolean) {    

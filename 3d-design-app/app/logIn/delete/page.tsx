@@ -13,7 +13,7 @@ import { auth, db } from "../../../src/datalayer/config"
 import { deleteUser, FacebookAuthProvider, GithubAuthProvider, GoogleAuthProvider, reauthenticateWithPopup } from "firebase/auth"
 import { deleteDoc, doc, where, collection, getDocs, query } from "firebase/firestore"
 
-import { cookieSetter } from "../../../src/datalayer/querys"
+import { cookieSetter } from "../../../src/datalayer/otherFunctionality"
 import { useRouter } from 'next/navigation'
 
 function ReAuth() {

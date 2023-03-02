@@ -13,7 +13,8 @@ import useProfileImage from "../../hooks/profileImagehook";
 import { db } from "../../datalayer/config";
 import { collection, where, onSnapshot, query } from "firebase/firestore";
 
-import { updateFriendOrUser } from "../../datalayer/querys";
+import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
+import messageUser from "../../datalayer/firestoreFunctions/messageUser";
 
 interface hoverState {
     overUser: boolean
@@ -26,7 +27,7 @@ interface payloadType {
 }
 
 function UserCardMessages({ user }: any) {
-    const { viewingUserId, viewingUserName, userId, userName, messagingId, userState } = user || {}
+    const { viewingUserId, viewingUserName, viewingUserMessagingId, userId, userName, messagingId, userState } = user || {}
 
     const router = useRouter()
 
@@ -98,9 +99,18 @@ function UserCardMessages({ user }: any) {
                 {
                     userState === 'friend' ? (
                         <>
-                            <button className="friendButton" id="message">
+                            <button className="friendButton" id="message"
+                                onClick={async () => {
+                                    const addNewConversation = await messageUser(viewingUserMessagingId, messagingId, viewingUserName, userName, 'Message history started with', 'start')
+
+                                    if (addNewConversation?.type === 'success') {
+                                        router.push(`/messages/${viewingUserId}=${viewingUserName}/${messagingId}=${userName}`)
+                                    }
+                                }}
+                            >
                                 <Image src={images.message} alt="message" />
                             </button>
+
                             <button className="friendButton" id="menu" 
                                 onClick={() => setHover({ payload: { overUser: hover.overUser, clicked: true }, type: userState })}
                             >

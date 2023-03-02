@@ -8,7 +8,8 @@ import images from "../../functions/importImages";
 import { useRouter } from "next/navigation"
 
 import { auth } from "../../datalayer/config"
-import { checkUser, cookieSetter } from "../../datalayer/querys";
+import { cookieSetter } from "../../datalayer/otherFunctionality";
+import checkUser from "../../datalayer/firestoreFunctions/checkUser";
 
 import { GoogleAuthProvider, FacebookAuthProvider, GithubAuthProvider, signInWithPopup, signOut } from "firebase/auth"
 

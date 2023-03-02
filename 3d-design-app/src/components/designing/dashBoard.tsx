@@ -12,7 +12,8 @@ import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from "../../datalayer/config";
 
-import { cookieSetter, updateDesign } from "../../datalayer/querys";
+import { cookieSetter } from "../../datalayer/otherFunctionality";
+import updateDesign from "../../datalayer/firestoreFunctions/updateDesign";
 
 import { Loader } from "../social/profilePage";
 

@@ -11,8 +11,7 @@ import images from "../../functions/importImages";
 import { auth, db } from "../../datalayer/config";
 // import { collection, addDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword,  } from "firebase/auth";
-
-import { checkUser } from "../../datalayer/querys";
+import checkUser from "../../datalayer/firestoreFunctions/checkUser";
 
 function SignUp() {
     const [inputType, setInputType] = useState<boolean>(false)

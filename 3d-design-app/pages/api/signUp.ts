@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 
 import { setCookie } from "cookies-next";
 
-import { generateId } from "../../src/datalayer/querys";
+import { generateId } from "../../src/datalayer/otherFunctionality";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {

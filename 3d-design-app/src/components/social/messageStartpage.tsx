@@ -12,7 +12,7 @@ import { useState } from 'react'
 function MessageStartPage({ user }: any) {
     const { userId, userName } = user || {}
 
-    const [queryOption, setQueryOption] = useState<string>('')
+    const [queryOption, setQueryOption] = useState<string>('Friends')
     const [search, setSearch] = useState<boolean>(false)
     const [searchedUsers, setSearchedUsers] = useState([])
 
@@ -25,7 +25,7 @@ function MessageStartPage({ user }: any) {
 
     function searchUsers(userName: string) {
         if (search && queryOption === 'Friends') {
-            const filteredSearch = userData.friendData.filter((friend: any) => friend.username.includes(userName))
+            const filteredSearch = userData.friendData.filter((friend: any) => friend.friendName.includes(userName))
             setSearchedUsers(filteredSearch)
 
         } else if (search && queryOption === 'Blocked Users') {
@@ -87,6 +87,8 @@ function MessageStartPage({ user }: any) {
                                 return <UserCardMessages key={friend.friendId} user={{
                                     viewingUserId: userId,
                                     viewingUserName: userName,
+                                    viewingUserMessagingId: userData.currentUserData.messagingId,
+
                                     userId: friend.friendId,
                                     userName: friend.friendName,
                                     messagingId: friend.messagingId,
@@ -99,6 +101,8 @@ function MessageStartPage({ user }: any) {
                                 return <UserCardMessages key={blockedUser.userId} user={{
                                     viewingUserId: userId,
                                     viewingUserName: userName,
+                                    vieviwngUserMessagingId: userData.currentUserData.messagingId,
+
                                     userId: blockedUser.userId,
                                     userName: blockedUser.username,
                                     messagingId: blockedUser.messagingId,
@@ -111,6 +115,8 @@ function MessageStartPage({ user }: any) {
                                 return <UserCardMessages key={blockedUser.userId} user={{
                                     viewingUserId: userId,
                                     viewingUserName: userName,
+                                    viewingUserMessagingId: userData.currentUserData.messagingId,
+
                                     userId: blockedUser.userId,
                                     userName: blockedUser.username,
                                     messagingId: blockedUser.messagingId,
@@ -123,6 +129,8 @@ function MessageStartPage({ user }: any) {
                                 return <UserCardMessages key={searchedFriend.friendId} user={{
                                     viewingUserId: userId,
                                     viewingUserName: userName,
+                                    viewingUserMessagingId: userData.currentUserData.messagingId,
+
                                     userId: searchedFriend.friendId,
                                     userName: searchedFriend.friendName,
                                     messagingId: searchedFriend.messagingId,

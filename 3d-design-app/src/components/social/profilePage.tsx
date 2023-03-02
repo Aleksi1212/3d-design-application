@@ -3,7 +3,7 @@
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
-import { updateFriendOrUser } from "../../datalayer/querys";
+import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
 
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'

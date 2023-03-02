@@ -9,7 +9,7 @@ import useInputType from '../../hooks/inputStylehook';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { cookieSetter } from '../../datalayer/querys';
+import { cookieSetter } from '../../datalayer/otherFunctionality';
 import images from '../../functions/importImages';
 
 function VerifyUser() {

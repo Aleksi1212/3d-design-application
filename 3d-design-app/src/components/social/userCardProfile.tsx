@@ -7,7 +7,7 @@ import { useState, useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
 
 import images from "../../functions/importImages";
-import { updateFriendOrUser } from "../../datalayer/querys";
+import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
 
 import { db } from "../../datalayer/config";
 import { query, collectionGroup, where, onSnapshot, collection } from "firebase/firestore";

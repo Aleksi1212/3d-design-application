@@ -8,8 +8,14 @@ import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation";
 
 import { db } from "../../datalayer/config";
-import { updateDesign } from "../../datalayer/querys";
 import { collectionGroup, onSnapshot, query, where } from "firebase/firestore";
+
+import updateDesign from "../../datalayer/firestoreFunctions/updateDesign";
+
+interface measurementTypes {
+    large: Array<string>
+    small: Array<string>
+}
 
 function DocEditor({ designData }: any) {
     const { user, docId, docName } = designData || {}
@@ -17,7 +23,7 @@ function DocEditor({ designData }: any) {
     const router = useRouter()
 
     const [system, setSystem] = useState('metric')
-    const [mesTypes, setMesTypes] = useState({ large: ['m', 'kg'], small: ['cm', 'g'] })
+    const [mesTypes, setMesTypes] = useState<measurementTypes>({ large: ['m', 'kg'], small: ['cm', 'g'] })
     const [desName, setDesName] = useState(docName)
 
     const editProps = ['Hat', 'Glasses', 'Shirt', 'Hoodie / Jacket', 'Pants', 'Socks', 'Shoes']
