@@ -5,7 +5,7 @@ import Link from "next/link";
 
 import images from "../../functions/importImages";
 
-import useUserData from "../../hooks/userDataHook";
+import useRealtimeChanges from "../../hooks/realtimeChangeshook";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -52,7 +52,7 @@ function UserDashboard({ currentUser }: any) {
     const [alert, setAlert] = useState<alertTypes>({ message: 'ok', image: images.success, top: '-2.5rem' })
     const [manualSignOut, setManualSignOut] = useState(false)
     
-    const designAndUserData = useUserData(currentUserId, currentUserId)
+    const designAndUserData = useRealtimeChanges(currentUserId, currentUserId, '')
 
     const backgroundSvgs: Array<backgroundTypes> =  [
         { image: images.arrow1, flexPos: 'flex-end', padLeft: '6rem', padTop: '0', padBottom: '5rem', key: 'arrrow1' },

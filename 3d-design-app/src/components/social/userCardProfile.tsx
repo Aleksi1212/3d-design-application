@@ -13,7 +13,7 @@ import { db } from "../../datalayer/config";
 import { query, collectionGroup, where, onSnapshot, collection } from "firebase/firestore";
 
 import useProfileImage from "../../hooks/profileImagehook";
-import useUserData from "../../hooks/userDataHook";
+import useUserData from "../../hooks/realtimeChangeshook";
 
 
 interface reducerType {

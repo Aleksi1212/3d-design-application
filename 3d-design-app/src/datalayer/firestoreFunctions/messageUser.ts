@@ -24,55 +24,63 @@ async function messageUser(senderId: string, recieverId: string, senderName: str
     }
 
     const docRefs = {
-        sender_sent_docRef: doc(db, 'data', docIds.sender_docId[0], `messagesSentTo-${recieverId}`, messageId1),
-        sender_recieved_docRef: doc(db, 'data', docIds.sender_docId[0], `messagesRecievedFrom-${recieverId}`, messageId2),
+        sender_sent_docRef: doc(db, 'data', docIds.sender_docId[0], 'messages', `messagesSentTo-${recieverId}`),
+        sender_recieved_docRef: doc(db, 'data', docIds.sender_docId[0], 'messages', `messagesRecievedFrom-${recieverId}`),
 
-        reciever_sent_docRef: doc(db, 'data', docIds.reciever_docId[0], `messagesSentTo-${senderId}`, messageId2),
-        reciever_recieved_docRef: doc(db, 'data', docIds.reciever_docId[0], `messagesRecievedFrom-${senderId}`, messageId1),
+        reciever_sent_docRef: doc(db, 'data', docIds.reciever_docId[0], 'messages', `messagesSentTo-${senderId}`),
+        reciever_recieved_docRef: doc(db, 'data', docIds.reciever_docId[0], 'messages', `messagesRecievedFrom-${senderId}`),
     }
 
     if (type === 'start') {
         const addMessageHistoryPromise = await Promise.allSettled([
             setDoc(docRefs.sender_sent_docRef, {
-                messageData: {
-                    message: `${message} ${senderName}`,
-                    messageSent: currentDate.toDateString(),
-                    messageId: messageId1,
-                    messageType: 'start'
-                },
+                messagesData: [
+                    {
+                        message: `${message} ${senderName}`,
+                        messageSent: currentDate.toDateString(),
+                        messageId: messageId1,
+                        messageType: 'start'
+                    }
+                ],
                 sentFrom: senderId,
                 recievedBy: recieverId
             }),
 
             setDoc(docRefs.reciever_recieved_docRef, {
-                messageData: {
-                    message: `${message} ${senderName}`,
-                    messageRecieved: currentDate.toDateString(),
-                    messageId: messageId1,
-                    messageType: 'start'
-                },
+                messagesData: [
+                    {
+                        message: `${message} ${senderName}`,
+                        messageRecieved: currentDate.toDateString(),
+                        messageId: messageId1,
+                        messageType: 'start'
+                    }
+                ],
                 sentFrom: senderId,
                 recievedBy: recieverId
             }),
 
             setDoc(docRefs.reciever_sent_docRef, {
-                messageData: {
-                    message: `${message} ${recieverName}`,
-                    messageSent: currentDate.toDateString(),
-                    messageId: messageId2,
-                    messageType: 'start'
-                },
+                messagesData: [
+                    {
+                        message: `${message} ${recieverName}`,
+                        messageSent: currentDate.toDateString(),
+                        messageId: messageId2,
+                        messageType: 'start'
+                    }
+                ],
                 sentFrom: recieverId,
                 recievedBy: senderId
             }),
 
             setDoc(docRefs.sender_recieved_docRef, {
-                messageData: {
-                    message: `${message} ${recieverName}`,
-                    messageRecieved: currentDate.toDateString(),
-                    messageId: messageId2,
-                    messageType: 'start'
-                },
+                messagesData: [
+                    {
+                        message: `${message} ${recieverName}`,
+                        messageRecieved: currentDate.toDateString(),
+                        messageId: messageId2,
+                        messageType: 'start'
+                    }
+                ],
                 sentFrom: recieverId,
                 recievedBy: senderId
             })

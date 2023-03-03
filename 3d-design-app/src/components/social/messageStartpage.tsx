@@ -4,7 +4,7 @@ import images from "../../functions/importImages";
 
 import Image from "next/image";
 
-import useUserData from "../../hooks/userDataHook";
+import useRealtimeChanges from "../../hooks/realtimeChangeshook";
 import UserCardMessages from "./userCardMessages";
 
 import { useState } from 'react'
@@ -16,7 +16,7 @@ function MessageStartPage({ user }: any) {
     const [search, setSearch] = useState<boolean>(false)
     const [searchedUsers, setSearchedUsers] = useState([])
 
-    const userData = useUserData(userId, userId)
+    const userData = useRealtimeChanges(userId, userId, '')
 
     let currentUserFriends: any = []
     userData.currentUserFriendData.map((friend: any) => {

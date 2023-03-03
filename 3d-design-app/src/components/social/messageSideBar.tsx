@@ -5,54 +5,14 @@ import images from "../../functions/importImages";
 import Image from 'next/image'
 import Link from "next/link";
 
-import { useEffect, useState } from 'react'
+import useUserData from "../../hooks/userDataHook";
 import useProfileImage from "../../hooks/profileImagehook";
-
-import { db } from "../../datalayer/config";
-import { query, collection, where, getDocs } from "firebase/firestore";
-
-interface userDataTypes {
-    userName: string
-    messagingId: string
-    profileUrl: string
-}
 
 function MessageSideBar({ user }: any) {
     const { userId } = user || {}
 
-    const [userData, setUserData] = useState<userDataTypes>({ userName: '', messagingId: '', profileUrl: 'profileImages/defaultProfile.png' })
+    const userData = useUserData(userId)
     const profileImage = useProfileImage(userData.profileUrl)
-
-    useEffect(() => {
-        let isMounted = true
-
-        async function getUserData() {
-            try {
-                const userQuery = query(collection(db, 'data'), where('userId', '==', userId))
-
-                const querySnapshot = await getDocs(userQuery)
-                const data: any = {
-                    userName: querySnapshot.docs.map((doc) => doc.data().username),
-                    messagingId: querySnapshot.docs.map((doc) => doc.data().messagingId),
-                    profileUrl: querySnapshot.docs.map((doc) => doc.data().profileUrl)
-                }
-
-                if (isMounted) {
-                    setUserData({ userName: data.userName[0], messagingId: data.messagingId[0], profileUrl: data.profileUrl[0] })
-                }
-
-            } catch(err) {
-                setUserData({ userName: 'error', messagingId: '', profileUrl: userData.profileUrl })
-            }
-        }
-
-        getUserData()
-
-        return () => {
-            isMounted = false
-        }
-    }, [])
-
 
     return (
         <div className="h-full w-[20%] bg-white relative">

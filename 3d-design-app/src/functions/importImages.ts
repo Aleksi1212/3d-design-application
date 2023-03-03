@@ -13,8 +13,10 @@ const importAll = useImages(require.context('../images', false, /\.(png|jpe?g|sv
 const images = {
     acceptRequest: importAll['acceptRequest.png'],
     add: importAll['add.png'], 
+    addDesign: importAll['addDesignToMessage.png'],
     addDoc: importAll['addDoc.png'],
     addFriend: importAll['addFriend.png'],
+    addImage: importAll['addImageToMessage.png'],
     addProfileImage: importAll['addProfileImage.png'],
     appLogo: importAll['appLogo.png'],
     arrow1: importAll['arrow1.svg'],
@@ -45,6 +47,8 @@ const images = {
     github: importAll['github.png'],
     google: importAll['google.png'],
 
+    happy1: importAll['happy1.png'],
+    happy2: importAll['happy2.png'],
     hide: importAll['hide.png'],
     home: importAll['home.png'],
 

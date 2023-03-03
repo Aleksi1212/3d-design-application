@@ -8,7 +8,7 @@ import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendO
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'
 import useProfileImage from "../../hooks/profileImagehook";
-import useUserData from "../../hooks/userDataHook";
+import useRealtimeChanges from "../../hooks/realtimeChangeshook";
 
 import SearchUsers from "./searchBox";
 import UserCard from "./userCardProfile";
@@ -28,7 +28,7 @@ function ProfilePage({ user }: any) {
     
     const router = useRouter()
 
-    const userData = useUserData(userId, currentUser.userId)
+    const userData = useRealtimeChanges(userId, currentUser.userId, '')
     const profileImage = useProfileImage(userData.profileUrl)
     const actions = userActions(userId, userData.currentUserData.username, userData.currentUserData.messagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
     

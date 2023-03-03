@@ -6,7 +6,7 @@ import Image from 'next/image'
 import UserCard from './userCardProfile';
 
 import { useState, useEffect, SetStateAction } from 'react';
-import useUserData from '../../hooks/userDataHook';
+import useRealtimeChanges from '../../hooks/realtimeChangeshook';
 
 import { db } from '../../datalayer/config';
 import { collectionGroup, query, where, onSnapshot } from 'firebase/firestore';
@@ -17,7 +17,7 @@ import acceptFriendRequest from '../../datalayer/firestoreFunctions/acceptFriend
 function Notifications({ user }: any) {
     const { currentUserId, userName } = user || {}
 
-    const friendRequests = useUserData(currentUserId, currentUserId)
+    const friendRequests = useRealtimeChanges(currentUserId, currentUserId, '')
 
     // const [pendingFriends, setPendingFriends] = useState([])
 
