@@ -8,10 +8,16 @@ import Link from "next/link";
 import useUserData from "../../hooks/userDataHook";
 import useProfileImage from "../../hooks/profileImagehook";
 
+interface userDataTypes {
+    userName: string
+    messagingId: string
+    profileUrl: string
+}
+
 function MessageSideBar({ user }: any) {
     const { userId } = user || {}
-
-    const userData = useUserData(userId)
+    
+    const userData = useUserData({ type: 'userId', id: userId })
     const profileImage = useProfileImage(userData.profileUrl)
 
     return (

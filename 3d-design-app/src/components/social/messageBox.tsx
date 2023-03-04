@@ -1,28 +1,30 @@
 'use client';
 
 import Image from 'next/image'
+import images from '../../functions/importImages';
+
+import { useReducer, Reducer, useState } from 'react'
 
 import useUserData from '../../hooks/userDataHook';
 import useProfileImage from '../../hooks/profileImagehook';
 import useRealtimeChanges from '../../hooks/realtimeChangeshook';
 
-import images from '../../functions/importImages';
-import { useReducer, Reducer } from 'react'
-import { IM_Fell_DW_Pica } from '@next/font/google';
+import messageUser from '../../datalayer/firestoreFunctions/messageUser';
 
 function MessageBox({ user }: any) {
-    const { userMessagingId, userName } = user || {}
-
-    const userData = useUserData(userMessagingId)
-    const profileImage = useProfileImage(userData.profileUrl)
+    const { userMessagingId, userName, viewingUserName, viewingUserMessagingId } = user || {}
+    
+    const profileUrl = useUserData({ type: 'messagingId', id: userMessagingId })
+    const profileImage = useProfileImage(profileUrl.profileUrl)
 
     const messagesData = useRealtimeChanges('', '', userMessagingId)
+    const [message, setMessage] = useState<string>('')
 
     const [rows, setRows] = useReducer<Reducer<number, number>>((prev, next) => {
-        if (next < 10) {
+        if (next < 3) {
             return next
         }
-        return 10
+        return 3
     }, 1)
 
     function changeRowCount(event: any) {
@@ -32,6 +34,19 @@ function MessageBox({ user }: any) {
         setRows(newRows)
     }
 
+    async function handleSubmit(event: any, message: string) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault()
+
+            const sendMessage = await messageUser(viewingUserMessagingId, userMessagingId, viewingUserName, userName, message, 'message')
+
+            if (sendMessage?.type === 'success') {
+                setMessage('success')
+            } else {
+                setMessage('error')
+            }
+        }
+    }
 
     return (
         <div className="h-full w-[80%] flex flex-col">
@@ -45,8 +60,8 @@ function MessageBox({ user }: any) {
                                 <Image src={profileImage.profileImage} alt="profileImage" width={500} height={500}
                                 style={{
                                     objectFit: 'cover',
-                                    width: userData.profileUrl === 'profileImages/defaultProfile.png' || userData.profileUrl === '' ? '40%' : '100%',
-                                    height: userData.profileUrl === 'profileImages/defaultProfile.png' || userData.profileUrl === '' ? '40%' : '100%',
+                                    width: profileUrl.profileUrl === 'profileImages/defaultProfile.png' || profileUrl.profileUrl === '' ? '40%' : '100%',
+                                    height: profileUrl.profileUrl === 'profileImages/defaultProfile.png' || profileUrl.profileUrl === '' ? '40%' : '100%',
                                 }} />
                             )
                         }
@@ -65,9 +80,16 @@ function MessageBox({ user }: any) {
                 </div>
 
                 <div className="w-full bg-[#F6F7F9] h-[3rem] rounded-xl shadow-lg relative flex items-center">
-                    <form className="w-full h-[3rem]" >
-                        <textarea name="message" onInput={changeRowCount} rows={rows} className="bg-[#F6F7F9] w-full rounded-xl outline-none pl-12 pr-20 py-3 resize-none flex" placeholder={`Message ${userName}`}></textarea>
-                    </form>
+                    <div className='w-full h-[3rem]'>
+                        <textarea className="bg-[#F6F7F9] w-full rounded-xl outline-none pl-12 pr-20 py-3 resize-none flex" placeholder={`Message ${userName}`}
+                            rows={rows}
+                            value={message}
+                            
+                            onInput={changeRowCount}
+                            onChange={(event: any) => setMessage(event.target.value)}
+                            onKeyDown={(event: any) => handleSubmit(event, message)}
+                        ></textarea>
+                    </div>
 
                     <Image src={images.addImage} alt="addImage" className="absolute left-3" width={25} />
 

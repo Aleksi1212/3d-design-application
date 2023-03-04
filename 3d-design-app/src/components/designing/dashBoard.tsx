@@ -44,7 +44,7 @@ interface svgPropType {
 }
 
 function UserDashboard({ currentUser }: any) {
-    const { currentUserId, test } = currentUser || {}
+    const { currentUserId } = currentUser || {}
 
     const router = useRouter()
 
@@ -174,7 +174,7 @@ function UserDashboard({ currentUser }: any) {
                                     <div className="h-full flex items-center">
                                         <div className="flex flex-col h-[13rem] justify-evenly">
                                             <Link href={`/profile/${currentUserId}=${designAndUserData.currentUserData.username}`} className="userButton bg-white flex justify-center items-center">Profile</Link>
-                                            <Link href={`/messages/${currentUserId}=${designAndUserData.currentUserData.username}`} className="userButton bg-white flex justify-center items-center">Messages</Link>
+                                            <Link href={`/messages/${currentUserId}=${designAndUserData.currentUserData.username}_${designAndUserData.currentUserData.messagingId}`} className="userButton bg-white flex justify-center items-center">Messages</Link>
                                             <button className="userButton bg-white">Settings</button>
                                             <button className="userButton bg-[#FA5252] text-white" onClick={userSignOut}>Sign Out</button>
                                             {/* <Link className="userButton bg-[#FA5252] flex justify-center items-center" href="/logIn/delete">Delete</Link> */}

@@ -1,7 +1,7 @@
 import { db } from "../datalayer/config"
 import { query, collection, where, getDocs } from "firebase/firestore"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface userDataTypes {
     userName: string
@@ -9,7 +9,12 @@ interface userDataTypes {
     profileUrl: string
 }
 
-function useUserData(id: string) {
+interface idType {
+    type: string
+    id: string
+}
+
+function useUserData(id: idType) {
     const [userData, setUserData] = useState<userDataTypes>({ userName: '', messagingId: '', profileUrl: 'profileImages/defaultProfile.png' })
 
     useEffect(() => {
@@ -17,7 +22,7 @@ function useUserData(id: string) {
 
         async function getUserData() {
             try {
-                const userQuery = query(collection(db, 'data'), where(id.length === 5 ? 'messagingId' : 'userId', '==', id))
+                const userQuery = query(collection(db, 'data'), where(id.type === 'messagingId' ? 'messagingId' : 'userId', '==', id.id))
                 const querySnapshot = await getDocs(userQuery)
 
                 const data: any = {

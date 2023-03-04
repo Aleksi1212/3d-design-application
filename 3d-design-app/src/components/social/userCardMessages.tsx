@@ -95,6 +95,8 @@ function UserCardMessages({ user }: any) {
 
             </div>
 
+            <Link href={`/messages/${viewingUserId}=${viewingUserName}/${messagingId}=${userName}`}>test</Link>
+
             <div className="w-[8rem] flex" style={{ justifyContent: userState === 'friend' ? 'space-between' : 'flex-end' }}>
                 {
                     userState === 'friend' ? (
