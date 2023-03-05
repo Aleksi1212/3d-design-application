@@ -14,7 +14,7 @@ import { db } from "../../datalayer/config";
 import { collection, where, onSnapshot, query } from "firebase/firestore";
 
 import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
-import messageUser from "../../datalayer/firestoreFunctions/messageUser";
+import { messageUser } from "../../datalayer/firestoreFunctions/messageUser";
 
 interface hoverState {
     overUser: boolean
@@ -103,7 +103,7 @@ function UserCardMessages({ user }: any) {
                         <>
                             <button className="friendButton" id="message"
                                 onClick={async () => {
-                                    const addNewConversation = await messageUser(viewingUserMessagingId, messagingId, viewingUserName, userName, 'Message history started with', 'start')
+                                    const addNewConversation = await messageUser(viewingUserMessagingId, messagingId, viewingUserId, userId, viewingUserName.split('_')[0], userName, 'Message history started with', 'start')
 
                                     if (addNewConversation?.type === 'success') {
                                         router.push(`/messages/${viewingUserId}=${viewingUserName}/${messagingId}=${userName}`)

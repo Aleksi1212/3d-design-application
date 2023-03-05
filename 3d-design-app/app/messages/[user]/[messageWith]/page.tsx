@@ -8,6 +8,7 @@ export default function MessagingBox({ params }: any) {
         userMessagingId: userData[0],
         userName: userData[1],
         viewingUserName: viewingUserData[1].split('_')[0],
-        viewingUserMessagingId: viewingUserData[1].split('_')[1]
+        viewingUserMessagingId: viewingUserData[1].split('_')[1],
+        viewingUserId: viewingUserData[0]
     }} />
 }
