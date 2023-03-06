@@ -34,6 +34,8 @@ function MessageStartPage({ user }: any) {
         }
     }
 
+    console.log('test')
+
     return (
         <div className="flex flex-col h-full w-[80%]">
             <nav className="w-full h-[9%] bg-[#F6F7F9] flex justify-between items-center px-16">

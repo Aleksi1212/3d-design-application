@@ -4,133 +4,166 @@ import { query, collection, where, getDocs, doc, setDoc, updateDoc, arrayUnion, 
 import { generateId } from "../otherFunctionality"
 import images from "../../functions/importImages"
 
-import { useEffect, useState, SetStateAction } from "react"
+import { useEffect, useState } from "react"
+import { StaticImageData } from "next/image"
+
+import useUserData from "../../hooks/userDataHook"
+import useProfileImage from "../../hooks/profileImagehook"
 
 async function messageUser(senderMessagingId: string, recieverMessagingId: string, senderUserId: string, recieverUserId: string, senderName: string, recieverName: string, message: string, type: string) {
-    const currentDate = new Date()
+    try {
+        const currentDateSent = new Date()
+        const currentDateRecieved = new Date()
+    
+        const messageId1 = generateId(8)
+        const messageId2 = generateId(8)
+    
+        const querys = {
+            sender_query: query(collection(db, 'data'), where('messagingId', '==', senderMessagingId)),
+            reciever_query: query(collection(db, 'data'), where('messagingId', '==', recieverMessagingId)),
 
-    const messageId1 = generateId(8)
-    const messageId2 = generateId(8)
-
-    const querys = {
-        sender_query: query(collection(db, 'data'), where('messagingId', '==', senderMessagingId)),
-        reciever_query: query(collection(db, 'data'), where('messagingId', '==', recieverMessagingId))
-    }
-
-    const sender_snapShot = await getDocs(querys.sender_query)
-    const reciever_snapShot = await getDocs(querys.reciever_query)
-
-    const docIds = {
-        sender_docId: sender_snapShot.docs.map((doc) => doc.id),
-        reciever_docId: reciever_snapShot.docs.map((doc) => doc.id)
-    }
-
-    const docRefs = {
-        sender_sent_docRef: doc(db, 'data', docIds.sender_docId[0], 'messages', `messagesSentTo-${recieverMessagingId}`),
-        sender_recieved_docRef: doc(db, 'data', docIds.sender_docId[0], 'messages', `messagesRecievedFrom-${recieverMessagingId}`),
-
-        reciever_sent_docRef: doc(db, 'data', docIds.reciever_docId[0], 'messages', `messagesSentTo-${senderMessagingId}`),
-        reciever_recieved_docRef: doc(db, 'data', docIds.reciever_docId[0], 'messages', `messagesRecievedFrom-${senderMessagingId}`),
-    }
-
-    if (type === 'message') {
-        const messageUser = await Promise.allSettled([
-            updateDoc(docRefs.sender_sent_docRef, {
-                'messagesData': arrayUnion({
-                    message: message,
-                    messageDate: currentDate.toLocaleString(),
-                    messageId: messageId1,
-                    messageStatus: 'sent',
-                    messageType: 'message'
-                })
-            }),
-
-            updateDoc(docRefs.reciever_recieved_docRef, {
-                'messagesData': arrayUnion({
-                    message: message,
-                    messageDate: currentDate.toLocaleString(),
-                    messageId: messageId1,
-                    messageStatus: 'recieved',
-                    messageType: 'message'
-                })
-            })
-        ])
-
-        return messageUser[0].status === 'fulfilled' ? {
-            message: 'Success', image: images.success, type: 'success'
-        } : {
-            message: messageUser[0].reason.message, image: images.error, type: messageUser[0].reason.constructor.name
+            sentMessagesQuery: query(collectionGroup(db, 'messages'), where('recievedBy', '==', recieverMessagingId), where('userId', '==', senderUserId)),
+            recieverMessagesQuery: query(collectionGroup(db, 'messages'), where('sentFrom', '==', recieverMessagingId), where('userId', '==', senderUserId))
         }
-    }
+    
+        const sender_snapShot = await getDocs(querys.sender_query)
+        const reciever_snapShot = await getDocs(querys.reciever_query)
 
-    if (type === 'start') {
-        const addMessageHistoryPromise = await Promise.allSettled([
-            setDoc(docRefs.sender_sent_docRef, {
-                messagesData: [
-                    {
-                        message: `${message} ${senderName}`,
-                        messageDate: currentDate.toLocaleString(),
+        const sentMessages = await getDocs(querys.sentMessagesQuery)
+        const recievedMessages = await getDocs(querys.recieverMessagesQuery)
+    
+        const docsData = {
+            sender_docId: sender_snapShot.docs.map((doc) => doc.id),
+            reciever_docId: reciever_snapShot.docs.map((doc) => doc.id),
+
+            sentMessagesData: sentMessages.docs.map((doc) => doc.data().messagesData[doc.data().messagesData.length - 1]),
+            recievedMessagesData: recievedMessages.docs.map((doc) => doc.data().messagesData[doc.data().messagesData.length - 1])
+        }
+    
+        const docRefs = {
+            sender_sent_docRef: doc(db, 'data', docsData.sender_docId[0], 'messages', `messagesSentTo-${recieverMessagingId}`),
+            sender_recieved_docRef: doc(db, 'data', docsData.sender_docId[0], 'messages', `messagesRecievedFrom-${recieverMessagingId}`),
+    
+            reciever_sent_docRef: doc(db, 'data', docsData.reciever_docId[0], 'messages', `messagesSentTo-${senderMessagingId}`),
+            reciever_recieved_docRef: doc(db, 'data', docsData.reciever_docId[0], 'messages', `messagesRecievedFrom-${senderMessagingId}`),
+        }
+    
+        if (type === 'message') {
+            const messageUser = await Promise.allSettled([
+                updateDoc(docRefs.sender_sent_docRef, {
+                    'messagesData': arrayUnion({
+                        message: message,
+                        messageDate: currentDateSent.toLocaleString('en-US'),
                         messageId: messageId1,
                         messageStatus: 'sent',
-                        messageType: 'start'
-                    }
-                ],
-                sentFrom: senderMessagingId,
-                recievedBy: recieverMessagingId,
-                userId: senderUserId
-            }),
+                        messageType: 'message',
+                        show: docsData.sentMessagesData[0].messageType === 'start' ? true :
 
-            setDoc(docRefs.reciever_recieved_docRef, {
-                messagesData: [
-                    {
-                        message: `${message} ${senderName}`,
-                        messageDate: currentDate.toLocaleString(),
+                        currentDateSent.setMinutes(currentDateSent.getMinutes() - 5) <= new Date(Date.parse(docsData.sentMessagesData[0].messageDate)).getTime() ?
+                        false : true
+                    })
+                }),
+    
+                updateDoc(docRefs.reciever_recieved_docRef, {
+                    'messagesData': arrayUnion({
+                        message: message,
+                        messageDate: currentDateRecieved.toLocaleString('en-US'),
                         messageId: messageId1,
                         messageStatus: 'recieved',
-                        messageType: 'start'
-                    }
-                ],
-                sentFrom: senderMessagingId,
-                recievedBy: recieverMessagingId,
-                userId: recieverUserId
-            }),
+                        messageType: 'message',
+                        show: docsData.sentMessagesData[0].messageType === 'start' ? true :
 
-            setDoc(docRefs.reciever_sent_docRef, {
-                messagesData: [
-                    {
-                        message: `${message} ${recieverName}`,
-                        messageDate: currentDate.toLocaleString(),
-                        messageId: messageId2,
-                        messageStatus: 'sent',
-                        messageType: 'start'
-                    }
-                ],
-                sentFrom: recieverMessagingId,
-                recievedBy: senderMessagingId,
-                userId: recieverUserId
-            }),
-
-            setDoc(docRefs.sender_recieved_docRef, {
-                messagesData: [
-                    {
-                        message: `${message} ${recieverName}`,
-                        messageDate: currentDate.toLocaleString(),
-                        messageId: messageId2,
-                        messageStatus: 'recieved',
-                        messageType: 'start'
-                    }
-                ],
-                sentFrom: recieverMessagingId,
-                recievedBy: senderMessagingId,
-                userId: senderUserId
-            })
-        ])
-
-        return addMessageHistoryPromise[0].status === 'fulfilled' ? {
-            message: 'Success', image: images.success, type: 'success'
-        } : {
-            message: addMessageHistoryPromise[0].reason.message, image: images.error, type: addMessageHistoryPromise[0].reason.constructor.name
+                        currentDateRecieved.setMinutes(currentDateRecieved.getMinutes() - 5) <= new Date(Date.parse(docsData.sentMessagesData[0].messageDate)).getTime() ?
+                        false : true
+                    })
+                })
+            ])
+    
+            return messageUser[0].status === 'fulfilled' ? {
+                message: 'Success', image: images.success, type: 'success'
+            } : {
+                message: messageUser[0].reason.message, image: images.error, type: messageUser[0].reason.constructor.name
+            }
         }
+    
+        if (type === 'start' && docsData.sentMessagesData.length <= 0) {
+            const addMessageHistoryPromise = await Promise.allSettled([
+                setDoc(docRefs.sender_sent_docRef, {
+                    messagesData: [
+                        {
+                            message: `${message} ${senderName}`,
+                            messageDate: currentDateSent.toLocaleString('en-US'),
+                            messageId: messageId1,
+                            messageStatus: 'sent',
+                            messageType: 'start',
+                            show: true
+                        }
+                    ],
+                    sentFrom: senderMessagingId,
+                    recievedBy: recieverMessagingId,
+                    userId: senderUserId
+                }),
+    
+                setDoc(docRefs.reciever_recieved_docRef, {
+                    messagesData: [
+                        {
+                            message: `${message} ${senderName}`,
+                            messageDate: currentDateRecieved.toLocaleString('en-US'),
+                            messageId: messageId1,
+                            messageStatus: 'recieved',
+                            messageType: 'start',
+                            show: true
+                        }
+                    ],
+                    sentFrom: senderMessagingId,
+                    recievedBy: recieverMessagingId,
+                    userId: recieverUserId
+                }),
+    
+                setDoc(docRefs.reciever_sent_docRef, {
+                    messagesData: [
+                        {
+                            message: `${message} ${recieverName}`,
+                            messageDate: currentDateSent.toLocaleString('en-US'),
+                            messageId: messageId2,
+                            messageStatus: 'sent',
+                            messageType: 'start',
+                            show: true
+                        }
+                    ],
+                    sentFrom: recieverMessagingId,
+                    recievedBy: senderMessagingId,
+                    userId: recieverUserId
+                }),
+    
+                setDoc(docRefs.sender_recieved_docRef, {
+                    messagesData: [
+                        {
+                            message: `${message} ${recieverName}`,
+                            messageDate: currentDateRecieved.toLocaleString('en-US'),
+                            messageId: messageId2,
+                            messageStatus: 'recieved',
+                            messageType: 'start',
+                            show: true
+                        }
+                    ],
+                    sentFrom: recieverMessagingId,
+                    recievedBy: senderMessagingId,
+                    userId: senderUserId
+                })
+            ])
+    
+            return addMessageHistoryPromise[0].status === 'fulfilled' ? {
+                message: 'Success', image: images.success, type: 'success'
+            } : {
+                message: addMessageHistoryPromise[0].reason.message, image: images.error, type: addMessageHistoryPromise[0].reason.constructor.name
+            }
+        } else {
+            return { message: 'Success', image: images.success, type: 'success' }
+        }
+
+    } catch(err) {
+        return { message: 'Error sending message', image: images.error, type: 'error' }
     }
 }
 
@@ -140,18 +173,26 @@ interface messageType {
     messageId: string
     messageStatus: string
     messageType: string
+    show: boolean
+}
+
+interface userTypes {
+    name: string
+    profileImage: StaticImageData
 }
 
 function useGetMessages(messagingId: string, userId: string) {
-    const [sentMessages, setSentMessages] = useState([])
-    const [recievedMessages, setRecievedMessages] = useState([])
+    const [sentMessages, setSentMessages] = useState<Array<messageType>>([])
+    const [recievedMessages, setRecievedMessages] = useState<Array<messageType>>([])
+
+    const senderUserData = useUserData({ type: 'userId', id: userId })
 
     useEffect(() => {
         const sentMessagesQuery = query(collectionGroup(db, 'messages'), where('recievedBy', '==', messagingId), where('userId', '==', userId))
         const recievedMessagesQuery = query(collectionGroup(db, 'messages'), where('sentFrom', '==', messagingId), where('userId', '==', userId))
 
         const getSentMessages = onSnapshot(sentMessagesQuery, (querySnapshot) => {
-            let sentMessages: SetStateAction<any> = []
+            let sentMessages: Array<messageType> = []
 
             querySnapshot.forEach((sentMessage) => {
                 sentMessages = sentMessage.data().messagesData
@@ -161,7 +202,7 @@ function useGetMessages(messagingId: string, userId: string) {
         })
 
         const getRecievedMessages = onSnapshot(recievedMessagesQuery, (querySnapshot) => {
-            let recievedMessages: SetStateAction<any> = []
+            let recievedMessages: Array<messageType> = []
 
             querySnapshot.forEach((recievedMessage) => {
                 recievedMessages = recievedMessage.data().messagesData
@@ -176,9 +217,13 @@ function useGetMessages(messagingId: string, userId: string) {
         }
     }, [])
 
-    const messages = sentMessages.concat(recievedMessages)
+    const messagesMerged = sentMessages.concat(recievedMessages)
 
-    return messages.sort((a: messageType, b: messageType) => new Date(Date.parse(a.messageDate)).getTime() - new Date(Date.parse(b.messageDate)).getTime())
+    return {
+        messages: messagesMerged.sort((a: messageType, b: messageType) => new Date(Date.parse(a.messageDate)).getTime() - new Date(Date.parse(b.messageDate)).getTime()),
+        senderUserData: senderUserData
+    }
+
 }
 
 export {
