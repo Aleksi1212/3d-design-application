@@ -3,7 +3,7 @@ import images from "./importImages";
 
 function userActions(userId: string, currentUserName: string, currentUserMessagingId: string, userName: string, messagingId: string, currenUserId: string, userState: any, blocked: boolean) {    
     const actions = userId === currenUserId ? [
-        { image: images.message, color: '#5D5D5D', message: 'Messages', key: 'messagees', type: 'link', action: null, params: `messages/${currenUserId}=${currentUserName}_ ${currentUserMessagingId}` },
+        { image: images.message, color: '#5D5D5D', message: 'Messages', key: 'messagees', type: 'link', action: null, params: `/messages/${currenUserId}=${currentUserName}_${currentUserMessagingId}` },
         { image: images.friendNoti, color: '#5D5D5D', message: 'Notifications', key: 'notifications', type: 'link', action: null, params: `/notifications/${currenUserId}=${currentUserName}` },
         { image: images.settings, color: '#5D5D5D', message: 'Settings', key: 'edit', type: 'link', action: null, params: null },
         { image: images.signOut, color: '#FA5252', message: 'Sign Out', key: 'signOut', type: '', action: null, params: null}

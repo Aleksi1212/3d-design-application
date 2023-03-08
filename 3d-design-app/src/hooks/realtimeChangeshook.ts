@@ -27,9 +27,6 @@ function useRealtimeChanges(userId: string, currentUserId: string, userMessaging
     const [messagingId, setMessagingId] = useState(String)
     const [profileUrl, setProfileUrl] = useState(String)
 
-    const [sentMessages, setSentMessages] = useState([])
-    const [recievedMessages, setRecivedMessages] = useState([])
-
     const [currentUserData, setCurrentUserData] = useState<currentUserTypes>({ userId: '', username: '', email: '', method: '', profileUrl: '', messagingId: '' })
     
     useEffect(() => {
@@ -44,10 +41,7 @@ function useRealtimeChanges(userId: string, currentUserId: string, userMessaging
             blockedQuery: query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', userId), where('user', '==', currentUserId)),
             blockedUsersQuery: query(collectionGroup(db, 'blockedUsers'), where('blockedBy', '==', currentUserId)),
 
-            designQuery: query(collectionGroup(db, 'usersDesigns'), where('user', '==', currentUserId)),
-
-            sentMessagesQuery: query(collectionGroup(db, 'messages'), where('recievedBy', '==', userMessagingId)),
-            recievedMessagesQuery: query(collectionGroup(db, 'messages'), where('sentFrom', '==', userMessagingId))
+            designQuery: query(collectionGroup(db, 'usersDesigns'), where('user', '==', currentUserId))
         }
 
         const getFriendData = onSnapshot(querys.friendQuery, (querySnapshot) => {
@@ -138,26 +132,6 @@ function useRealtimeChanges(userId: string, currentUserId: string, userMessaging
             setBlockedUsers(blockedUsers)
         })
 
-        const getSentMessages = onSnapshot(querys.sentMessagesQuery, (querySnapshot) => {
-            let sentMessages: SetStateAction<any> = []
-
-            querySnapshot.forEach((sentMessage) => {
-                sentMessages = sentMessage.data().messagesData
-            })
-
-            setSentMessages(sentMessages)
-        })
-
-        const getRecievedMessages = onSnapshot(querys.recievedMessagesQuery, (querySnapshot) => {
-            let recievedMessages: SetStateAction<any> = []
-
-            querySnapshot.forEach((recievedMessage) => {
-                recievedMessages = recievedMessage.data().messagesData
-            })
-
-            setRecivedMessages(recievedMessages)
-        })
-
         return () => {
             getFriendData()
             getCurrentUserFriends()
@@ -170,9 +144,6 @@ function useRealtimeChanges(userId: string, currentUserId: string, userMessaging
             getBlockedUsers()
 
             getDesigns()
-
-            getSentMessages()
-            getRecievedMessages()
         }
     }, [])
 
@@ -189,10 +160,7 @@ function useRealtimeChanges(userId: string, currentUserId: string, userMessaging
         messagingId: messagingId,
         profileUrl: profileUrl,
 
-        currentUserData: currentUserData,
-
-        sentMessages: sentMessages,
-        recievedMessages: recievedMessages
+        currentUserData: currentUserData
     }
 }
 

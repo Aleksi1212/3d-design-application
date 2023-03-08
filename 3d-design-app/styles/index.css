@@ -118,6 +118,14 @@
     @apply hidden
   }
 
+  #messagesContainer::-webkit-scrollbar {
+    @apply w-2 bg-[white] rounded-full
+  }
+
+  #messagesContainer::-webkit-scrollbar-thumb {
+    @apply bg-[#9D9D9D] rounded-full
+  }
+
   #friend:nth-child(-n + 1) {
     @apply border-t-2
   }

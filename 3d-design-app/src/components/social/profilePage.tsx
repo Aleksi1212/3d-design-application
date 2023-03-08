@@ -7,6 +7,7 @@ import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendO
 
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'
+
 import useProfileImage from "../../hooks/profileImagehook";
 import useRealtimeChanges from "../../hooks/realtimeChangeshook";
 

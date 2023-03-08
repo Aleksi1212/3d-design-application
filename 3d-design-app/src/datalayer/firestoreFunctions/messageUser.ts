@@ -8,7 +8,6 @@ import { useEffect, useState } from "react"
 import { StaticImageData } from "next/image"
 
 import useUserData from "../../hooks/userDataHook"
-import useProfileImage from "../../hooks/profileImagehook"
 
 async function messageUser(senderMessagingId: string, recieverMessagingId: string, senderUserId: string, recieverUserId: string, senderName: string, recieverName: string, message: string, type: string) {
     try {
@@ -59,8 +58,9 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                         messageType: 'message',
                         show: docsData.sentMessagesData[0].messageType === 'start' ? true :
 
-                        currentDateSent.setMinutes(currentDateSent.getMinutes() - 5) <= new Date(Date.parse(docsData.sentMessagesData[0].messageDate)).getTime() ?
-                        false : true
+                        new Date(Date.parse(docsData.sentMessagesData[0].messageDate)).getTime() <= new Date(Date.parse(docsData.recievedMessagesData[0].messageDate)).getTime() ? true :
+                        currentDateSent.setMinutes(currentDateSent.getMinutes() - 3) <= new Date(Date.parse(docsData.sentMessagesData[0].messageDate)).getTime() ? false : true
+
                     })
                 }),
     
@@ -73,8 +73,8 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                         messageType: 'message',
                         show: docsData.sentMessagesData[0].messageType === 'start' ? true :
 
-                        currentDateRecieved.setMinutes(currentDateRecieved.getMinutes() - 5) <= new Date(Date.parse(docsData.sentMessagesData[0].messageDate)).getTime() ?
-                        false : true
+                        new Date(Date.parse(docsData.sentMessagesData[0].messageDate)).getTime() <= new Date(Date.parse(docsData.recievedMessagesData[0].messageDate)).getTime() ? true :
+                        currentDateRecieved.setMinutes(currentDateRecieved.getMinutes() - 3) <= new Date(Date.parse(docsData.sentMessagesData[0].messageDate)).getTime() ? false : true
                     })
                 })
             ])
@@ -101,7 +101,8 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     ],
                     sentFrom: senderMessagingId,
                     recievedBy: recieverMessagingId,
-                    userId: senderUserId
+                    userId: senderUserId,
+                    type: 'sender'
                 }),
     
                 setDoc(docRefs.reciever_recieved_docRef, {
@@ -117,7 +118,8 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     ],
                     sentFrom: senderMessagingId,
                     recievedBy: recieverMessagingId,
-                    userId: recieverUserId
+                    userId: recieverUserId,
+                    type: 'reciever'
                 }),
     
                 setDoc(docRefs.reciever_sent_docRef, {
@@ -133,7 +135,8 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     ],
                     sentFrom: recieverMessagingId,
                     recievedBy: senderMessagingId,
-                    userId: recieverUserId
+                    userId: recieverUserId,
+                    type: 'sender'
                 }),
     
                 setDoc(docRefs.sender_recieved_docRef, {
@@ -149,7 +152,8 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     ],
                     sentFrom: recieverMessagingId,
                     recievedBy: senderMessagingId,
-                    userId: senderUserId
+                    userId: senderUserId,
+                    type: 'receiver'
                 })
             ])
     
@@ -174,11 +178,6 @@ interface messageType {
     messageStatus: string
     messageType: string
     show: boolean
-}
-
-interface userTypes {
-    name: string
-    profileImage: StaticImageData
 }
 
 function useGetMessages(messagingId: string, userId: string) {

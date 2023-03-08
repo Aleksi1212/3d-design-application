@@ -9,9 +9,8 @@ import useUserData from '../../hooks/userDataHook';
 import useProfileImage from '../../hooks/profileImagehook';
 
 import { messageUser, useGetMessages } from '../../datalayer/firestoreFunctions/messageUser';
-import { db } from '../../datalayer/config';
-import { query, where, collectionGroup, getDocs } from 'firebase/firestore';
-import test from 'node:test';
+
+import ProfileBox from '../styledComponents/profileBox';
 
 interface alertType {
     message: string
@@ -33,11 +32,6 @@ interface profileTypes {
     errors: Array<string>
 }
 
-interface nextMessage {
-    date: string
-    status: string
-}
-
 interface messageBoxtype {
     message: string
     messageDate: string
@@ -50,7 +44,7 @@ interface messageBoxtype {
     profileUrl: string
 }
 
-interface test {
+interface messageDataTypes {
     messageData: messageBoxtype
 }
 
@@ -64,15 +58,6 @@ function MessageBox({ user }: any) {
     const profileUrl = useUserData({ type: 'messagingId', id: userMessagingId })
     const recieverProfileImage = useProfileImage(profileUrl.profileUrl)
     const senderProfileImage = useProfileImage(messagesData.senderUserData.profileUrl)
-
-    let nextMessages: Array<nextMessage> = []
-
-    messagesData.messages.map((message: messageType) => {
-        if (message.messageType === 'message' && (message.messageStatus === 'sent' || message.messageStatus === 'recieved')) {
-            nextMessages.push({ date: message.messageDate, status: message.messageStatus })
-        }
-    })
-
     
     const [rows, setRows] = useReducer<Reducer<number, number>>((prev, next) => {
         if (next < 3) {
@@ -122,31 +107,23 @@ function MessageBox({ user }: any) {
             </div>
 
             <nav className="w-ful h-[9%] bg-[#F6F7F9] flex items-center pl-5">
-                <div className="flex gap-x-5 items-center">
-                    <div className="bg-white w-16 h-16 rounded-full shadow-md flex justify-center items-center overflow-hidden">
-                        {
-                            recieverProfileImage.errors.includes(recieverProfileImage.profileImage) || recieverProfileImage.profileImage.length <= 0 ? (
-                                <h1>{recieverProfileImage.profileImage}</h1>
-                            ) : (
-                                <Image src={recieverProfileImage.profileImage} alt="profileImage" width={500} height={500}
-                                style={{
-                                    objectFit: 'cover',
-                                    width: profileUrl.profileUrl === 'profileImages/defaultProfile.png' || profileUrl.profileUrl === '' ? '40%' : '100%',
-                                    height: profileUrl.profileUrl === 'profileImages/defaultProfile.png' || profileUrl.profileUrl === '' ? '40%' : '100%',
-                                }} />
-                            )
-                        }
-                    </div>
+                <div className="flex gap-x-4">
+                    <ProfileBox styles={{
+                        dimensions: '4rem',
+                        backgroundColor: 'white',
+                        shadow: 'md',
+                        bold: false,
 
-                    <div className="flex flex-col justify-center">
-                        <h1 className="text-lg">{userName}</h1>
-                        <p className="text-xs opacity-90">{userMessagingId}</p>
-                    </div>
+                        userName: userName,
+                        info: userMessagingId,
+                        profileImage: recieverProfileImage,
+                        profileUrl: profileUrl.profileUrl
+                    }} />
                 </div>
             </nav>
 
             <div className="w-full h-[91%] bg-[#D2D2D2] flex flex-col px-14 pb-16 justify-end">
-                <div className="w-full flex flex-col max-h-[48rem] overflow-auto pb-5">
+                <div className="w-full flex flex-col max-h-[48rem] overflow-auto pb-5" id="messagesContainer">
                     {
                         messagesData.messages.map((message: messageType) => {
                             if (message.messageType === 'message' && (message.messageStatus === 'sent' || message.messageStatus === 'recieved')) {
@@ -189,7 +166,7 @@ function MessageBox({ user }: any) {
     )
 }
 
-function Message({ messageData }: test) {
+function Message({ messageData }: messageDataTypes) {
     const { message, messageDate, messageId, messageStatus, messageType, sentFromName, profileData, profileUrl, show } = messageData || {}
 
     if (!show) {
@@ -205,25 +182,17 @@ function Message({ messageData }: test) {
     return (
         <div className="flex flex-col w-max my-6">
             <div className="flex gap-x-2">
-                <div className="w-12 h-12 bg-white rounded-full flex justify-center items-center overflow-hidden">
-                    {
-                        profileData.errors.includes(profileData.profileImage) ||profileData.profileImage.length <= 0 ? (
-                            <h1>{profileData.profileImage}</h1>
-                        ) : (
-                            <Image src={ profileData.profileImage} alt="profileImage" width={500} height={500}
-                            style={{
-                                objectFit: 'cover',
-                                width: profileUrl === 'profileImages/defaultProfile.png' || profileUrl === '' ? '40%' : '100%',
-                                height: profileUrl === 'profileImages/defaultProfile.png' || profileUrl === '' ? '40%' : '100%',
-                            }} />
-                        )
-                    }
-                </div>
+                <ProfileBox styles={{
+                    dimensions: '3rem',
+                    backgroundColor: 'white',
+                    shadow: 'none',
+                    bold: true,
 
-                <div className='flex flex-col justify-center'>
-                    <h1 className='font-semibold'>{sentFromName}</h1>
-                    <p className='text-xs opacity-60'>{messageDate}</p>
-                </div>
+                    userName: sentFromName,
+                    info: messageDate,
+                    profileImage: profileData,
+                    profileUrl: profileUrl
+                }} />
             </div>
 
             <div className="ml-14 max-w-[40rem] text-lg flex flex-wrap">

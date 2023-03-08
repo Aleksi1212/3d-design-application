@@ -7,13 +7,22 @@ import { Canvas } from "@react-three/fiber";
 import Scene1 from "../scenes/section1Scene";
 import Scene from "../scenes/section2Scene";
 
+import { auth } from "../datalayer/config";
+
+import { cookieSetter } from "../datalayer/otherFunctionality";
+
+interface currentUserTypes {
+    state: boolean
+    userId: string
+}
 
 function StartPage() {
     const titleRef = useRef<HTMLDivElement | any>(null)
 
-
     const [scrollPos, setScrollPos] = useState<number>(300)
     const [y, setY] = useState<number>(0)
+
+    const [currentUser, setCurrentUser] = useState<currentUserTypes>({ state: false, userId: '' })
 
     useEffect(() => {
         const handleScroll = () => {
@@ -24,6 +33,16 @@ function StartPage() {
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
+
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            const test = await Promise.allSettled([
+                cookieSetter(true, user.uid)
+            ])
+
+            test[0].status === 'fulfilled' ? setCurrentUser({ state: true, userId: user.uid }) : null
+        }
+    }) 
 
     return (
         <>
@@ -41,7 +60,9 @@ function StartPage() {
 
                     <div className="flex gap-x-5 pt-[.3rem]">
                         <button className="bg-black w-[7rem] h-[3rem] flex justify-center items-center text-white border-2 rounded-[10px]">
-                            <Link href="/logIn" className="w-full h-full flex justify-center items-center">Log In</Link>
+                            <Link href={currentUser.state ? `/dashboard/${currentUser.userId}` : '/logIn'} className="w-full h-full flex justify-center items-center">
+                                {currentUser.state ? 'Dashboard' : 'Log In'}
+                            </Link>
                         </button>
 
                         <button className="bg-white w-[7rem] h-[3rem] flex justify-center items-center rounded-[10px]">

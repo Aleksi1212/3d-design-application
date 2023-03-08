@@ -16,6 +16,8 @@ import { collection, where, onSnapshot, query } from "firebase/firestore";
 import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
 import { messageUser } from "../../datalayer/firestoreFunctions/messageUser";
 
+import ProfileBox from "../styledComponents/profileBox";
+
 interface hoverState {
     overUser: boolean
     clicked: boolean
@@ -72,30 +74,19 @@ function UserCardMessages({ user }: any) {
         >
             <div className="absolute w-[97%] h-[2px] bg-[#8D8D8D] top-[-2px]"></div>
 
-            <div className="flex justify-start items-center gap-x-5 w-[70rem]">
-                <div className="w-[4rem] h-[4rem] bg-white rounded-full flex justify-center items-center overflow-hidden">
-                    {
-                        profileImage.errors.includes(profileImage.profileImage) || profileImage.profileImage.length <= 0 ? (
-                            <h1>{profileImage.profileImage}</h1>
-                        ) : (
-                            <Image src={profileImage.profileImage} alt="profileImage" width={500} height={500}
-                            style={{
-                                objectFit: 'cover',
-                                width: profileUrl[0] === 'profileImages/defaultProfile.png' || profileUrl[0] === '' ? '40%' : '100%',
-                                height: profileUrl[0] === 'profileImages/defaultProfile.png' || profileUrl[0] === '' ? '40%' : '100%',
-                            }} />
-                        )
-                    }
-                </div>
+            <Link href={`/messages/${viewingUserId}=${viewingUserName}/${messagingId}=${userName}`} className="flex justify-start items-center gap-x-5 w-[70rem]">
+                <ProfileBox styles={{
+                    dimensions: '4rem',
+                    backgroundColor: 'white',
+                    shadow: 'none',
+                    bold: false,
 
-                <div>
-                    <h1 className="text-lg">{userName}</h1>
-                    <p className="text-xs opacity-90">{messagingId}</p>
-                </div>
-
-            </div>
-
-            <Link href={`/messages/${viewingUserId}=${viewingUserName}/${messagingId}=${userName}`}>test</Link>
+                    userName: userName,
+                    info: messagingId,
+                    profileImage: profileImage,
+                    profileUrl: profileUrl[0]
+                }} />
+            </Link>
 
             <div className="w-[8rem] flex" style={{ justifyContent: userState === 'friend' ? 'space-between' : 'flex-end' }}>
                 {
