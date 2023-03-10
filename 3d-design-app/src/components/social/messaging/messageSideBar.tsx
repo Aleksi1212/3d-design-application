@@ -1,19 +1,20 @@
 'use client';
 
-import images from "../../functions/importImages";
+import images from "../../../functions/importImages";
 
 import Image from 'next/image'
 import Link from "next/link";
 
-import useUserData from "../../hooks/userDataHook";
-import useProfileImage from "../../hooks/profileImagehook";
+import useUserData from "../../../hooks/userDataHook";
+import useProfileImage from "../../../hooks/profileImagehook";
 
 import { useEffect, useState } from "react";
 
-import { db } from "../../datalayer/config";
+import { db } from "../../../datalayer/config";
 import { query, where, collectionGroup, onSnapshot } from "firebase/firestore";
 
-import ProfileBox from "../styledComponents/profileBox";
+import ProfileBox from "../../styledComponents/profileBox";
+import MessageWithBox from "./messageWithBox";
 
 interface messagesWithUserTypes {
     recievedBy: string
@@ -31,7 +32,11 @@ function MessageSideBar({ user }: any) {
     const [messagesWith, setMessagesWith] = useState<Array<messagesWithUserTypes>>([])
 
     useEffect(() => {
-        const getUsers_UserHasMessagesWithQuery = query(collectionGroup(db, 'messages'), where('userId', '==', userId), where('type', '==', 'sender'))
+        const getUsers_UserHasMessagesWithQuery = query(collectionGroup(db, 'messages'),
+            where('userId', '==', userId),
+            where('type', '==', 'sender'),
+            where('showHistory', '==', true)
+        )
 
         const getUsers_UserHasMessagesWith = onSnapshot(getUsers_UserHasMessagesWithQuery, (querySnapshot) => {
             let messagesWith: Array<any> = []
@@ -41,9 +46,9 @@ function MessageSideBar({ user }: any) {
             })
 
             const filterMessagesWith = messagesWith.map((obj: any) => {
-                const { ['messagesData']: _, ...rest } = obj
+                const { ['messagesData']: _, ...otherMessageData } = obj
 
-                return rest
+                return otherMessageData
             })
 
             setMessagesWith(filterMessagesWith)
@@ -81,7 +86,6 @@ function MessageSideBar({ user }: any) {
                     <ProfileBox styles={{
                         dimensions: '3.5rem',
                         backgroundColor: '#F6F7F9',
-                        shadow: 'md',
                         bold: false,
 
                         userName: userData.userName,
@@ -104,46 +108,6 @@ function MessageSideBar({ user }: any) {
                     <div className="profileRoute right-[-1rem] top-[-1.75rem] text-sm h-[1.5rem]" id="settingsMessage">Settings</div>
                 </div>
             </div>
-        </div>
-    )
-}
-
-interface userData {
-    messagingId: string
-    currentUserId: string
-    currentUserName: string
-    currentUserMessagingId: string
-}
-
-interface messageWithType {
-    messageWithUser: userData
-}
-
-function MessageWithBox({ messageWithUser }: messageWithType) {
-    const { messagingId, currentUserId, currentUserName, currentUserMessagingId } = messageWithUser || {}
-
-    const userData = useUserData({ type: 'messagingId', id: messagingId })
-    const profileImage = useProfileImage(userData.profileUrl)
-
-    return (
-        <div className="w-full h-[4rem] flex rounded-lg justify-between items-center px-2 mt-4 hover:bg-[#F2F3F9] relative">
-            <div className="absolute w-[95%] h-[2px] bg-[#8D8D8D] top-[-2px]"></div>
-
-            <Link href={`/messages/${currentUserId}=${currentUserName}_${currentUserMessagingId}/${messagingId}=${userData.userName}`} className="flex gap-x-4 w-[90%]">
-                <ProfileBox styles={{
-                    dimensions: '3.5rem',
-                    backgroundColor: '#F6F7F9',
-                    shadow: 'md',
-                    bold: false,
-
-                    userName: userData.userName,
-                    info: messagingId,
-                    profileImage: profileImage,
-                    profileUrl: userData.profileUrl
-                }} />
-            </Link>
-
-            <Image src={images.close} alt="close" />
         </div>
     )
 }

@@ -3,20 +3,20 @@
 import Image from "next/image";
 import Link from 'next/link'
 
-import images from "../../functions/importImages";
+import images from "../../../functions/importImages";
 
 import { useEffect, useState, useReducer } from 'react'
 import { useRouter } from "next/navigation";
 
-import useProfileImage from "../../hooks/profileImagehook";
+import useProfileImage from "../../../hooks/profileImagehook";
 
-import { db } from "../../datalayer/config";
+import { db } from "../../../datalayer/config";
 import { collection, where, onSnapshot, query } from "firebase/firestore";
 
-import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
-import { messageUser } from "../../datalayer/firestoreFunctions/messageUser";
+import updateFriendOrUser from "../../../datalayer/firestoreFunctions/updateFriendOrUser";
+import messageUser from "../../../datalayer/firestoreFunctions/messages/sendMessage";
 
-import ProfileBox from "../styledComponents/profileBox";
+import ProfileBox from "../../styledComponents/profileBox";
 
 interface hoverState {
     overUser: boolean
@@ -78,7 +78,6 @@ function UserCardMessages({ user }: any) {
                 <ProfileBox styles={{
                     dimensions: '4rem',
                     backgroundColor: 'white',
-                    shadow: 'none',
                     bold: false,
 
                     userName: userName,

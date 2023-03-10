@@ -5,7 +5,6 @@ import Image from "next/image";
 interface stylesTypes {
     dimensions: string
     backgroundColor: string
-    shadow: string
     bold: boolean
     userName: string
     info: string
@@ -18,11 +17,15 @@ interface styles {
 }
 
 function ProfileBox({ styles }: styles) {
-    const { dimensions, backgroundColor, shadow, bold, userName, info, profileImage, profileUrl } = styles || {}
+    const { dimensions, backgroundColor, bold, userName, info, profileImage, profileUrl } = styles || {}
 
     return (
         <>
-            <div className={`w-[${dimensions}] h-[${dimensions}] bg-[${backgroundColor}] shadow-${shadow} flex justify-center items-center rounded-full overflow-hidden`}>
+            <div className="shadow-md flex justify-center items-center rounded-full overflow-hidden" style={{
+                width: dimensions,
+                height: dimensions,
+                backgroundColor: backgroundColor
+            }}>
                 {
                     profileImage.errors.includes(profileImage.profileImage) || profileImage.profileImage.length <= 0 ? (
                         <h1>{profileImage.profileImage}</h1>

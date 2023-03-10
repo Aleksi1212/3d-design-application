@@ -158,6 +158,10 @@
   .hideSearchBox:hover {
     @apply w-[8rem] before:h-[1rem]
   }
+
+  #messageContainer:hover > #messageDate {
+    @apply scale-100
+  }
 }
 
 html, body {

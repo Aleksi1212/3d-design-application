@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 
 import { cookies } from 'next/headers'
 
-import MessageSideBar from '../../../src/components/social/messageSideBar'
+import MessageSideBar from '../../../src/components/social/messaging/messageSideBar'
 import '../../../styles/index.css'
 
 export default function MessagesLayout({

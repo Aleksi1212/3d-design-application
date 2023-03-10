@@ -1,38 +1,37 @@
 'use client';
 
-import images from "../../functions/importImages";
+import images from "../../../functions/importImages";
 
 import Image from "next/image";
 
-import useRealtimeChanges from "../../hooks/realtimeChangeshook";
+import useRealtimeChanges from "../../../hooks/realtimeChangeshook";
 import UserCardMessages from "./userCardMessages";
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 
 function MessageStartPage({ user }: any) {
     const { userId, userName } = user || {}
 
     const [queryOption, setQueryOption] = useState<string>('Friends')
     const [search, setSearch] = useState<boolean>(false)
-    const [searchedUsers, setSearchedUsers] = useState([])
 
-    const userData = useRealtimeChanges(userId, userId, '')
+    const [searchedFriends, setSearchedFriends] = useState([])
+    const [searchedUsers, setSearchedUsers] = useState<any>([])
 
-    let currentUserFriends: any = []
-    userData.currentUserFriendData.map((friend: any) => {
-        currentUserFriends.push(friend.friendId)
-    })
+    const userData = useRealtimeChanges(userId, userId)
 
-    function searchUsers(userName: string) {
+    const searchUsers = useCallback((userName: string) => {
         if (search && queryOption === 'Friends') {
-            const filteredSearch = userData.friendData.filter((friend: any) => friend.friendName.includes(userName))
-            setSearchedUsers(filteredSearch)
+            const filterSearch = userData.friendData.filter((friend: any) => friend.friendName.includes(userName))
+            setSearchedFriends(userName.length <= 0 ? [] : filterSearch)
+            setSearchedUsers([])
 
         } else if (search && queryOption === 'Blocked Users') {
-            const filteredSearch = userData.blockedUsers.filter((blockedUser: any) => blockedUser.username.includes(userName))
-            setSearchedUsers(filteredSearch)
+            const filterSearch = userData.blockedUsers.filter((blockedUser: any) => blockedUser.username.includes(userName))
+            setSearchedUsers(userName.length <= 0 ? [] : filterSearch)
+            setSearchedFriends([])
         }
-    }
+    }, [userData, queryOption, search])
 
     return (
         <div className="flex flex-col h-full w-[80%]">
@@ -59,7 +58,7 @@ function MessageStartPage({ user }: any) {
                     <Image src={images.search} alt="search" width={20} height={20} className="absolute pointer-events-none left-2" />
                     <input type="text" placeholder="Search" className="w-full bg-white h-full pl-8 rounded-md"
                         onClick={() => setSearch(true)}
-                        onChange={(event: any) => searchUsers(event.target.value)}
+                        onChange={async (event: any) => searchUsers(event.target.value)}
                     />
                 </div>
             </nav>
@@ -74,7 +73,7 @@ function MessageStartPage({ user }: any) {
                     </h1>
 
                     {
-                        search && searchedUsers.length <= 0 ? (
+                        search && searchedUsers.length <= 0 && searchedFriends.length <= 0 ? (
                             <h1 className="w-full flex justify-center">No Users Found</h1>
                         ) : (
                             null
@@ -87,7 +86,7 @@ function MessageStartPage({ user }: any) {
                                 return <UserCardMessages key={friend.friendId} user={{
                                     viewingUserId: userId,
                                     viewingUserName: userName,
-                                    viewingUserMessagingId: userData.currentUserData.messagingId,
+                                    viewingUserMessagingId: 'any',
 
                                     userId: friend.friendId,
                                     userName: friend.friendName,
@@ -101,7 +100,7 @@ function MessageStartPage({ user }: any) {
                                 return <UserCardMessages key={blockedUser.userId} user={{
                                     viewingUserId: userId,
                                     viewingUserName: userName,
-                                    vieviwngUserMessagingId: userData.currentUserData.messagingId,
+                                    vieviwngUserMessagingId: 'any',
 
                                     userId: blockedUser.userId,
                                     userName: blockedUser.username,
@@ -125,7 +124,7 @@ function MessageStartPage({ user }: any) {
                             })
 
                         ) : search && queryOption === 'Friends' ? (
-                            searchedUsers.map((searchedFriend: any) => {
+                            searchedFriends.map((searchedFriend: any) => {
                                 return <UserCardMessages key={searchedFriend.friendId} user={{
                                     viewingUserId: userId,
                                     viewingUserName: userName,

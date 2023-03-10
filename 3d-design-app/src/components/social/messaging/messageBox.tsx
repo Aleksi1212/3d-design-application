@@ -1,16 +1,18 @@
 'use client';
 
 import Image, { StaticImageData } from 'next/image'
-import images from '../../functions/importImages';
+import images from '../../../functions/importImages';
 
 import { useReducer, Reducer, useState, useEffect } from 'react'
 
-import useUserData from '../../hooks/userDataHook';
-import useProfileImage from '../../hooks/profileImagehook';
+import useUserData from '../../../hooks/userDataHook';
+import useProfileImage from '../../../hooks/profileImagehook';
 
-import { messageUser, useGetMessages } from '../../datalayer/firestoreFunctions/messageUser';
+import messageUser from '../../../datalayer/firestoreFunctions/messages/sendMessage';
+import useGetMessages from '../../../datalayer/firestoreFunctions/messages/getMessages';
 
-import ProfileBox from '../styledComponents/profileBox';
+import ProfileBox from '../../styledComponents/profileBox';
+import Message from './messageContainer';
 
 interface alertType {
     message: string
@@ -25,27 +27,6 @@ interface messageType {
     messageStatus: string
     messageType: string
     show: boolean
-}
-
-interface profileTypes {
-    profileImage: any
-    errors: Array<string>
-}
-
-interface messageBoxtype {
-    message: string
-    messageDate: string
-    messageId: string
-    messageStatus: string
-    messageType: string
-    sentFromName: string
-    show: boolean
-    profileData: profileTypes
-    profileUrl: string
-}
-
-interface messageDataTypes {
-    messageData: messageBoxtype
 }
 
 function MessageBox({ user }: any) {
@@ -89,6 +70,7 @@ function MessageBox({ user }: any) {
         }
     }
 
+
     useEffect(() => {
         if (alert.top !== '2.5rem') {
             setTimeout(() => {
@@ -111,7 +93,6 @@ function MessageBox({ user }: any) {
                     <ProfileBox styles={{
                         dimensions: '4rem',
                         backgroundColor: 'white',
-                        shadow: 'md',
                         bold: false,
 
                         userName: userName,
@@ -122,8 +103,8 @@ function MessageBox({ user }: any) {
                 </div>
             </nav>
 
-            <div className="w-full h-[91%] bg-[#D2D2D2] flex flex-col px-14 pb-16 justify-end">
-                <div className="w-full flex flex-col max-h-[48rem] overflow-auto pb-5" id="messagesContainer">
+            <div className="w-full h-[91%] bg-[#D2D2D2] flex flex-col pr-14 pb-16 justify-end">
+                <div className="w-full flex flex-col max-h-[48rem] overflow-auto pb-5 pl-14" id="messagesContainer">
                     {
                         messagesData.messages.map((message: messageType) => {
                             if (message.messageType === 'message' && (message.messageStatus === 'sent' || message.messageStatus === 'recieved')) {
@@ -141,67 +122,31 @@ function MessageBox({ user }: any) {
                         })
                     }
                 </div>
+                
+                <div className="pl-14">
+                    <div className="w-full bg-[#F6F7F9] h-[3rem] rounded-xl shadow-lg relative flex items-center">
+                        <div className='w-full h-[3rem]'>
+                            <textarea className="bg-[#F6F7F9] w-full rounded-xl outline-none pl-12 pr-20 py-3 resize-none flex" placeholder={`Message ${userName}`}
+                                rows={rows}
+                                value={message}
+                                
+                                onInput={changeRowCount}
+                                onChange={(event: any) => setMessage(event.target.value)}
+                                onKeyDown={(event: any) => sendMessage(event, message)}
+                            ></textarea>
+                        </div>
 
-                <div className="w-full bg-[#F6F7F9] h-[3rem] rounded-xl shadow-lg relative flex items-center">
-                    <div className='w-full h-[3rem]'>
-                        <textarea className="bg-[#F6F7F9] w-full rounded-xl outline-none pl-12 pr-20 py-3 resize-none flex" placeholder={`Message ${userName}`}
-                            rows={rows}
-                            value={message}
-                            
-                            onInput={changeRowCount}
-                            onChange={(event: any) => setMessage(event.target.value)}
-                            onKeyDown={(event: any) => sendMessage(event, message)}
-                        ></textarea>
-                    </div>
+                        <Image src={images.addImage} alt="addImage" className="absolute left-3" width={25} />
 
-                    <Image src={images.addImage} alt="addImage" className="absolute left-3" width={25} />
-
-                    <div className="flex absolute gap-x-2 right-3">
-                        <Image src={images.addDesign} alt="design" width={25} />
-                        <Image src={images.happy1} alt="emoji" width={25} />
+                        <div className="flex absolute gap-x-2 right-3">
+                            <Image src={images.addDesign} alt="design" width={25} />
+                            <Image src={images.happy1} alt="emoji" width={25} />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     )
-}
-
-function Message({ messageData }: messageDataTypes) {
-    const { message, messageDate, messageId, messageStatus, messageType, sentFromName, profileData, profileUrl, show } = messageData || {}
-
-    if (!show) {
-        return (
-            <div className="flex flex-col w-max -mt-6 mb-6">
-                <div className="ml-14 max-w-[40rem] text-lg flex flex-wrap">
-                    {message}
-                </div>
-            </div>
-        )
-    }
-
-    return (
-        <div className="flex flex-col w-max my-6">
-            <div className="flex gap-x-2">
-                <ProfileBox styles={{
-                    dimensions: '3rem',
-                    backgroundColor: 'white',
-                    shadow: 'none',
-                    bold: true,
-
-                    userName: sentFromName,
-                    info: messageDate,
-                    profileImage: profileData,
-                    profileUrl: profileUrl
-                }} />
-            </div>
-
-            <div className="ml-14 max-w-[40rem] text-lg flex flex-wrap">
-                {message}
-            </div>
-        </div>
-    )
-    
-    
 }
 
 export default MessageBox

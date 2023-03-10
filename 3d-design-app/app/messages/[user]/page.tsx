@@ -1,4 +1,4 @@
-import MessageStartPage from "../../../src/components/social/messageStartpage"
+import MessageStartPage from "../../../src/components/social/messaging/messageStartpage"
 
 
 export default function MessagesStart({ params }: any) {

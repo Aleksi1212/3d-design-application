@@ -14,7 +14,7 @@ interface currentUserTypes {
     messagingId: string
 }
 
-function useRealtimeChanges(userId: string, currentUserId: string, userMessagingId: string) {
+function useRealtimeChanges(userId: string, currentUserId: string) {
     const [friendData, setFriendData] = useState([])
     const [currentUserFriendData, setCurrentUserFriendData] = useState([])
     const [pendingFriends, setPendingFriends] = useState([])

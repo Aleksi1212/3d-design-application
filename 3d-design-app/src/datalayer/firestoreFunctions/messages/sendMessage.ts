@@ -1,13 +1,8 @@
-import { db } from "../config"
-import { query, collection, where, getDocs, doc, setDoc, updateDoc, arrayUnion, collectionGroup, onSnapshot } from "firebase/firestore"
+import { db } from "../../config"
+import { query, collection, where, collectionGroup, getDocs, doc, setDoc, updateDoc, arrayUnion } from "firebase/firestore"
 
-import { generateId } from "../otherFunctionality"
-import images from "../../functions/importImages"
-
-import { useEffect, useState } from "react"
-import { StaticImageData } from "next/image"
-
-import useUserData from "../../hooks/userDataHook"
+import { generateId } from "../../otherFunctionality"
+import images from "../../../functions/importImages"
 
 async function messageUser(senderMessagingId: string, recieverMessagingId: string, senderUserId: string, recieverUserId: string, senderName: string, recieverName: string, message: string, type: string) {
     try {
@@ -87,7 +82,7 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
         }
     
         if (type === 'start' && docsData.sentMessagesData.length <= 0) {
-            const addMessageHistoryPromise = await Promise.allSettled([
+            const addMessageHistory = await Promise.allSettled([
                 setDoc(docRefs.sender_sent_docRef, {
                     messagesData: [
                         {
@@ -102,7 +97,8 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     sentFrom: senderMessagingId,
                     recievedBy: recieverMessagingId,
                     userId: senderUserId,
-                    type: 'sender'
+                    type: 'sender',
+                    showHistory: true
                 }),
     
                 setDoc(docRefs.reciever_recieved_docRef, {
@@ -136,7 +132,8 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     sentFrom: recieverMessagingId,
                     recievedBy: senderMessagingId,
                     userId: recieverUserId,
-                    type: 'sender'
+                    type: 'sender',
+                    showHistory: true
                 }),
     
                 setDoc(docRefs.sender_recieved_docRef, {
@@ -157,13 +154,24 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                 })
             ])
     
-            return addMessageHistoryPromise[0].status === 'fulfilled' ? {
+            return addMessageHistory[0].status === 'fulfilled' ? {
                 message: 'Success', image: images.success, type: 'success'
             } : {
-                message: addMessageHistoryPromise[0].reason.message, image: images.error, type: addMessageHistoryPromise[0].reason.constructor.name
+                message: addMessageHistory[0].reason.message, image: images.error, type: addMessageHistory[0].reason.constructor.name
             }
+
         } else {
-            return { message: 'Success', image: images.success, type: 'success' }
+            const setVisibility = await Promise.allSettled([
+                updateDoc(docRefs.sender_sent_docRef, {
+                    'showHistory': true
+                })
+            ])
+
+            return setVisibility[0].status === 'fulfilled' ? {
+                message: 'Success', image: images.success, type: 'success'
+            } : {
+                message: setVisibility[0].reason.message, image: images.error, type: setVisibility[0].reason.constructor.name
+            }
         }
 
     } catch(err) {
@@ -171,61 +179,4 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
     }
 }
 
-interface messageType {
-    message: string
-    messageDate: string
-    messageId: string
-    messageStatus: string
-    messageType: string
-    show: boolean
-}
-
-function useGetMessages(messagingId: string, userId: string) {
-    const [sentMessages, setSentMessages] = useState<Array<messageType>>([])
-    const [recievedMessages, setRecievedMessages] = useState<Array<messageType>>([])
-
-    const senderUserData = useUserData({ type: 'userId', id: userId })
-
-    useEffect(() => {
-        const sentMessagesQuery = query(collectionGroup(db, 'messages'), where('recievedBy', '==', messagingId), where('userId', '==', userId))
-        const recievedMessagesQuery = query(collectionGroup(db, 'messages'), where('sentFrom', '==', messagingId), where('userId', '==', userId))
-
-        const getSentMessages = onSnapshot(sentMessagesQuery, (querySnapshot) => {
-            let sentMessages: Array<messageType> = []
-
-            querySnapshot.forEach((sentMessage) => {
-                sentMessages = sentMessage.data().messagesData
-            })
-
-            setSentMessages(sentMessages)
-        })
-
-        const getRecievedMessages = onSnapshot(recievedMessagesQuery, (querySnapshot) => {
-            let recievedMessages: Array<messageType> = []
-
-            querySnapshot.forEach((recievedMessage) => {
-                recievedMessages = recievedMessage.data().messagesData
-            })
-
-            setRecievedMessages(recievedMessages)
-        })
-
-        return () => {
-            getSentMessages()
-            getRecievedMessages()
-        }
-    }, [])
-
-    const messagesMerged = sentMessages.concat(recievedMessages)
-
-    return {
-        messages: messagesMerged.sort((a: messageType, b: messageType) => new Date(Date.parse(a.messageDate)).getTime() - new Date(Date.parse(b.messageDate)).getTime()),
-        senderUserData: senderUserData
-    }
-
-}
-
-export {
-    messageUser,
-    useGetMessages
-}
+export default messageUser

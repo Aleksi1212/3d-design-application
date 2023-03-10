@@ -17,7 +17,7 @@ import acceptFriendRequest from '../../datalayer/firestoreFunctions/acceptFriend
 function Notifications({ user }: any) {
     const { currentUserId, userName } = user || {}
 
-    const friendRequests = useRealtimeChanges(currentUserId, currentUserId, '')
+    const friendRequests = useRealtimeChanges(currentUserId, currentUserId)
 
     // const [pendingFriends, setPendingFriends] = useState([])
 
