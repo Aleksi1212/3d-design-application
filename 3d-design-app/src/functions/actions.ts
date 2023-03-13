@@ -1,32 +1,59 @@
-import updateFriendOrUser from "../datalayer/firestoreFunctions/updateFriendOrUser";
+// import updateFriendOrUser from "../datalayer/firestoreFunctions/updateFriendOrUser";
 import images from "./importImages";
+import UpdateFriendOrUser from "../datalayer/firestoreFunctions/updateFriendOrUser";
 
-function userActions(userId: string, currentUserName: string, currentUserMessagingId: string, userName: string, messagingId: string, currenUserId: string, userState: any, blocked: boolean) {    
-    const actions = userId === currenUserId ? [
-        { image: images.message, color: '#5D5D5D', message: 'Messages', key: 'messagees', type: 'link', action: null, params: `/messages/${currenUserId}=${currentUserName}_${currentUserMessagingId}` },
-        { image: images.friendNoti, color: '#5D5D5D', message: 'Notifications', key: 'notifications', type: 'link', action: null, params: `/notifications/${currenUserId}=${currentUserName}` },
-        { image: images.settings, color: '#5D5D5D', message: 'Settings', key: 'edit', type: 'link', action: null, params: null },
-        { image: images.signOut, color: '#FA5252', message: 'Sign Out', key: 'signOut', type: '', action: null, params: null}
+function profileHeaders(userId: string, currentUserName: string, currentUserMessagingId: string, userName: string, messagingId: string, currentUserId: string, blocked: boolean) {    
+    const actions = userId === currentUserId ? [
+        { image: images.message, color: '#5D5D5D', message: 'Messages', key: 'messagees', type: 'link', link: `/messages/${currentUserId}=${currentUserName}_${currentUserMessagingId}` },
+        { image: images.friendNoti, color: '#5D5D5D', message: 'Notifications', key: 'notifications', type: 'link', link: `/notifications/${currentUserId}=${currentUserName}` },
+        { image: images.settings, color: '#5D5D5D', message: 'Settings', key: 'edit', type: 'link', link: null },
+        { image: images.signOut, color: '#FA5252', message: 'Sign Out', key: 'signOut', type: '', link: null}
         
     ] : !blocked ? [
-        { image: images.message, color: '#5D5D5D', message: 'Message', key: 'message', type: '', action: null, prams: null},
+        { image: images.message, color: '#5D5D5D', message: 'Message', key: 'message', type: '', link: null},
+        { image: images.addFriend, color: '#40C057', message: 'Add', key: 'add', type: 'func', link: null},
+        { image: images.block, color: '#FA5252', message: 'Block', key: 'block', type: 'func', link: null}
 
-        { image: images.addFriend, color: '#40C057', message: 'Add', key: 'add', type: 'func', action: updateFriendOrUser, params: {
-            userId: currenUserId, userName: currentUserName, action: 'add', friendId: userId, friendName: userName, friendMessagingId: messagingId,
-            userMessagingId: currentUserMessagingId, friendOrUser: 'friend', state: null, blockedUser: null, image: null
-        } },
-        { image: images.block, color: '#FA5252', message: 'Block', key: 'block', type: 'func', action: updateFriendOrUser, params: {
-            userId: currenUserId, userName: null, action: 'block', friendId: null, friendName: null, friendMessagingId: null,
-            userMessagingId: null, friendOrUser: 'user', state: null, blockedUser: userId, image: null
-        } }
     ] : [
-        { image: images.block, color: '#FA5252', message: 'Unblock', key: 'unblock', type: 'func', action: updateFriendOrUser, params: {
-            userId: currenUserId, userName: null, action: 'unBlock', friendId: null, friendName: null, friendMessagingId: null,
-            userMessagingId: null, friendOrUser: 'user', state: null, blockedUser: userId, image: null
-        } }
+        { image: images.block, color: '#FA5252', message: 'Unblock', key: 'unblock', type: 'func', link: null}
     ]
 
-    return actions
+    const params = { 
+        userId: currentUserId, userName: currentUserName, userMessagingId: currentUserMessagingId,
+        friendId: userId, friendName: userName, friendMessagingId: messagingId, blockedUserId: userId
+    }
+
+    return {
+        actions: actions,
+        params: params
+    }
 }
 
-export default userActions
+async function profileActions(userId: string, userName: string, userMessagingId: string, friendId: string, friendName: string, friendMessagingId: string, blockedUserId: string, method: string) {
+    const initializeActions = await UpdateFriendOrUser.createDocId(userId)
+
+    if (method === 'remove') {
+        const removeFriend = await initializeActions.removeFriend(userId, friendId)
+        return removeFriend
+
+    } else if (method === 'add') {
+        const sendFriendRequest = await initializeActions.sendFriendRequest(userId, userName, userMessagingId, friendId, friendName, friendMessagingId)
+        return sendFriendRequest
+
+    } else if (method === 'block') {
+        const blockUser = await initializeActions.blockUser(blockedUserId, userId)
+        return blockUser
+
+    } else if (method === 'unblock') {
+        const unBlockUser = await initializeActions.unBlockUser(blockedUserId)
+        return unBlockUser
+    }
+
+    return { message: 'error', image: images.error, type: 'error' }
+}
+
+
+export {
+    profileHeaders,
+    profileActions
+}

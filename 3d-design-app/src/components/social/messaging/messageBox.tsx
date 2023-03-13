@@ -1,6 +1,7 @@
 'use client';
 
 import Image, { StaticImageData } from 'next/image'
+import Link from 'next/link';
 import images from '../../../functions/importImages';
 
 import { useReducer, Reducer, useState, useEffect } from 'react'
@@ -79,6 +80,7 @@ function MessageBox({ user }: any) {
         }
     }, [alert])
 
+
     return (
         <div className="h-full w-[80%] flex flex-col">
             <div className="absolute left-[50%] w-[15rem] h-[2rem] bg-[#3D3D3D] rounded-lg pl-2 flex items-center text-white transition-all duration-500"
@@ -88,7 +90,7 @@ function MessageBox({ user }: any) {
                 <h1>{alert.message}</h1>
             </div>
 
-            <nav className="w-ful h-[9%] bg-[#F6F7F9] flex items-center pl-5">
+            <nav className="w-ful h-[9%] bg-[#F6F7F9] flex justify-between items-center pl-5 pr-20">
                 <div className="flex gap-x-4">
                     <ProfileBox styles={{
                         dimensions: '4rem',
@@ -101,6 +103,10 @@ function MessageBox({ user }: any) {
                         profileUrl: profileUrl.profileUrl
                     }} />
                 </div>
+                
+                <Link href={`/messages/${viewingUserId}=${viewingUserName}_${viewingUserMessagingId}`} className="w-[10rem] h-[80%] flex justify-center items-center rounded-md hover:bg-[#D9D9D9] bg-white shadow-md">
+                    Friend List
+                </Link>
             </nav>
 
             <div className="w-full h-[91%] bg-[#D2D2D2] flex flex-col pr-14 pb-16 justify-end">

@@ -7,7 +7,8 @@ import { useState, useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
 
 import images from "../../functions/importImages";
-import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
+// import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
+import UpdateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
 
 import { db } from "../../datalayer/config";
 import { query, collectionGroup, where, onSnapshot, collection } from "firebase/firestore";
@@ -34,6 +35,7 @@ function UserCard({ user }: any) {
     const [profileUrl, setProfileUrl] = useState<Array<string>>([''])
     const profileImage = useProfileImage(profileUrl[0])
 
+    const [userMethods, setUserMethods] = useState<UpdateFriendOrUser>(new UpdateFriendOrUser('initialDocId'))
     const userData = useUserData(usersId, viewingUser)
 
     function reducer(state: any, action: payloadType) {
@@ -53,6 +55,8 @@ function UserCard({ user }: any) {
     const [state, dispatch] = useReducer(reducer, { overUser: false, overMenu: false, clicked: false, children: 3 } as reducerType)
 
     useEffect(() => {
+        let isMounted = true
+
         const blockedQue = query(collectionGroup(db, 'blockedUsers'), where('blockedusers', 'array-contains', usersId), where('user', '==', viewingUser))
         const seeIfBlocked = onSnapshot(blockedQue, (querySnapshot) => {
             let blocked: any = []
@@ -73,9 +77,20 @@ function UserCard({ user }: any) {
             setProfileUrl(imageUrl)
         })
 
+        async function initializeClass() {
+            const updateUser = await UpdateFriendOrUser.createDocId(viewingUser)
+            
+            if (isMounted) {
+                setUserMethods(updateUser)
+            }
+        }
+
+        initializeClass()
+
         return () => {
             seeIfBlocked()
             getProfileImage()
+            isMounted = false
         }
     }, [])
 
@@ -142,13 +157,18 @@ function UserCard({ user }: any) {
                                 borderBottom: viewingUser === usersId ? '0px' : '2px solid lightgray',
                                 borderBottomLeftRadius: viewingUser === usersId ? '.375rem' : '0', borderBottomRightRadius: viewingUser === usersId ? '.375rem' : '0'
                             }}
-                            onClick={() => {
-                                if (secondaryAction.action === 'add' || secondaryAction.action === 'remove') {
-                                    updateFriendOrUser({
-                                        userId: viewingUser, userName: userData.currentUserData.username, action: secondaryAction.action, friendId: usersId, friendName: usersName,
-                                        friendMessagingId: messagingId, userMessagingId: userData.currentUserData.messagingId, friendOrUser: 'friend', state: null,
-                                        blockedUser: null, image: null
-                                    })
+                            onClick={async () => {
+                                if (secondaryAction === 'add') {
+                                    const sendFriendRequest = await userMethods.sendFriendRequest(
+                                        viewingUser, userData.currentUserData.username, userData.currentUserData.messagingId,
+                                        usersId, usersName, messagingId
+                                    )
+
+                                    console.log(sendFriendRequest)
+
+                                } else if (secondaryAction === 'remove') {
+                                    const removeFriend = await userMethods.removeFriend(viewingUser, usersId)
+                                    console.log(removeFriend)
                                 }
                             }}>
                             {secondaryAction.message}</button>
@@ -160,19 +180,13 @@ function UserCard({ user }: any) {
                     {
                         viewingUser !== usersId ? (
                             <button className="w-full h-[2rem] rounded-bl-md rounded-br-md hover:bg-[#FA5252]"
-                            onClick={() => {
+                            onClick={async () => {
                                 if (blockable) {
-                                    updateFriendOrUser({
-                                        userId: viewingUser, userName: null, action: 'block', friendId: null, friendName: null,
-                                        friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null,
-                                        blockedUser: usersId, image: null
-                                    })
+                                    const blockUser = await userMethods.blockUser(usersId, viewingUser)
+                                    console.log(blockUser)
                                 } else {
-                                    updateFriendOrUser({
-                                        userId: viewingUser, userName: null, action: 'unBlock', friendId: null, friendName: null,
-                                        friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null,
-                                        blockedUser: usersId, image: null
-                                    })
+                                    const unBlockUser = await userMethods.unBlockUser(usersId)
+                                    console.log(unBlockUser)
                                 }
                             }}>{ blockable ? 'Block User' : 'Unblock User' }</button>
                         ) : (

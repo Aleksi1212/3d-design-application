@@ -47,12 +47,19 @@ function Message({ messageData }: messageDataTypes) {
                 >
                     <p id="messageDate" className="scale-0 absolute text-xs left-[-5rem] top-[.45rem] w-[4.5rem] text-center opacity-70">{messageDate.split(', ')[1]}</p>
                     
-                    <button className="absolute right-[-2rem] w-[2rem] flex justify-center items-center pt-1" style={{ scale: hoverState.hovered ? '1' : '0' }}
+                    <button className="absolute right-[-2rem] w-[2rem] flex justify-center items-center pt-1" style={{ scale: hoverState.hovered && !hoverState.clicked ? '1' : '0' }}
                         onMouseEnter={() => setHoverState({ hovered: true, clicked: hoverState.clicked })}
                         onClick={() => setHoverState({ hovered: hoverState.hovered, clicked: true })}
                     >
                         <Image src={images.docRemove} alt="remove" width={20} height={20} />
                     </button>
+
+                    <div className="absolute bg-[#5D5D5D] flex h-5 rounded-lg right-[-12.5rem] top-1 text-xs text-[#F6F7F9]"
+                        style={{ scale: hoverState.clicked ? '1' : '0' }}
+                    >
+                        <button className="w-[6rem] hover:opacity-70 rounded-l-md border-r">From Myself</button>
+                        <button className="w-[6rem] hover:opacity-70 rounded-r-md">From Everyone</button>
+                    </div>
 
                     {
                         message.split('\n').map((value: string, index: number, arr: Array<string>) => {
@@ -68,7 +75,7 @@ function Message({ messageData }: messageDataTypes) {
     }
 
     return (
-        <div className="flex flex-col w-max my-6 relative">
+        <div className="flex flex-col w-max my-6">
             <div className="flex gap-x-2">
                 <ProfileBox styles={{
                     dimensions: '3rem',
@@ -82,20 +89,22 @@ function Message({ messageData }: messageDataTypes) {
                 }} />
             </div>
 
-            <div className="ml-14 max-w-[60rem] text-lg" style={{ overflowWrap: 'break-word' }}
+            <div className="ml-14 max-w-[60rem] text-lg relative" style={{ overflowWrap: 'break-word' }}
                 onMouseEnter={() => setHoverState({ hovered: true, clicked: hoverState.clicked })}
                 onMouseLeave={() => setHoverState({ hovered: false, clicked: false })}
             >
-                <button className="absolute right-[-2rem] w-[2rem] flex justify-center items-center pt-1" style={{ scale: hoverState.hovered ? '1' : '0' }}
+                <button className="absolute right-[-2rem] w-[2rem] flex justify-center items-center pt-1" style={{ scale: hoverState.hovered && !hoverState.clicked ? '1' : '0' }}
                     onMouseEnter={() => setHoverState({ hovered: true, clicked: hoverState.clicked })}
                     onClick={() => setHoverState({ hovered: hoverState.hovered, clicked: true })}
                 >
                     <Image src={images.docRemove} alt="remove" width={20} height={20} />
                 </button>
 
-                <div className="absolute bg-[#5D5D5D] flex px-2 h-5 gap-x-2 rounded-md right-[-11rem] text-xs text-[#F6F7F9]">
-                    <button>From Myself</button>
-                    <button>From Everyone</button>
+                <div className="absolute bg-[#5D5D5D] flex h-5 rounded-lg right-[-12.5rem] top-1 text-xs text-[#F6F7F9]"
+                    style={{ scale: hoverState.clicked ? '1' : '0' }}
+                >
+                    <button className="w-[6rem] hover:opacity-70 rounded-l-md border-r">From Myself</button>
+                    <button className="w-[6rem] hover:opacity-70 rounded-r-md">From Everyone</button>
                 </div>
 
                 {

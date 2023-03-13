@@ -3,7 +3,8 @@
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
-import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
+// import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
+import UpdateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
 
 import { useEffect, useState } from "react";
 import { useRouter } from 'next/navigation'
@@ -15,7 +16,7 @@ import SearchUsers from "./searchBox";
 import UserCard from "./userCardProfile";
 import AuthBox from "../authentication/authenticationBox";
 
-import userActions from "../../functions/actions";
+import { profileHeaders, profileActions } from "../../functions/actions";
 import images from "../../functions/importImages";
 
 interface alertType {
@@ -31,12 +32,14 @@ function ProfilePage({ user }: any) {
 
     const userData = useRealtimeChanges(userId, currentUser.userId)
     const profileImage = useProfileImage(userData.profileUrl)
-    const actions = userActions(userId, userData.currentUserData.username, userData.currentUserData.messagingId, userName, userData.messagingId, currentUser.userId, userData.userLocked.state, userData.blocked )
+    const profile_Headers = profileHeaders(userId, userData.currentUserData.username, userData.currentUserData.messagingId, userName, userData.messagingId, currentUser.userId, userData.blocked )
     
     const [alert, setAlert] = useState<alertType>({ message: 'ok', image: images.success, top: '-2.5rem' })
     const [logIn, setLogIn] = useState<string>('none')
     const [loading, setLoading] = useState<boolean>(false)
     const [hovered, setHovered] = useState<boolean>(false)
+
+    const [profileMethods, setProfileMethods] = useState<UpdateFriendOrUser>(new UpdateFriendOrUser('initialDocId'))
 
     let currentUserFriends: any = []
     userData.currentUserFriendData.map((friend: any) => {
@@ -50,6 +53,26 @@ function ProfilePage({ user }: any) {
             }, 2000)
         }
     }, [alert])
+    
+
+    useEffect(() => {
+        let isMounted = true
+
+        async function initializeClass() {
+            const updateProfile = await UpdateFriendOrUser.createDocId(userId)
+
+            if (isMounted) {
+                setProfileMethods(updateProfile)
+            }
+        }
+
+        initializeClass()
+
+        return () => {
+            isMounted = false
+        }
+    }, [])
+
 
     return (
         <>
@@ -122,15 +145,10 @@ function ProfilePage({ user }: any) {
                                         <input type="file" className="hidden" accept="image/png, image/jpeg" onChange={async (e: any) => {
                                             if (e.target.files.length > 0) {
                                                 setLoading(true)
-                                                
-                                                const changeImageResult = await updateFriendOrUser({ 
-                                                    userId: currentUser.userId, userName: null, action: 'updateProfile', friendId: null, friendName: null,
-                                                    friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null, blockedUser: null,
-                                                    image: e.target.files[0]
-                                                })
-                                                
+                                                const changeImageResult = await profileMethods.updateProfilePicture(e.target.files[0])
                                                 setLoading(false)
-                                                setAlert({ message: changeImageResult?.message, image: changeImageResult?.image, top: '1.25rem' })
+
+                                                setAlert({ message: changeImageResult.message, image: changeImageResult.image, top: '1.25rem' })
                                             }
                                         }} />
                                     </label>
@@ -146,20 +164,25 @@ function ProfilePage({ user }: any) {
                             <h1 className="text-3xl">{userName}</h1>
                             <div className="flex justify-center relative gap-x-5" style={{ width: 'calc(100% + 20px)' }}>
                                 {
-                                    actions.map((action: any) => {
+                                    profile_Headers.actions.map((action: any) => {
                                         return (
                                             <button id="profileAction" className="relative" key={action.key}
                                             onClick={async () => {
-                                                if (action.type === 'func') {
-                                                    const alert = await action.action(action.params)
-                                                    
-                                                    if (alert.type === 'FirebaseError') {
+                                                if (action.type !== 'func') {
+                                                    router.push(action.link)
+
+                                                } else {
+                                                    const profileActionResult = await profileActions(
+                                                        profile_Headers.params.userId, profile_Headers.params.userName, profile_Headers.params.userMessagingId,
+                                                        profile_Headers.params.friendId, profile_Headers.params.friendName, profile_Headers.params.friendMessagingId,
+                                                        profile_Headers.params.blockedUserId, action.key
+                                                    )
+
+                                                    if (profileActionResult.type ==='FirebaseError') {
                                                         setLogIn('flex')
                                                     } else {
-                                                        setAlert({ message: alert.message, image: alert.image, top: '1.25rem' })
+                                                        setAlert({ message: profileActionResult.message, image: profileActionResult.image, top: '1.25rem' })
                                                     }
-                                                } else {
-                                                    router.push(action.params)
                                                 }
                                             }}>
                                                 {

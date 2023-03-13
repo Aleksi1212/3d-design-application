@@ -1,154 +1,201 @@
-import { db, storage } from "../config"
+import { db, storage } from "../config";
 import { query, collection, collectionGroup, where, getDocs, doc, getDoc, deleteDoc, updateDoc, setDoc, arrayUnion, arrayRemove  } from "firebase/firestore"
 import { ref, uploadBytes, deleteObject } from "firebase/storage"
 
-import images from "../../functions/importImages"
-import { generateId } from "../otherFunctionality"
+import images from "../../functions/importImages";
+import { generateId } from "../otherFunctionality";
 
-async function updateFriendOrUser(friendOrUserData: any) {
-    const que = query(collection(db, 'data'), where('userId', '==', friendOrUserData.userId !== null ? friendOrUserData.userId : 'errorid'))
-    const querySnapshot = await getDocs(que)
-    const docId = querySnapshot.docs.map((doc) => doc.id)
+import { StaticImageData } from "next/image";
 
-    // remove friend
-    if (friendOrUserData.action === 'remove' && friendOrUserData.friendOrUser === 'friend') {
-        const friendsDocRef = doc(db, 'data', docId[0], 'friends', friendOrUserData.friendId)
+interface returnType {
+    message: string
+    image: StaticImageData
+    type: string
+}
 
-        const docExists = await getDoc(friendsDocRef)
-        
-        if (docExists.data()) {
-            const userQuery = query(collection(db, 'data'), where('userId', '==', friendOrUserData.friendId))
-            const userQuerySnapshot = await getDocs(userQuery)
-            const userDocId = userQuerySnapshot.docs.map((doc) => doc.id)
 
-            const userDocRef = doc(db, 'data', userDocId[0], 'friends', friendOrUserData.userId)
+class UpdateFriendOrUser {
+    docId: string
 
-            const removeFriendPromise = await Promise.allSettled([
+    static async createDocId(userId: string) {
+        const userQuery = query(collection(db, 'data'), where('userId', '==', userId))
+        const userQuerySnapshot = await getDocs(userQuery)
+        const docId = userQuerySnapshot.docs.map((doc) => doc.id)
+
+        return new UpdateFriendOrUser(docId[0])
+    }
+
+    constructor(docId: string) {
+        this.docId = docId
+    }
+
+
+    // method to remove friend
+    async removeFriend(userId: string, friendId: string) {
+        try {
+            const friendQuery = query(collection(db, 'data'), where('userId', '==', friendId))
+            const friendQuerySnapshot = await getDocs(friendQuery)
+            const friendDocId = friendQuerySnapshot.docs.map((doc) => doc.id)
+
+            const friendsDocRef = doc(db, 'data', this.docId, 'friends', friendId)
+            const userDocRef = doc(db, 'data', friendDocId[0], 'friends', userId)
+
+
+            const removeFriend = await Promise.allSettled([
                 deleteDoc(friendsDocRef),
                 deleteDoc(userDocRef)
             ])
 
-            return removeFriendPromise[0].status === 'fulfilled' ? { 
-                message: 'Friend Removed', image: images.success, type: 'success' 
-            } : { 
-                message: removeFriendPromise[0].reason.message, image: images.error, type: removeFriendPromise[0].reason.constructor.name 
+            return (
+                removeFriend[0].status == 'fulfilled' ? {
+                    message: 'Friend Removed', image: images.success, type: 'success'
+                } : {
+                    message: removeFriend[0].reason.message, image: images.error, type: removeFriend[0].reason.constructor.name
+                }
+            ) as returnType
+
+        } catch(err: any) {
+            return { message: 'Error Removing Friend', image: images.error, type: err.constructor.name } as returnType
+        }
+    }
+
+
+    // method to send friend request
+    async sendFriendRequest(userId: string, userName: string, userMessagingId: string, friendId: string, friendName: string, friendMessagingId: string) {
+        try {
+            const friendQuery = query(collection(db, 'data'), where('userId', '==', friendId))
+            const friendQuerySnapshot = await getDocs(friendQuery)
+            const friendDocId = friendQuerySnapshot.docs.map((doc) => doc.id)
+            
+            const userDocRef = doc(db, 'data', this.docId, 'friends', friendId)
+            const friendDocRef = doc(db, 'data', friendDocId[0], 'friendRequests', userId)
+
+            const addFriend = await Promise.allSettled([
+                setDoc(userDocRef, {
+                    friendData: {
+                        friendId: friendId,
+                        friendName: friendName,
+                        messagingId: friendMessagingId
+                    },
+                    user: userId,
+                    state: 'pending'
+                }),
+
+                setDoc(friendDocRef, {
+                    requestData: {
+                        requestFromId: userId,
+                        requestFromName: userName,
+                        messagingId: userMessagingId
+                    },
+                    sentTo: friendId
+                })
+            ])
+
+            return (
+                addFriend[0].status === 'fulfilled' ? {
+                    message: 'Friend Request Sent', image: images.success, type: 'success'
+                } : {
+                    message: addFriend[0].reason.message, image: images.error, type: addFriend[0].reason.constructor.name
+                }
+            ) as returnType
+
+        } catch(err: any) {
+            return { message: 'Error Sending Friend Request', image: images.error, type: err.constructor.name  } as returnType
+        }
+    }
+
+
+    // method to change users visibility
+    async updateUserState(state: boolean) {
+        try {
+            const userDocRef = doc(db, 'data', this.docId)
+            const update_UserState = await Promise.allSettled([
+                updateDoc(userDocRef, {
+                    'locked': state
+                })
+            ])
+
+            return (
+                update_UserState[0].status === 'fulfilled' ? {
+                    message: state ? 'Profile Locked' : 'Profile Unlocked', image: images.success, type: 'success'
+                } : {
+                    message: update_UserState[0].reason.message, image: images.error, type: update_UserState[0].reason.constructor.name
+                }
+            ) as returnType
+
+        } catch(err: any) {
+            return { message: state ? 'Error locking Profile' : 'Error Unlocking Profile', image: images.error, type: err.constructor.name } as returnType
+        }
+    }
+
+
+    // method to block user
+    async blockUser(blockedUserId: string, userId: string) {
+        try {
+            const blockedDocRef_1 = doc(db, 'data', this.docId, 'blockedUsers', 'blocked')
+            const blockedDocRef_2 = doc(db, 'data', this.docId, 'blockedUsers', blockedUserId)
+
+            const friendDoc = doc(db, 'data', this.docId, 'friends', blockedUserId)
+
+            const friendQuery = query(collectionGroup(db, 'friends'), where('friendData.friendId', '==', blockedUserId))
+            const blockedUserQuery = query(collection(db, 'data'), where('userId', '==', blockedUserId))
+
+            const friendQuerySnapshot = await getDocs(friendQuery)
+            const friendExists = friendQuerySnapshot.docs.map((doc) => doc.data())
+
+            if (friendExists.length > 0) {
+                this.removeFriend(userId, blockedUserId)
             }
 
-        } else {
-            return { message:'Friend Not Found', image: images.error, type: 'unkown error' }
-        }
-        
-    // send friend request
-    } else if (friendOrUserData.action === 'add' && friendOrUserData.friendOrUser === 'friend') {
-        const friendQue = query(collection(db, 'data'), where('userId', '==', friendOrUserData.friendId))
-        const newquerySnapshot = await getDocs(friendQue)
-        const friendDocId = newquerySnapshot.docs.map((doc) => doc.id)
-
-        const docRef = doc(db, 'data', docId[0], 'friends', friendOrUserData.friendId)
-        const friendDocRef = doc(db, 'data', friendDocId[0], 'friendRequests', friendOrUserData.userId !== null ? friendOrUserData.userId : 'errorid')
-
-        const addFriendPromise = await Promise.allSettled([
-            setDoc(docRef, {
-                friendData: {
-                    friendId: friendOrUserData.friendId,
-                    friendName: friendOrUserData.friendName,
-                    messagingId: friendOrUserData.friendMessagingId
-                },
-                user: friendOrUserData.userId,
-                state: 'pending'
-            }),
-
-            setDoc(friendDocRef, {
-                requestData: {
-                    requestFromId: friendOrUserData.userId,
-                    requestFromName: friendOrUserData.userName,
-                    messagingId: friendOrUserData.userMessagingId
-                },
-                sentTo: friendOrUserData.friendId
-            })
-        ])
     
-        return addFriendPromise[0].status === 'fulfilled' ? {
-            message: 'Friend Request Sent', image: images.success, type: 'success'
-        } : {
-            message: addFriendPromise[0].reason.message, image: images.error, type: addFriendPromise[0].reason.constructor.name
-        }
-        
-    // lock profile so that only friends can view it
-    } else if (friendOrUserData.action === 'update' && friendOrUserData.friendOrUser === 'user') {
-        const docRef = doc(db, 'data', docId[0])
-
-        const updateStatePromise = await Promise.allSettled([
-            updateDoc(docRef, {
-                'locked': friendOrUserData.state
+            const userQuerySnapshot = await getDocs(blockedUserQuery)
+            const blockedUserData = userQuerySnapshot.docs.map((doc) => doc.exists() ? doc.data() : {
+                messagingId: '',
+                email: '',
+                method: '',
+                userName: '',
+                locked: false,
+                profileUrl: '',
+                userId: ''
             })
-        ])
 
-        if (updateStatePromise[0].status === 'fulfilled') {
-            return { message: friendOrUserData.state ? 'Succesfully Locked' : 'Succesfully Unlocked', image: images.success, type: 'success' }
-        }
-        return { message: updateStatePromise[0].reason.message, image: images.error, type: updateStatePromise[0].reason.constructor.name }
+            const block_User = await Promise.allSettled([
+                updateDoc(blockedDocRef_1, {
+                    'blockedusers': arrayUnion(blockedUserId)
+                }),
+    
+                setDoc(blockedDocRef_2, {
+                    blockedBy: userId,
+                    blockedUserData: {
+                        messagingId: blockedUserData[0].messagingId,
+                        profileUrl: blockedUserData[0].profileUrl,
+                        userId: blockedUserData[0].userId,
+                        username: blockedUserData[0].username
+                    }
+                }),
+    
+                friendExists.length > 0 ?
+                deleteDoc(friendDoc) : null
+            ])
 
-    // block user
-    } else if (friendOrUserData.action === 'block' && friendOrUserData.friendOrUser === 'user') {
-        const blockedDocRef_1 = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
-        const blockedDocRef_2 = doc(db, 'data', docId[0], 'blockedUsers', friendOrUserData.blockedUser)
 
-        const friendDoc = doc(db, 'data', docId[0], 'friends', friendOrUserData.blockedUser)
+            if (block_User[0].status === 'fulfilled') {
+                return { message: 'User Blocked Succesfully', image: images.success, type: 'success' } as returnType
+            }
 
-        const friendQuery = query(collectionGroup(db, 'friends'), where('friendData.friendId', '==', friendOrUserData.blockedUser))
-        const userQuery = query(collection(db, 'data'), where('userId', '==', friendOrUserData.blockedUser))
-
-        const friendQuerySnapshot = await getDocs(friendQuery)
-        const friendExists = friendQuerySnapshot.docs.map((doc) => doc.data())
-
-        const userQuerySnapshot = await getDocs(userQuery)
-        const userData = userQuerySnapshot.docs.map((doc) => doc.exists() ? doc.data() : {
-            messagingId: '',
-            email: '',
-            method: '',
-            userName: '',
-            locked: false,
-            profileUrl: '',
-            userId: ''
-        })
-
-        const blockUserPromise = await Promise.allSettled([
-            updateDoc(blockedDocRef_1, {
-                'blockedusers': arrayUnion(friendOrUserData.blockedUser)
-            }),
-
-            setDoc(blockedDocRef_2, {
-                blockedBy: friendOrUserData.userId,
-                blockedUserData: {
-                    messagingId: userData[0].messagingId,
-                    profileUrl: userData[0].profileUrl,
-                    userId: userData[0].userId,
-                    username: userData[0].username
-                }
-            }),
-
-            friendExists.length > 0 ?
-            deleteDoc(friendDoc) : null
-        ])
-
-        if (blockUserPromise[0].status === 'fulfilled') {
-            return { message: 'User Blocked', image: images.success, type: 'success' }
-
-        } else if (blockUserPromise[0].status === 'rejected') {
-            const setBlockedUserPromise = await Promise.allSettled([
+            const setBlockeduser = await Promise.allSettled([
                 setDoc(blockedDocRef_1, {
-                    blockedusers: [friendOrUserData.blockedUser],
-                    user: friendOrUserData.userId
+                    blockedusers: [blockedUserId],
+                    user: userId
                 }),
 
                 setDoc(blockedDocRef_2, {
-                    blockedBy: friendOrUserData.userId,
+                    blockedBy: userId,
                     blockedUserData: {
-                        messagingId: userData[0].messagingId,
-                        profileUrl: userData[0].profileUrl,
-                        userId: userData[0].userId,
-                        username: userData[0].username
+                        messagingId: blockedUserData[0].messagingId,
+                        profileUrl: blockedUserData[0].profileUrl,
+                        userId: blockedUserData[0].userId,
+                        username: blockedUserData[0].username
                     }
                 }),
 
@@ -156,73 +203,92 @@ async function updateFriendOrUser(friendOrUserData: any) {
                 deleteDoc(friendDoc) : null
             ])
 
-            return setBlockedUserPromise[0].status === 'fulfilled' ? { 
-                message: 'User Blocked', image: images.success, type: 'success' 
-            } : { 
-                message: setBlockedUserPromise[0].reason.message, image: images.error, type: setBlockedUserPromise[0].reason.constructor.name
-            }
+            return (
+                setBlockeduser[0].status === 'fulfilled' ? {
+                    message: 'User Blocked Succesfully', image: images.success, type: 'success'
+                } : {
+                    message: setBlockeduser[0].reason.message, image: images.error, type: setBlockeduser[0].reason.constructor.name
+                }
+            ) as returnType
+
+
+        } catch(err: any) {
+            return { message: 'Error Blocking User', image: images.error, type: err.constructor.name } as returnType
         }
+    }
 
-        if (friendExists.length > 0) {
-            updateFriendOrUser({
-                userId: friendOrUserData.userId, userName: null, action: 'remove', friendId: friendOrUserData.blockedUser,
-                friendName: null, friendMessagingId: null, userMessagingId: null, friendOrUser: 'friend', state: null,
-                blockedUser: null, image: null
-            })
+
+    // method to unblock user
+    async unBlockUser(blockedUserId: string) {
+        try {
+            const blockedDocRef_1 = doc(db, 'data', this.docId, 'blockedUsers', 'blocked')
+            const blockedDocRef_2 = doc(db, 'data', this.docId, 'blockedUsers', blockedUserId)
+
+            const unblock_User = await Promise.allSettled([
+                updateDoc(blockedDocRef_1, {
+                    'blockedusers': arrayRemove(blockedUserId)
+                }),
+    
+                deleteDoc(blockedDocRef_2)
+            ])
+
+            return (
+                unblock_User[0].status === 'fulfilled' ? {
+                    message: 'User Succesfully Unblocked', image: images.success, type: 'success'
+                } : {
+                    message: unblock_User[0].reason.message, image: images.error, type: unblock_User[0].reason.constructor.name
+                }
+            ) as returnType
+
+
+        } catch(err: any) {
+            return { message: 'Error Unblocking User', image: images.error, type: err.constructor.name } as returnType
         }
+    }
 
-    // unblock user
-    } else if (friendOrUserData.action === 'unBlock' && friendOrUserData.friendOrUser === 'user') {
-        const blockedDocRef_1 = doc(db, 'data', docId[0], 'blockedUsers', 'blocked')
-        const blockedDocRef_2 = doc(db, 'data', docId[0], 'blockedUsers', friendOrUserData.blockedUser)
 
-        const unblockUserPromise = await Promise.allSettled([
-            updateDoc(blockedDocRef_1, {
-                'blockedusers': arrayRemove(friendOrUserData.blockedUser)
-            }),
+    // method to update profile image
+    async updateProfilePicture(image: any) {
+        try {
+            const imageId = generateId(5)
 
-            deleteDoc(blockedDocRef_2)
-        ])
+            const storageRef = ref(storage, `profileImages/${imageId+image.name}`)
+            const userDocRef = doc(db, 'data', this.docId)
+            const oldprofileUrl = await getDoc(userDocRef)
 
-        return unblockUserPromise[0].status === 'fulfilled' ? { 
-            message: 'User Unblocked', image: images.success, type: 'success' 
-        } : { 
-            message: unblockUserPromise[0].reason.message, image: images.error, type: unblockUserPromise[0].reason.constructor.name
-        }
+            const update_ProfilePicture = oldprofileUrl.data()?.profileUrl !== 'profileImages/defaultProfile.png' ?
 
-    // update profile picture
-    } else if (friendOrUserData.action === 'updateProfile' && friendOrUserData.friendOrUser === 'user') {
-        const imageId = generateId(5)
+            await Promise.allSettled([
+                uploadBytes(storageRef, image),
+                deleteObject(ref(storage, oldprofileUrl.data()?.profileUrl)),
+                updateDoc(userDocRef, {
+                    'profileUrl': `profileImages/${imageId+image.name}`
+                })
+            ])
 
-        const storageRef = ref(storage, `profileImages/${imageId+friendOrUserData.image.name}`)
-        const docRef = doc(db, 'data', docId[0])
-        const oldprofileUrl = await getDoc(docRef)
+            :
 
-        const profilePicturePromise = oldprofileUrl?.data()?.profileUrl !== 'profileImages/defaultProfile.png' ? 
+            await Promise.allSettled([
+                uploadBytes(storageRef, image),
+                updateDoc(userDocRef, {
+                    'profileUrl': `profileImages/${imageId+image.name}`
+                })
+            ])
 
-        await Promise.allSettled([
-            uploadBytes(storageRef, friendOrUserData.image),
-            deleteObject(ref(storage, oldprofileUrl?.data()?.profileUrl)),
-            updateDoc(docRef, {
-                'profileUrl': `profileImages/${imageId+friendOrUserData.image.name}`
-            })
-        ])
-        
-        :
+            return (
+                update_ProfilePicture[0].status === 'fulfilled' ? {
+                    message: 'Profile Image Updated', image: images.success, type: 'success'
+                }: {
+                    message: update_ProfilePicture[0].reason.message, image: images.error, type: update_ProfilePicture[0].reason.constructor.name
+                }
+            ) as returnType
 
-        await Promise.allSettled([
-            uploadBytes(storageRef, friendOrUserData.image),
-            updateDoc(docRef, {
-                'profileUrl': `profileImages/${imageId+friendOrUserData.image.name}`
-            })
-        ])
 
-        return profilePicturePromise[0].status === 'fulfilled' ? {
-            message: 'Profile Image Updated', image: images.success, type: 'success'
-        } : {
-            message: profilePicturePromise[0].reason.message, image: images.error, type: profilePicturePromise[0].reason.constructor.name
+        } catch(err: any) {
+            return { message: 'Error Changing Profile Image', image: images.error, type: err.constructor.name } as returnType
         }
     }
 }
 
-export default updateFriendOrUser
+
+export default UpdateFriendOrUser
