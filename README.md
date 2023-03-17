@@ -9,4 +9,4 @@ Users can also message, and share their designs with their friends in the applic
 
 
 I might add a NodeJs server to it to imporve performance.  
-I will also build, and train my own neural network for it with TensorFlow, that can recognize which pieces of clothing does the user upload.
+I will also build, and train my own neural network for it with TensorFlow, that can recognize which pieces of clothing user uploads to the editor.
