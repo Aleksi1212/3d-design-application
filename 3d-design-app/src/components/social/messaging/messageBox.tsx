@@ -123,6 +123,10 @@ function MessageBox({ user }: any) {
                                         profileImage: recieverProfileImage.profileImage, errors: recieverProfileImage.errors
                                     },
                                     profileUrl: message.messageStatus === 'sent' ? messagesData.senderUserData.profileUrl : profileUrl.profileUrl,
+                                    currentUserName: viewingUserName,
+                                    recieverMessagingId: userMessagingId,
+                                    senderMessagingId: viewingUserMessagingId,
+                                    alert: setAlert
                                 }} />
                             }
                         })
