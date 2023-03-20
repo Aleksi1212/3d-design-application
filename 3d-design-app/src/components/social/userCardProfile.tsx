@@ -7,14 +7,15 @@ import { useState, useEffect, useReducer } from "react";
 import { useRouter } from "next/navigation";
 
 import images from "../../functions/importImages";
-// import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
 import UpdateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
+import messageUser from "../../datalayer/firestoreFunctions/messages/sendMessage";
 
 import { db } from "../../datalayer/config";
 import { query, collectionGroup, where, onSnapshot, collection } from "firebase/firestore";
 
 import useProfileImage from "../../hooks/profileImagehook";
 import useUserData from "../../hooks/realtimeChangeshook";
+import acceptFriendRequest from "../../datalayer/firestoreFunctions/acceptFriendRequest";
 
 
 interface reducerType {
@@ -29,7 +30,7 @@ interface payloadType {
 }
 
 function UserCard({ user }: any) {
-    const { viewingUser, usersId, usersName, messagingId, initialAction, secondaryAction, alert } = user || {}
+    const { viewingUser, viewingUserMessagingId, viewingUserName, usersId, usersName, messagingId, initialAction, secondaryAction } = user || {}
 
     const [blockable, setBlockable] = useState<boolean>(true)
     const [profileUrl, setProfileUrl] = useState<Array<string>>([''])
@@ -37,6 +38,7 @@ function UserCard({ user }: any) {
 
     const [userMethods, setUserMethods] = useState<UpdateFriendOrUser>(new UpdateFriendOrUser('initialDocId'))
     const userData = useUserData(usersId, viewingUser)
+
 
     function reducer(state: any, action: payloadType) {
         if (!blockable || viewingUser === usersId) {
@@ -127,11 +129,21 @@ function UserCard({ user }: any) {
 
 
             <div className="flex w-[7rem] justify-between relative">
-                <button className="friendButton" id="message" onClick={async () => {
-                    const actionResult = await initialAction.action(viewingUser, usersId, usersName, messagingId)
+                <button className="friendButton" id="message"
+                    onClick={async () => {
+                        if (initialAction.action === 'message') {
+                            const startMessageHistory = await messageUser(viewingUserMessagingId, messagingId, viewingUser, usersId, viewingUserName, usersName, 'Message History Started With', 'start')
 
-                    alert({ message: actionResult.message, image: actionResult.image })
-                    }}>
+                            if (startMessageHistory?.type === 'success') {
+                                router.push(`/messages/${viewingUser}=${viewingUserName}_${viewingUserMessagingId}/${messagingId}=${usersName}`)
+                            }
+
+                        } else if (initialAction.action === 'accept') {
+                            const acceptFriend = await acceptFriendRequest(viewingUser, usersId, usersName, messagingId)
+                            console.log(acceptFriend.message)
+                        }
+                    }}
+                >
                     <Image src={initialAction.image} alt="initialAction" />
                 </button>
 
@@ -158,7 +170,7 @@ function UserCard({ user }: any) {
                                 borderBottomLeftRadius: viewingUser === usersId ? '.375rem' : '0', borderBottomRightRadius: viewingUser === usersId ? '.375rem' : '0'
                             }}
                             onClick={async () => {
-                                if (secondaryAction === 'add') {
+                                if (secondaryAction.action === 'add') {
                                     const sendFriendRequest = await userMethods.sendFriendRequest(
                                         viewingUser, userData.currentUserData.username, userData.currentUserData.messagingId,
                                         usersId, usersName, messagingId
@@ -166,7 +178,7 @@ function UserCard({ user }: any) {
 
                                     console.log(sendFriendRequest)
 
-                                } else if (secondaryAction === 'remove') {
+                                } else if (secondaryAction.action === 'remove') {
                                     const removeFriend = await userMethods.removeFriend(viewingUser, usersId)
                                     console.log(removeFriend)
                                 }

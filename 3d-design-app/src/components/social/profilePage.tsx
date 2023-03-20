@@ -3,7 +3,6 @@
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
-// import updateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
 import UpdateFriendOrUser from "../../datalayer/firestoreFunctions/updateFriendOrUser";
 
 import { useEffect, useState } from "react";
@@ -34,16 +33,18 @@ function ProfilePage({ user }: any) {
     const profileImage = useProfileImage(userData.profileUrl)
     const profile_Headers = profileHeaders(userId, userData.currentUserData.username, userData.currentUserData.messagingId, userName, userData.messagingId, currentUser.userId, userData.blocked )
     
+    console.log(currentUser)
+
     const [alert, setAlert] = useState<alertType>({ message: 'ok', image: images.success, top: '-2.5rem' })
     const [logIn, setLogIn] = useState<string>('none')
     const [loading, setLoading] = useState<boolean>(false)
     const [hovered, setHovered] = useState<boolean>(false)
-
     const [profileMethods, setProfileMethods] = useState<UpdateFriendOrUser>(new UpdateFriendOrUser('initialDocId'))
+    
 
-    let currentUserFriends: any = []
+    let CURRENT_USERS_FRIENDS: any = []
     userData.currentUserFriendData.map((friend: any) => {
-        currentUserFriends.push(friend.friendId)
+        CURRENT_USERS_FRIENDS.push(friend.friendId)
     })
     
     useEffect(() => {
@@ -240,12 +241,15 @@ function ProfilePage({ user }: any) {
                                                 return <UserCard key={friendCard.friendId} 
                                                 user={{ 
                                                     viewingUser: currentUser.userId,
+                                                    viewingUserMessagingId: userData.currentUserData.messagingId,
+                                                    viewingUserName: userData.currentUserData.username,
                                                     usersId: friendCard.friendId, 
                                                     usersName: friendCard.friendName, 
-                                                    messagingId: friendCard.messagingId, 
-                                                    initialAction: { message: 'Message', action: '', image: images.message },
+                                                    messagingId: friendCard.messagingId,
+
+                                                    initialAction: { message: 'Message', action: 'message', image: images.message },
                                                     secondaryAction: friendCard.friendId === currentUser.userId ? { message: 'Edit Profile', color: '#40C057', action: '' } :  
-                                                    currentUserFriends.includes(friendCard.friendId) ? { message: 'Remove Friend', color: '#FA5252', action: 'remove' } : { message: 'Add Friend', color: '#40C057', action: 'add' }
+                                                    CURRENT_USERS_FRIENDS.includes(friendCard.friendId) ? { message: 'Remove Friend', color: '#FA5252', action: 'remove' } : { message: 'Add Friend', color: '#40C057', action: 'add' }
                                                 }} />
                                             })
                                         }
@@ -256,7 +260,7 @@ function ProfilePage({ user }: any) {
                     </div>
                 </div>
 
-                <SearchUsers viewer={{ userId: currentUser.userId, alert: (alertData: alertType) => setAlert(alertData)}} />
+                <SearchUsers viewer={{ userId: currentUser.userId, messagingId: userData.currentUserData.messagingId, userName: userData.currentUserData.username}} />
 
                 <div className="absolute w-full h-[100vh] backdrop-blur-md items-center justify-center" style={{ display: logIn }}>
                     <button className="w-full h-full cursor-default" onClick={() => setLogIn('none')}></button>

@@ -44,6 +44,7 @@ function useRealtimeChanges(userId: string, currentUserId: string) {
             designQuery: query(collectionGroup(db, 'usersDesigns'), where('user', '==', currentUserId))
         }
 
+
         const getFriendData = onSnapshot(querys.friendQuery, (querySnapshot) => {
             let friends: SetStateAction<any> = []
             
@@ -54,6 +55,7 @@ function useRealtimeChanges(userId: string, currentUserId: string) {
             setFriendData(friends)
         })
 
+
         const getCurrentUserFriends = onSnapshot(querys.currentUserFriendQuery, (querySnapshot) => {
             let currentUserFriends: SetStateAction<any> = []
 
@@ -63,6 +65,7 @@ function useRealtimeChanges(userId: string, currentUserId: string) {
 
             setCurrentUserFriendData(currentUserFriends)
         })
+
 
         const getUserData = onSnapshot(querys.userQuery, (querySnapshot) => {
             let userLocked: any = { state: Boolean }
@@ -80,6 +83,7 @@ function useRealtimeChanges(userId: string, currentUserId: string) {
             setMessagingId(messagingId)
         })
 
+
         const getCurrentUserData = onSnapshot(querys.currendUserQuery, (querySnapshot) => {
             let userData: any
 
@@ -92,6 +96,7 @@ function useRealtimeChanges(userId: string, currentUserId: string) {
             setCurrentUserData(userData)
         })
 
+
         const getBlockedData = onSnapshot(querys.blockedQuery, (querySnapshot) => {
             let blockedData: Array<any> = []
 
@@ -101,6 +106,7 @@ function useRealtimeChanges(userId: string, currentUserId: string) {
 
             blockedData.length > 0 ? setBlocked(true) : setBlocked(false)
         })
+
 
         const getDesigns = onSnapshot(querys.designQuery, (querySnapshot) => {
             let desingns: SetStateAction<any> = []
@@ -112,6 +118,7 @@ function useRealtimeChanges(userId: string, currentUserId: string) {
             setDesignData(desingns)
         })
 
+
         const getPendingFriends = onSnapshot(querys.pendingFriendsQuery, (querySnapshot) => {
             let pendingFriends: SetStateAction<any> = []
 
@@ -122,6 +129,7 @@ function useRealtimeChanges(userId: string, currentUserId: string) {
             setPendingFriends(pendingFriends)
         })
 
+
         const getBlockedUsers = onSnapshot(querys.blockedUsersQuery, (querySnapshot) => {
             let blockedUsers: SetStateAction<any> = []
 
@@ -131,6 +139,7 @@ function useRealtimeChanges(userId: string, currentUserId: string) {
 
             setBlockedUsers(blockedUsers)
         })
+        
 
         return () => {
             getFriendData()

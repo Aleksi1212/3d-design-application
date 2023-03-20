@@ -3,7 +3,7 @@
 import Image from "next/image";
 import images from "../../../functions/importImages";
 
-import { useState, Fragment } from "react";
+import { useState, Fragment, memo } from "react";
 import ProfileBox from "../../styledComponents/profileBox";
 
 import removeMessage from "../../../datalayer/firestoreFunctions/messages/removeMessage";
@@ -26,7 +26,6 @@ interface messageBoxtype {
     currentUserName: string
     recieverMessagingId: string
     senderMessagingId: string
-    alert: any
 }
 
 interface messageDataTypes {
@@ -39,9 +38,9 @@ interface hoverTypes {
 }
 
 
-function Message({ messageData }: messageDataTypes) {
+const Message = memo(function Message({ messageData }: messageDataTypes) {
     const { message, messageDate, messageId, messageStatus, messageType, sentFromName,
-            profileData, profileUrl, show, currentUserName, recieverMessagingId, senderMessagingId, alert
+            profileData, profileUrl, show, currentUserName, recieverMessagingId, senderMessagingId
     } = messageData || {}
 
     const [hoverState, setHoverState] = useState<hoverTypes>({ hovered: false, clicked: false })
@@ -79,7 +78,7 @@ function Message({ messageData }: messageDataTypes) {
                                                 show: show
                                             }, 'self', recieverMessagingId, senderMessagingId)
 
-                                            alert({ message: removeFromSelf.message, image: removeFromSelf.image, top: '6rem' })
+                                            console.log(removeFromSelf)
                                         }}
                                     >From Myself</button>
 
@@ -94,7 +93,7 @@ function Message({ messageData }: messageDataTypes) {
                                                 show: show
                                             }, 'all', recieverMessagingId, senderMessagingId)
 
-                                            alert({ message: removeFromAll.message, image: removeFromAll.image, top: '6rem' })
+                                            console.log(removeFromAll)
                                         }}
                                     >From Everyone</button>
                                 </div>
@@ -160,7 +159,7 @@ function Message({ messageData }: messageDataTypes) {
                                             show: show
                                         }, 'self', recieverMessagingId, senderMessagingId)
 
-                                        alert({ message: removeFromSelf.message, image: removeFromSelf.image, top: '6rem' })
+                                        console.log(removeFromSelf)
                                     }}
                                 >From Myself</button>
 
@@ -175,7 +174,7 @@ function Message({ messageData }: messageDataTypes) {
                                             show: show
                                         }, 'all', recieverMessagingId, senderMessagingId)
 
-                                        alert({ message: removeFromAll.message, image: removeFromAll.image, top: '6rem' })
+                                        console.log(removeFromAll)
                                     }}
                                 >From Everyone</button>
                             </div>
@@ -196,6 +195,6 @@ function Message({ messageData }: messageDataTypes) {
             </div>
         </div>
     )
-}
+})
 
 export default Message

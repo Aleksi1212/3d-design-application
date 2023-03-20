@@ -15,7 +15,7 @@ import { auth } from "../../datalayer/config";
 import { cookieSetter } from "../../datalayer/otherFunctionality";
 import updateDesign from "../../datalayer/firestoreFunctions/updateDesign";
 
-import { Loader } from "../social/profilePage";
+import Loader from "../styledComponents/loader";
 
 interface errorScreenTypes {
     display: string
@@ -51,6 +51,7 @@ function UserDashboard({ currentUser }: any) {
     const [errorScreen, setErrorScreen] = useState<errorScreenTypes>({ display: 'none', message: '', url: '', state: false })
     const [alert, setAlert] = useState<alertTypes>({ message: 'ok', image: images.success, top: '-2.5rem' })
     const [manualSignOut, setManualSignOut] = useState(false)
+    const [loading, setLoading] = useState<boolean>(false)
     
     const designAndUserData = useRealtimeChanges(currentUserId, currentUserId)
 
@@ -89,7 +90,12 @@ function UserDashboard({ currentUser }: any) {
 
         if (signOutPromise[0].status === 'fulfilled') {
             setManualSignOut(true)
+            setLoading(true)
         }  
+    }
+
+    if (loading) {
+        return <Loader />
     }
 
     return (

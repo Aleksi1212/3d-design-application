@@ -8,11 +8,35 @@ import Image from "next/image";
 
 import images from "../../functions/importImages";
 
+import { auth } from "../../datalayer/config";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
+import Loader from "../styledComponents/loader";
+
 function LogIn() {
     const [inputType, setInputType] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
 
     const [emailFieldStyles, setEmailFieldStyles] = useInputStyles({ inputVal: '', placeholder: false, isUp: false }) as any
     const [passwordFieldStyles, setPasswordFieldStyles] = useInputStyles({ inputVal: '', placeholder: false, isUp: false }) as any
+
+    async function logIn(event: any) {
+        event.preventDefault()
+
+        const email = event.target.email.value
+        const password = event.target.password.value
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredentials) => {
+                setLoading(true)
+            }).catch((err) => {
+                console.error(err)
+            })
+    }
+
+    if (loading) {
+        return <Loader />
+    }
 
     return (
         <>
@@ -28,7 +52,7 @@ function LogIn() {
                     <h1 className="formHeader">Log In</h1>
 
                     <div className="formContainer">
-                        <form className="form" method="POST" action="http://localhost:3000/api/logIn">
+                        <form className="form" onSubmit={logIn}>
                             <div className="flex relative">
                                 <input type="text" className="input" name="email" required
                                 onClick={() => setEmailFieldStyles({ payload: { inputVal: emailFieldStyles.inputVal, placeholder: true, isUp: true } })}

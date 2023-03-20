@@ -8,6 +8,7 @@ import useRealtimeChanges from "../../../hooks/realtimeChangeshook";
 import UserCardMessages from "./userCardMessages";
 
 import { useState, useCallback } from 'react'
+import { auth } from "../../../datalayer/config";
 
 function MessageStartPage({ user }: any) {
     const { userId, userName } = user || {}
@@ -32,6 +33,14 @@ function MessageStartPage({ user }: any) {
             setSearchedFriends([])
         }
     }, [userData, queryOption, search])
+
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            console.log(user.uid)
+        } else {
+            console.log('no user')
+        }
+    })
 
     return (
         <div className="flex flex-col h-full w-[80%]">
@@ -86,7 +95,7 @@ function MessageStartPage({ user }: any) {
                                 return <UserCardMessages key={friend.friendId} user={{
                                     viewingUserId: userId,
                                     viewingUserName: userName,
-                                    viewingUserMessagingId: 'any',
+                                    viewingUserMessagingId: userData.currentUserData.messagingId,
 
                                     userId: friend.friendId,
                                     userName: friend.friendName,
@@ -100,7 +109,7 @@ function MessageStartPage({ user }: any) {
                                 return <UserCardMessages key={blockedUser.userId} user={{
                                     viewingUserId: userId,
                                     viewingUserName: userName,
-                                    vieviwngUserMessagingId: 'any',
+                                    vieviwngUserMessagingId: userData.currentUserData.messagingId,
 
                                     userId: blockedUser.userId,
                                     userName: blockedUser.username,

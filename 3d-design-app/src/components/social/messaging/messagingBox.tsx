@@ -75,7 +75,7 @@ function MessageBox({ user }: any) {
     useEffect(() => {
         if (alert.top !== '2.5rem') {
             setTimeout(() => {
-                setAlert({ ...alert, top: '-2.5rem' })
+                setAlert({ message: alert.message, image: alert.image, top: '-2.5rem' })
             }, 2500)
         }
     }, [alert])
@@ -83,7 +83,7 @@ function MessageBox({ user }: any) {
 
     return (
         <div className="h-full w-[80%] flex flex-col">
-            <div className="absolute left-[50%] w-[15rem] h-[2rem] bg-[#3D3D3D] rounded-lg pl-2 flex items-center text-white transition-all duration-500"
+            <div className="absolute left-[50%] px-4 h-[2rem] bg-[#3D3D3D] rounded-lg pl-2 flex items-center text-white transition-all duration-500"
                 style={{ top: alert.top }}>
                 <Image src={alert?.image} alt="image" />
                 <h1 className="px-2">|</h1>
@@ -125,8 +125,7 @@ function MessageBox({ user }: any) {
                                     profileUrl: message.messageStatus === 'sent' ? messagesData.senderUserData.profileUrl : profileUrl.profileUrl,
                                     currentUserName: viewingUserName,
                                     recieverMessagingId: userMessagingId,
-                                    senderMessagingId: viewingUserMessagingId,
-                                    alert: setAlert
+                                    senderMessagingId: viewingUserMessagingId
                                 }} />
                             }
                         })

@@ -4,38 +4,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 import UserCard from './userCardProfile';
-
-import { useState, useEffect, SetStateAction } from 'react';
 import useRealtimeChanges from '../../hooks/realtimeChangeshook';
 
-import { db } from '../../datalayer/config';
-import { collectionGroup, query, where, onSnapshot } from 'firebase/firestore';
-
 import images from '../../functions/importImages';
-import acceptFriendRequest from '../../datalayer/firestoreFunctions/acceptFriendRequest';
 
 function Notifications({ user }: any) {
     const { currentUserId, userName } = user || {}
 
     const friendRequests = useRealtimeChanges(currentUserId, currentUserId)
-
-    // const [pendingFriends, setPendingFriends] = useState([])
-
-    // useEffect(() => {
-    //     const pendingFriendsQuery = query(collectionGroup(db, 'friendRequests'), where('sentTo', '==', currentUserId))
-
-    //     const getPendingFriends = onSnapshot(pendingFriendsQuery, (querySnapshot) => {
-    //         let pendingFriends: SetStateAction<any> = []
-
-    //         querySnapshot.forEach((pendingFriend) => {
-    //             pendingFriends.push(pendingFriend.data().requestData)
-    //         })
-
-    //         setPendingFriends(pendingFriends)
-    //     })
-
-    //     return () => getPendingFriends()
-    // }, [])
 
     return (
         <section className="w-full h-[100vh] bg-[#F6F7F9] flex justify-center items-center">
@@ -92,6 +68,8 @@ function Notifications({ user }: any) {
                             return <UserCard key={pendingFriend.requestFromId} 
                             user={{
                                 viewingUser: currentUserId,
+                                viewingUserMessagingId: '',
+                                viewingUserName: '',
                                 usersId: pendingFriend.requestFromId,
                                 usersName: pendingFriend.requestFromName,
                                 messagingId: pendingFriend.messagingId,
@@ -99,7 +77,7 @@ function Notifications({ user }: any) {
                                 initialAction: {
                                     message: 'Accept',
                                     image: images.acceptRequest,
-                                    action: acceptFriendRequest,
+                                    action: 'accept'
                                 },
 
                                 secondaryAction: { message: 'Decline Request', color: '#FA5252', action: '' }

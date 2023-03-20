@@ -46,8 +46,8 @@ function MessageWithBox({ messageWithUser }: messageWithType) {
             </Link>
             
             <button className="hover:brightness-150 active:scale-90" onClick={async () => {
-                const test = await changeHistoryVisibility(currentUserId, messagingId)
-                console.log(test)
+                const removeUserFromSideBar = await changeHistoryVisibility(currentUserId, messagingId)
+                console.log(removeUserFromSideBar)
             }}>
                 <Image src={images.close} alt="close" />
             </button>

@@ -123,7 +123,7 @@
   }
 
   #messagesContainer::-webkit-scrollbar-thumb {
-    @apply bg-[#9D9D9D] rounded-full
+    @apply bg-[#9D9D9D] rounded-full hover:bg-[#8D8D8D] active:bg-[#7D7D7D]
   }
 
   #friend:nth-child(-n + 1) {
@@ -183,23 +183,6 @@ html, body {
   background: rgb(45,45,45);
   background: linear-gradient(360deg, rgba(45,45,45,1) 43%, rgba(52,52,52,1) 49%, rgba(61,61,61,1) 54%);
 }
-
-/* .hideSearchBox::before {
-  background-color: #5D5D5D;
-  width: .4rem;
-  height: 2rem;
-  border-radius: .357rem;
-} */
-
-/* .input {
-  background-color: #2d2d2d;
-  border-radius: .5rem;
-  height: 3rem;
-  width: 100%;
-  border: 1px solid cyan;
-  padding-left: 10px;
-  color: white;
-} */
 
 .inputButton {
   background: rgb(0,255,255);
@@ -276,4 +259,38 @@ html, body {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.authLoader, .authLoader:before, .authLoader:after {
+  border-radius: 50%;
+  width: 2.5em;
+  height: 2.5em;
+  animation-fill-mode: both;
+  animation: bblFadInOut 1.8s infinite ease-in-out;
+}
+.authLoader {
+  color: #2F2F2F;
+  font-size: 7px;
+  position: relative;
+  text-indent: -9999em;
+  transform: translateZ(0);
+  animation-delay: -0.16s;
+}
+.authLoader:before,
+.authLoader:after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+.authLoader:before {
+  left: -3.5em;
+  animation-delay: -0.32s;
+}
+.authLoader:after {
+  left: 3.5em;
+}
+
+@keyframes bblFadInOut {
+  0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
+  40% { box-shadow: 0 2.5em 0 0 }
 }

@@ -8,10 +8,10 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
     try {
         const currentDateSent = new Date()
         const currentDateRecieved = new Date()
-    
+
         const messageId1 = generateId(8)
         const messageId2 = generateId(8)
-    
+
         const querys = {
             sender_query: query(collection(db, 'data'), where('messagingId', '==', senderMessagingId)),
             reciever_query: query(collection(db, 'data'), where('messagingId', '==', recieverMessagingId)),
@@ -19,13 +19,13 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
             sentMessagesQuery: query(collectionGroup(db, 'messages'), where('recievedBy', '==', recieverMessagingId), where('userId', '==', senderUserId)),
             recieverMessagesQuery: query(collectionGroup(db, 'messages'), where('sentFrom', '==', recieverMessagingId), where('userId', '==', senderUserId))
         }
-    
+
         const sender_snapShot = await getDocs(querys.sender_query)
         const reciever_snapShot = await getDocs(querys.reciever_query)
 
         const sentMessages = await getDocs(querys.sentMessagesQuery)
         const recievedMessages = await getDocs(querys.recieverMessagesQuery)
-    
+
         const docsData = {
             sender_docId: sender_snapShot.docs.map((doc) => doc.id),
             reciever_docId: reciever_snapShot.docs.map((doc) => doc.id),
@@ -33,15 +33,15 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
             sentMessagesData: sentMessages.docs.map((doc) => doc.data().messagesData[doc.data().messagesData.length - 1]),
             recievedMessagesData: recievedMessages.docs.map((doc) => doc.data().messagesData[doc.data().messagesData.length - 1])
         }
-    
+
         const docRefs = {
             sender_sent_docRef: doc(db, 'data', docsData.sender_docId[0], 'messages', `messagesSentTo-${recieverMessagingId}`),
             sender_recieved_docRef: doc(db, 'data', docsData.sender_docId[0], 'messages', `messagesRecievedFrom-${recieverMessagingId}`),
-    
+
             reciever_sent_docRef: doc(db, 'data', docsData.reciever_docId[0], 'messages', `messagesSentTo-${senderMessagingId}`),
             reciever_recieved_docRef: doc(db, 'data', docsData.reciever_docId[0], 'messages', `messagesRecievedFrom-${senderMessagingId}`),
         }
-    
+
         if (type === 'message') {
             const messageUser = await Promise.allSettled([
                 updateDoc(docRefs.sender_sent_docRef, {
@@ -58,7 +58,7 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
 
                     })
                 }),
-    
+
                 updateDoc(docRefs.reciever_recieved_docRef, {
                     'messagesData': arrayUnion({
                         message: message,
@@ -73,14 +73,15 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     })
                 })
             ])
-    
+
             return messageUser[0].status === 'fulfilled' ? {
                 message: 'Success', image: images.success, type: 'success'
             } : {
                 message: messageUser[0].reason.message, image: images.error, type: messageUser[0].reason.constructor.name
             }
         }
-    
+
+
         if (type === 'start' && docsData.sentMessagesData.length <= 0) {
             const addMessageHistory = await Promise.allSettled([
                 setDoc(docRefs.sender_sent_docRef, {
@@ -100,7 +101,7 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     type: 'sender',
                     showHistory: true
                 }),
-    
+
                 setDoc(docRefs.reciever_recieved_docRef, {
                     messagesData: [
                         {
@@ -117,7 +118,7 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     userId: recieverUserId,
                     type: 'reciever'
                 }),
-    
+
                 setDoc(docRefs.reciever_sent_docRef, {
                     messagesData: [
                         {
@@ -135,7 +136,7 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     type: 'sender',
                     showHistory: true
                 }),
-    
+
                 setDoc(docRefs.sender_recieved_docRef, {
                     messagesData: [
                         {
@@ -153,14 +154,15 @@ async function messageUser(senderMessagingId: string, recieverMessagingId: strin
                     type: 'receiver'
                 })
             ])
-    
+
             return addMessageHistory[0].status === 'fulfilled' ? {
                 message: 'Success', image: images.success, type: 'success'
             } : {
                 message: addMessageHistory[0].reason.message, image: images.error, type: addMessageHistory[0].reason.constructor.name
             }
 
-        } else {
+        
+        } else if (type === 'start' && docsData.sentMessagesData.length > 0) {
             const setVisibility = await Promise.allSettled([
                 updateDoc(docRefs.sender_sent_docRef, {
                     'showHistory': true

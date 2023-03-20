@@ -30,7 +30,7 @@ function reducer(state: any, action: any) {
 }
 
 function SearchUsers({ viewer }: any) {
-    const { userId, alert } = viewer || {}
+    const { userId, messagingId, userName } = viewer || {}
 
     const [state, dispatch] = useReducer(reducer, { message: 'Hide Searchbox', hidden: false } as searchBoxTypes)
     const [userData, setUserData] = useState([]) as any
@@ -91,12 +91,13 @@ function SearchUsers({ viewer }: any) {
                         return <UserCard key={userCard.userId} 
                         user={{
                             viewingUser: userId,
+                            viewingUserMessagingId: messagingId,
+                            viewingUserName: userName,
                             usersId: userCard.userId,
                             usersName: userCard.username,
                             messagingId: userCard.messagingId,
-                            initialAction: { message: 'Message', action: '', image: images.message },
+                            initialAction: { message: 'Message', action: 'message', image: images.message },
                             secondaryAction: userCard.userId === userId ? { message: 'Settings', color: '#40C057', action: '' } : { message: 'Add Friend', color: '#40C057', action: 'add' },
-                            alert: (alertData: any) => alert(alertData)
                         }} />
                     })
                 }

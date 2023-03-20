@@ -6,8 +6,7 @@ function profileHeaders(userId: string, currentUserName: string, currentUserMess
     const actions = userId === currentUserId ? [
         { image: images.message, color: '#5D5D5D', message: 'Messages', key: 'messagees', type: 'link', link: `/messages/${currentUserId}=${currentUserName}_${currentUserMessagingId}` },
         { image: images.friendNoti, color: '#5D5D5D', message: 'Notifications', key: 'notifications', type: 'link', link: `/notifications/${currentUserId}=${currentUserName}` },
-        { image: images.settings, color: '#5D5D5D', message: 'Settings', key: 'edit', type: 'link', link: null },
-        { image: images.signOut, color: '#FA5252', message: 'Sign Out', key: 'signOut', type: '', link: null}
+        { image: images.settings, color: '#5D5D5D', message: 'Settings', key: 'edit', type: 'func', link: null }
         
     ] : !blocked ? [
         { image: images.message, color: '#5D5D5D', message: 'Message', key: 'message', type: '', link: null},

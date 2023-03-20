@@ -9,7 +9,7 @@ function useProfileImage(url: string) {
     const [profileImage, setProfileImage] = useState('') as any
     const errors = [ 'Image not found', 'Access denied', 'Download cancelled', 'Unkown error, check console for details' ]
 
-    if (url.length > 0) {
+    if (url) {
         const profileImageRef = ref(storage, url)
     
         getDownloadURL(profileImageRef)

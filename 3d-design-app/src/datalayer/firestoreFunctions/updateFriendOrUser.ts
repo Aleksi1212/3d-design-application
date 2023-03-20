@@ -7,12 +7,12 @@ import { generateId } from "../otherFunctionality";
 
 import { StaticImageData } from "next/image";
 
+
 interface returnType {
     message: string
     image: StaticImageData
     type: string
 }
-
 
 class UpdateFriendOrUser {
     docId: string

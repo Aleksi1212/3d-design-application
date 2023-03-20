@@ -8,13 +8,15 @@ import Link from "next/link";
 
 import images from "../../functions/importImages";
 
-import { auth, db } from "../../datalayer/config";
-// import { collection, addDoc } from "firebase/firestore";
-import { createUserWithEmailAndPassword,  } from "firebase/auth";
+import { auth } from "../../datalayer/config";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import checkUser from "../../datalayer/firestoreFunctions/checkUser";
+
+import Loader from "../styledComponents/loader";
 
 function SignUp() {
     const [inputType, setInputType] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
 
     const [emailFieldStyles, setEmailFieldStyles] = useInputStyles({ inputVal: '', placeholder: false, isUp: false }) as any
     const [usernameFieldStyles, setUsernameFieldStyles] = useInputStyles({ inputVal: '', placeholder: false, isUp: false }) as any
@@ -30,14 +32,19 @@ function SignUp() {
         }
 
         createUserWithEmailAndPassword(auth, userData.email, userData.password)
-            .then(async (userCredentials) => {
+            .then((userCredentials) => {
                 const user = userCredentials.user
-
+            
                 checkUser(user.uid, userData.username, userData.email, 'email')
+                setLoading(true)
             })
             .catch((err) => {
                 console.error(err)
             })
+    }
+
+    if (loading) {
+        return <Loader />
     }
 
     return (

@@ -1,4 +1,4 @@
-import MessageBox from "../../../../src/components/social/messaging/messageBox"
+import MessageBox from "../../../../src/components/social/messaging/messagingBox"
 
 export default function MessagingBox({ params }: any) {
     const userData = params.messageWith.split('%3D')

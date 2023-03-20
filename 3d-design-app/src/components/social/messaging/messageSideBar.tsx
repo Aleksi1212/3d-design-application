@@ -9,12 +9,15 @@ import useUserData from "../../../hooks/userDataHook";
 import useProfileImage from "../../../hooks/profileImagehook";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { cookieSetter } from "../../../datalayer/otherFunctionality";
 
-import { db } from "../../../datalayer/config";
+import { db, auth } from "../../../datalayer/config";
 import { query, where, collectionGroup, onSnapshot } from "firebase/firestore";
 
 import ProfileBox from "../../styledComponents/profileBox";
 import MessageWithBox from "./messageWithBox";
+
 
 interface messagesWithUserTypes {
     recievedBy: string
@@ -25,6 +28,8 @@ interface messagesWithUserTypes {
 
 function MessageSideBar({ user }: any) {
     const { userId } = user || {}
+
+    const router = useRouter()
     
     const userData = useUserData({ type: 'userId', id: userId })
     const profileImage = useProfileImage(userData.profileUrl)
@@ -57,6 +62,17 @@ function MessageSideBar({ user }: any) {
         return () => getUsers_UserHasMessagesWith()
     }, [])
 
+
+    auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+            const deleteCookie = await cookieSetter(false, null)
+
+            if (deleteCookie === 'cookie set') {
+                router.push('/logIn')
+            }
+        }
+    })
+
     return (
         <div className="h-full w-[20%] bg-white flex flex-col">
             <div className="w-full h-[11%] border-b-2 border-[#D2D2D2] flex justify-center items-center">
@@ -82,7 +98,7 @@ function MessageSideBar({ user }: any) {
             </div>
 
             <div className="w-full h-[9%] border-t-2 border-[#D2D2D2] flex justify-between items-center px-4">
-                <div className="flex gap-x-4">
+                <Link href={`/profile/${userId}=${userData.userName}`} className="flex gap-x-4 w-[75%]">
                     <ProfileBox styles={{
                         dimensions: '3.5rem',
                         backgroundColor: '#F6F7F9',
@@ -93,7 +109,7 @@ function MessageSideBar({ user }: any) {
                         profileImage: profileImage,
                         profileUrl: userData.profileUrl
                     }} />
-                </div>
+                </Link>
 
                 <div className="flex gap-x-4 relative">
                     <Link href={`/dashboard/${userId}`} id="dashboard">

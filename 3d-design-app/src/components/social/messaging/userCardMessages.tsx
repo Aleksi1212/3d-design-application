@@ -13,7 +13,7 @@ import useProfileImage from "../../../hooks/profileImagehook";
 import { db } from "../../../datalayer/config";
 import { collection, where, onSnapshot, query } from "firebase/firestore";
 
-import updateFriendOrUser from "../../../datalayer/firestoreFunctions/updateFriendOrUser";
+import UpdateFriendOrUser from "../../../datalayer/firestoreFunctions/updateFriendOrUser";
 import messageUser from "../../../datalayer/firestoreFunctions/messages/sendMessage";
 
 import ProfileBox from "../../styledComponents/profileBox";
@@ -35,6 +35,8 @@ function UserCardMessages({ user }: any) {
 
     const [profileUrl, setProfileUrl] = useState<Array<string>>([''])
     const profileImage = useProfileImage(profileUrl[0])
+    const [userMethods, setUserMethods] = useState<UpdateFriendOrUser>(new UpdateFriendOrUser('initialDocId'))
+
 
     function reducer(state: any, action: payloadType) {
         if (action.type === 'friend') {
@@ -52,6 +54,8 @@ function UserCardMessages({ user }: any) {
     const [hover, setHover] = useReducer(reducer, { overUser: false, clicked: false } as hoverState)
 
     useEffect(() => {
+        let isMounted = true
+
         const profileImageQuery = query(collection(db, 'data'), where('userId', '==', userId))
 
         const getProfileImageUrl = onSnapshot(profileImageQuery, (querySnapshot) => {
@@ -63,8 +67,23 @@ function UserCardMessages({ user }: any) {
             setProfileUrl(profileImageUrl)
         })
 
-        return () => getProfileImageUrl()
+        async function initializeClass() {
+            const updateUser = await UpdateFriendOrUser.createDocId(viewingUserId)
+            
+            if (isMounted) {
+                setUserMethods(updateUser)
+            }
+        }
+
+        initializeClass()
+
+        return () => {
+            getProfileImageUrl()
+            isMounted = false
+        }
     }, [])
+
+    console.log(viewingUserId, userId)
 
 
     return (
@@ -119,10 +138,10 @@ function UserCardMessages({ user }: any) {
                                 <button onClick={() => router.push(`/profile/${userId}=${userName}`)} className="w-full h-[2rem] rounded-t-md hover:bg-[#40C057]">View Profile</button>
                                 
                                 <button className="w-full h-[2rem] hover:bg-[#FA5252] border-y-2"
-                                    onClick={() => updateFriendOrUser({
-                                        userId: viewingUserId, userName: null, action: 'remove', friendId: userId, friendName: userName,
-                                        friendMessagingId: messagingId, userMessagingId: null, friendOrUser: 'friend', state: null, blockedUser: null, image: null
-                                    })}
+                                    onClick={async () => {
+                                        const removeFriend = await userMethods.removeFriend(viewingUserId, userId)
+                                        console.log(removeFriend.message)
+                                    }}
                                 >
                                     Remove Friend
                                 </button>
@@ -133,11 +152,10 @@ function UserCardMessages({ user }: any) {
                     ) : (
                         <>
                             <button className="friendButton" id="menu"
-                                onClick={() => updateFriendOrUser({
-                                    userId: viewingUserId, userName: null, action: 'unBlock', friendId: null, friendName: null,
-                                    friendMessagingId: null, userMessagingId: null, friendOrUser: 'user', state: null,
-                                    blockedUser: userId, image: null
-                                })}
+                                onClick={async () => {
+                                    const unBlockUser = await userMethods.unBlockUser(userId)
+                                    console.log(unBlockUser.message)
+                                }}
                             >
                                 <Image src={images.unlockProfile} alt="unBlock" />
                             </button>
