@@ -3,8 +3,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
 
-import back from '../images/back.png'
-
 import useInputType from '../../hooks/inputStylehook';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -45,7 +43,7 @@ function VerifyUser() {
         <section className='w-full h-[100vh] bg-[#2D2D2D] flex justify-center'>
         <div className="goBack">
             <Link href="/" className="w-full flex" id='link'>
-                <Image src={back} alt="back" />
+                <Image src={images.back} alt="back" />
                 <span className='pl-2 pt-[1px]'>Start</span>
             </Link>
         </div>

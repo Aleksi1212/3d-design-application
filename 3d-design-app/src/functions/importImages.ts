@@ -1,5 +1,5 @@
 
-function useImages(directory: any) {
+function importImages(directory: any) {
     let images = {} as any
     directory.keys().map((item: any, index: any) => {
         images[item.replace('./', '')] = directory(item)
@@ -8,7 +8,7 @@ function useImages(directory: any) {
     return images
 }
 
-const importAll = useImages(require.context('../images', false, /\.(png|jpe?g|svg)$/))
+const importAll = importImages(require.context('../images', false, /\.(png|jpe?g|svg)$/))
 
 const images = {
     acceptRequest: importAll['acceptRequest.png'],

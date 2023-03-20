@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import images from "../../functions/importImages";
 
-import back from '../images/back.png'
 
 function ResetPage() {
     return (
         <>
             <nav className="absolute w-full flex justify-end pr-20 pt-12">
                 <Link href="/">
-                    <Image src={back} alt="back" />
+                    <Image src={images.back} alt="back" />
                 </Link>
             </nav>
             <section className="w-full h-[100vh] bg-[#2D2D2D] flex justify-center">
