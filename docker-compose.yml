@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  app:
+    build: 3d-design-app
+    ports:
+      - 3000:3000
+    env_file:
+      - ./3d-design-app/.env
+    command: ["npm", "start"]
